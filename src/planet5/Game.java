@@ -1,23 +1,15 @@
 package planet5;
 
+import planet5.framework.Applet;
 import processing.core.PApplet;
 
-public class Game extends PApplet {
-
-	/**
-	 * Make Eclipse happy.
-	 */
-	private static final long serialVersionUID = 1L;
-
+public class Game extends Applet {
+	@Override
 	public void setup() {
-		
+		smooth();
 	}
-	
-	public void draw() {
-		
-	}
-	
+
 	public static void main(String[] args) {
-		PApplet.main(new String[] {"planet5.Game" });
+		PApplet.main(new String[] { "planet5.Game" });
 	}
 }
