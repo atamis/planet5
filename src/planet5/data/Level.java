@@ -2,6 +2,7 @@ package planet5.data;
 
 import java.util.Random;
 
+import planet5.math.ImprovedNoise;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -36,7 +37,7 @@ public class Level {
 		}
 	}
 	
-	public static Level levelReallyRandomLevel(int width, int height) {
+	public static Level reallyRandomLevel(int width, int height) {
 		return reallyRandomLevel(width, height, new Random());
 	}
 	
@@ -48,5 +49,20 @@ public class Level {
 			}
 		}
 		return new Level(tiles);
+	}
+	
+	public static Level noiseRandomLevel(int width, int height) {
+		return noiseRandomLevel(width, height, (new Random()).nextInt());
+	}
+	
+	public static Level noiseRandomLevel(int width, int height, int seed) {
+		Tile[][] tiles = new Tile[width][height];
+		for(int x = 0; x < tiles.length; x++) {
+			for(int y = 0; y < tiles[x].length; y++) {
+				tiles[x][y] = new Tile(0xffffff, (ImprovedNoise.noise(x*0.1, y*0.1, seed) > 0));
+			}
+		}
+		return new Level(tiles);
+
 	}
 }
