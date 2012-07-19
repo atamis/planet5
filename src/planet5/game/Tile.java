@@ -5,4 +5,10 @@ public class Tile {
 	boolean wall;
 	Building building;
 	byte lighting;
+
+	public Tile(int color, boolean wall) {
+		super();
+		this.color = color;
+		this.wall = wall;
+	}
 }
