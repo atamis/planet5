@@ -13,10 +13,10 @@ import processing.core.PApplet;
 
 public abstract class Button {
 	// provides many methods and variables
-	protected PApplet parent;
+	protected PApplet p;
 
 	// the frame that will listen to this button click
-	private Frame listener;
+	Frame listener;
 
 	// text to be displayed on the button
 	private String text;
@@ -34,8 +34,8 @@ public abstract class Button {
 	private boolean pressedInside = false;
 
 	// constructor
-	public Button(Frame listener, Rectangle bounds, String text, String command) {
-		this.listener = listener;
+	public Button(Rectangle bounds, String text, String command) {
+		//TODO: textAlign(...baseline
 		this.bounds = bounds;
 		this.text = text;
 		this.command = command;
@@ -85,13 +85,13 @@ public abstract class Button {
 
 	// painting methods
 	protected void paintComponent() {
-		boolean mouseInside = bounds.contains(parent.mouseX, parent.mouseY);
+		boolean mouseInside = bounds.contains(p.mouseX, p.mouseY);
 
 		if (!enabled) {
 			paintDisabledState();
 		} else if (pressedInside && mouseInside) {
 			paintPressedState();
-		} else if (!parent.mousePressed && mouseInside) {
+		} else if (p.focused && !p.mousePressed && mouseInside) {
 			paintHoveredState();
 		} else {
 			paintDefaultState();
@@ -109,29 +109,26 @@ public abstract class Button {
 	// updating method
 	public void update() {
 		// check every frame to see if the mouse was released
-		if (!parent.mousePressed) {
+		if (!p.focused || !p.mousePressed) {
 			pressedInside = false;
+			p.mousePressed = false;
 		}
 	}
 
 	// input methods
 	public void mousePressed() {
-		if (parent.mouseButton == parent.LEFT
-				&& bounds.contains(parent.mouseX, parent.mouseY)) {
+		if (p.mouseButton == p.LEFT
+				&& bounds.contains(p.mouseX, p.mouseY)) {
 			pressedInside = true;
-			if (listener != null) {
-				listener.buttonPressed(command);
-			}
+			listener.buttonPressed(command);
 			pressed();
 		}
 	}
 
 	public void mouseReleased() {
-		if (parent.mouseButton == parent.LEFT && pressedInside
-				&& bounds.contains(parent.mouseX, parent.mouseY)) {
-			if (listener != null) {
-				listener.buttonClicked(command);
-			}
+		if (p.mouseButton == p.LEFT && pressedInside
+				&& bounds.contains(p.mouseX, p.mouseY)) {
+			listener.buttonClicked(command);
 			clicked();
 		}
 	}

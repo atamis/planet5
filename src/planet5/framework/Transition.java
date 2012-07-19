@@ -11,7 +11,7 @@ public abstract class Transition {
 	// keep track of passed time
 	private int startTime;
 
-	private Applet parent;
+	protected Applet p;
 
 	// the frame to transition into
 	private Frame nextFrame = null;
@@ -19,16 +19,20 @@ public abstract class Transition {
 	// arrays that store the frame images
 	private int[] currentFrameImagePixels;
 	private int[] nextFrameImagePixels;
+	
+	public Transition(Applet parent) {
+		p = parent;
+	}
 
 	// starts a transition
 	public void start(Frame nextFrame) {
 		// save the next frame first so the current frame will draw over it
 		nextFrameImagePixels = captureFrame(nextFrame);
-		currentFrameImagePixels = captureFrame(parent.currentFrame);
+		currentFrameImagePixels = captureFrame(p.currentFrame);
 
 		// set variables
-		parent.currentTransition = this;
-		startTime = parent.millis();
+		p.currentTransition = this;
+		startTime = p.millis();
 		this.nextFrame = nextFrame;
 	}
 
@@ -57,30 +61,30 @@ public abstract class Transition {
 
 	// returns the elapsed milliseconds this transition has been going
 	protected int getElapsedMillis() {
-		return parent.millis() - startTime;
+		return p.millis() - startTime;
 	}
 
 	// stops the transition and sets the next screen
 	protected void finish() {
-		parent.currentFrame = nextFrame;
-		parent.currentTransition = null;
+		p.currentFrame = nextFrame;
+		p.currentTransition = null;
 	}
 
 	// sets the frame to a color array
 	private void drawImage(int[] imagePixels) {
-		parent.loadPixels();
+		p.loadPixels();
 		for (int i = 0; i < imagePixels.length; i++) {
-			parent.pixels[i] = imagePixels[i];
+			p.pixels[i] = imagePixels[i];
 		}
-		parent.updatePixels();
+		p.updatePixels();
 	}
 
 	// returns a color array of a frame. will also draw the frame
 	private int[] captureFrame(Frame frame) {
 		frame.paint();
-		parent.loadPixels();
-		int[] result = parent.pixels.clone();
-		parent.updatePixels();
+		p.loadPixels();
+		int[] result = p.pixels.clone();
+		p.updatePixels();
 		return result;
 	}
 }

@@ -7,16 +7,17 @@
 
 package planet5.framework;
 
+import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
 public abstract class Frame {
 	// variables
 	private ArrayList<Button> buttons = new ArrayList<Button>();
 
-	protected Applet parent;
+	protected Applet p;
 
 	public Frame(Applet parent) {
-		this.parent = parent;
+		this.p = parent;
 	}
 
 	// basic methods
@@ -33,7 +34,8 @@ public abstract class Frame {
 	// button methods
 	public void addButton(Button button) {
 		buttons.add(button);
-		button.parent = parent;
+		button.p = p;
+		button.listener = this;
 	}
 
 	void update() {
@@ -79,4 +81,6 @@ public abstract class Frame {
 		}
 		mouseReleased();
 	}
+
+	protected void mouseWheelMoved(int unitsMovedDown) {}
 }

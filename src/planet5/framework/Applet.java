@@ -9,17 +9,24 @@
 
 package planet5.framework;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Arrays;
 
 import processing.core.PApplet;
 
-public class Applet extends PApplet {
+public class Applet extends PApplet implements MouseWheelListener {
 	// variables
 	Frame currentFrame = null;
 	Transition currentTransition = null;
 
 	// stores whether a key is pressed, using key codes
 	boolean[] pressedKeys = new boolean[65536];
+
+	public Applet() {
+		addMouseWheelListener(this);
+	}
 
 	// drawing and updating method
 	@Override
@@ -83,11 +90,22 @@ public class Applet extends PApplet {
 	}
 
 	@Override
+	public void mouseWheelMoved(MouseWheelEvent event) {
+		if (processInput()) {
+			currentFrame.mouseWheelMoved(event.getWheelRotation());
+		}
+	}
+
+	@Override
 	public void keyPressed() {
 		pressedKeys[keyCode] = true;
 		if (processInput()) {
 			currentFrame.keyPressed();
 		}
+		
+		// don't let the escape key exit the game
+		if (keyCode == KeyEvent.VK_ESCAPE)
+			key = 0;
 	}
 
 	@Override
