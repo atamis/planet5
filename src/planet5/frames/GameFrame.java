@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import planet5.Game;
+import planet5.config.BuildingStats;
 import planet5.config.Fonts;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
@@ -13,7 +14,10 @@ public class GameFrame extends Frame {
 	public Map map;
 	public int lastDrawTime;
 
-	// what the mouse is doing
+	// bar variables
+	public static final int barHeight = 45;
+	
+	// building variables
 	public int placingBuilding = -1;
 
 	public GameFrame(Applet parent) {
@@ -29,11 +33,11 @@ public class GameFrame extends Frame {
 	@Override
 	protected void draw() {
 		updateGameTime();
-		p.translate(0, 45);
+		p.translate(0, barHeight);
 		map.draw();
-		p.translate(0, -45);
+		p.translate(0, -barHeight);
 		
-		drawGui();
+		drawBar();
 	}
 
 	void updateGameTime() {
@@ -43,50 +47,34 @@ public class GameFrame extends Frame {
 		lastDrawTime = p.millis();
 	}
 	
-	void drawGui() {
-		// gui background
+	void drawBar() {
+		// bar background
+		// TODO: replace this
 		p.fill(32);
 		p.noStroke();
-		p.rect(0, 0, p.width, 45);
+		p.rect(0, 0, p.width, barHeight);
 		
 		// background shadow
 		p.strokeWeight(1);
 		int alpha = 255;
 		for (int i = 0; alpha >= 2; i++) {
 			p.stroke(0, 0, 0, alpha);
-			p.line(0, 45 + i, p.width, 45 + i);
+			p.line(0, barHeight + i, p.width, barHeight + i);
 			alpha /= 1.5;
 		}
-		
-		// time
-		p.noStroke();
-		// p.fill(p.color()); TODO: custom
-		p.fill(p.color(32, 64, 128));
-		p.textFont(Fonts.consolas32);
-		p.textAlign(p.RIGHT, p.CENTER);
-		//p.text("12:40pm", p.width - 240, 0 - p.textDescent() / 2, 130, 45);
-		
-		// energy
-		p.noStroke();
-		p.fill(p.color(32, 64, 128));
-		p.textAlign(p.CENTER, p.CENTER);
-		p.text("32", p.width - 100, 0 - p.textDescent() / 2, 100, 45);
-		
-		// separators
-		p.stroke(32);
-		p.strokeWeight(1);
-		//p.line(p.width - 244, 4, p.width - 244, 45-4);
-		//p.line(p.width - 100, 4, p.width - 100, 45-4);
 	}
 
 	// key event handlers
 	@Override
 	public void keyPressed() {
-		// TODO Hero.keyPressed(int keyCode)
-		if (p.key >= '0' && p.key <= '9') {
-			placingBuilding = p.key - '0';
+		int intKey = p.key - '0';	// the key as an integer
+		
+		//hero.keyPressed(keyCode)
+		
+		// update building placement
+		if (intKey >= 1 && intKey <= BuildingStats.rows.length - 1) {
+			placingBuilding = intKey;
 		} else if (p.keyCode == KeyEvent.VK_ESCAPE) {
-			// TODO reset everything
 			placingBuilding = -1;
 		}
 	}
@@ -94,15 +82,19 @@ public class GameFrame extends Frame {
 	// mouse event handlers
 	@Override
 	public void mousePressed() {
+		// TODO check if a building can be selected
+		
+		
+		// TODO check if an enemy can be selected
+		
 		if (placingBuilding != -1) {
-			// TODO place down a building
 			map.placeBuilding();
 		}
 	}
 
 	@Override
 	public void mouseReleased() {
-
+		
 	}
 
 	// button event handlers
