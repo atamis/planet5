@@ -96,7 +96,7 @@ public class GameFrame extends Frame {
 	public void mousePressed() {
 		if (placingBuilding != -1) {
 			// TODO place down a building
-			// map.placeBuilding(int building)
+			map.placeBuilding();
 		}
 	}
 

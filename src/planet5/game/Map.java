@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
+import planet5.config.BuildingStats;
+import planet5.config.Fonts;
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import processing.core.PApplet;
@@ -108,44 +110,75 @@ public class Map {
 				if(t.wall) {
 					//Color c = new Color(t.color);
 					//p.fill(p.color(255-c.getRed(), 255-c.getGreen(), 255-c.getBlue()));
-					p.fill(p.color(0));
+					p.fill(p.color(128));
 				} else {
 					p.fill(t.color);
 				}
+				
+				if (t.building != null) {
+					p.fill(p.color(192));
+				}
 				//p.fill(t.color);
 				p.rect(loc.x, loc.y, size, size);
+				if (t.building != null) {
+					p.fill(p.color(0));
+					p.stroke(p.color(0));
+					p.strokeWeight(1);
+					p.textFont(Fonts.consolas16);
+					p.text("" + t.building.type, loc.x, loc.y, 32, 32);
+				}
 			}
 		}
-		
-		if (game.placingBuilding != -1) {
-			if (p.mouseY > 45) {
-				int x = p.mouseX, y = p.mouseY;
-				x += mapX;
-				y += mapY;
-				y -= 45;
-				x /= 32;
-				y /= 32;
-				boolean good = true;
-				int width=3,height=3;
-				for(int i = 0; i < width; i++) {
-					for (int j = 0; j < height; j++) {
-						int c = x+i, r = y+j;
-						if (c >= tiles.length || r >= tiles[0].length || tiles[c][r].wall) {
-							good = false;
-						}
-					}
-				}
-				
-				if(good){
-					p.fill(p.color(32, 128, 0, 128));
-				}else{
-					p.fill(p.color(255, 0, 0, 128));
-				}
-				p.rect(32 * x, 32 * y, width*size, height*size);
-			}
+
+		// TODO: ...
+		if (isValidBuilding() && p.mouseY > 45) {
+			drawBuildingPlaceover(canPlaceBuilding());
 		}
-		
+
 		p.translate(mapX, mapY);
+	}
+	
+	public void drawBuildingPlaceover(boolean canPlace) {
+		int x = p.mouseX, y = p.mouseY;
+		x += mapX;
+		y += mapY;
+		y -= 45;
+		x /= 32;
+		y /= 32;
+		int width=BuildingStats.cols[game.placingBuilding];
+		int height=BuildingStats.rows[game.placingBuilding];
+		if (canPlaceBuilding()) {
+			p.fill(p.color(32, 128, 0, 128));
+		} else {
+			p.fill(p.color(255, 0, 0, 128));
+		}
+		p.rect(32 * x, 32 * y, width * 32, height * 32);
+	}
+	
+	public boolean isValidBuilding() {
+		return (game.placingBuilding != -1 && p.mouseY > 45 &&
+				game.placingBuilding < BuildingStats.cols.length);
+	}
+	
+	public boolean canPlaceBuilding() {
+		int x = p.mouseX, y = p.mouseY;
+		x += mapX;
+		y += mapY;
+		y -= 45;
+		x /= 32;
+		y /= 32;
+		int width=BuildingStats.cols[game.placingBuilding];
+		int height=BuildingStats.rows[game.placingBuilding];
+		for(int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				int c = x + i, r = y + j;
+				if (c >= tiles.length || r >= tiles[0].length || tiles[c][r].wall || tiles[c][r].building != null) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	public static Map reallyRandomLevel(Applet p, GameFrame game, int width, int height, Random r) {
@@ -171,5 +204,24 @@ public class Map {
 		}
 		return new Map(p, game, tiles);
 
+	}
+
+	public void placeBuilding() {
+		if (isValidBuilding() && canPlaceBuilding()) {
+			int x = p.mouseX, y = p.mouseY;
+			x += mapX;
+			y += mapY;
+			y -= 45;
+			x /= 32;
+			y /= 32;
+			int width=BuildingStats.cols[game.placingBuilding];
+			int height=BuildingStats.rows[game.placingBuilding];
+			for(int i = 0; i < width; i++) {
+				for (int j = 0; j < height; j++) {
+					int c = x + i, r = y + j;
+					tiles[c][r].building = new Building(game.placingBuilding);
+				}
+			}
+		}
 	}
 }
