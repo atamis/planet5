@@ -12,12 +12,10 @@ import planet5.framework.Transition;
 import processing.core.PApplet;
 
 public class Game extends Applet {
-	// frames
+	// frames and transitions
 	public static Frame menuFrame;
 	public static Frame campaignFrame;
 	public static Frame aboutFrame;
-	
-	// transitions
 	public static Transition fullFadeTransition;
 	
 	@Override
@@ -26,15 +24,16 @@ public class Game extends Applet {
 		smooth();
 		size(1024, 768);
 		
+		// load configuration
+		Fonts.load(this);
+		
 		// load frames and transitions
 		menuFrame = new MenuFrame(this);
 		campaignFrame = new CampaignFrame(this);
 		aboutFrame = new AboutFrame(this);
 		fullFadeTransition = new FullFadeTransition(this);
 		
-		// load configuration
-		Fonts.load(this);
-		
+		// TODO: change back to menuFrame
 		setFrame(campaignFrame);
 	}
 

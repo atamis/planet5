@@ -11,6 +11,6 @@ import processing.core.PVector;
 public class CampaignFrame extends GameFrame {
 	public CampaignFrame(Applet parent) {
 		super(parent);
-		map.enemies.add(new Enemy(new PVector(20, 20)));
+		//map.enemies.add(new Enemy(new PVector(20, 20)));
 	}
 }

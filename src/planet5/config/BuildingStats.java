@@ -3,14 +3,14 @@ package planet5.config;
 public final class BuildingStats {
 
 	// All
-	static float[] healths	= {1500, 100, 100, 100,	500, 500, 350};
-	static float[] costs	= {0,    20,  30,  100,	500, 350, 500};
-	static float[] rows		= {3,    1,   1,   1,	2,   1,   2};
-	static float[] cols		= {3,    1,   1,   1,	2,   1,   2};
-	static float[] light	= {8,    2,   2,   2,	8,   3,   2};
-	static float[] cap		= {4800, 0,   0,   500,	0,   0,   0};
-	static float[] gen		= {20,   0,   50,  0,	0,   0,   0};
-	static float[] draw		= {0,    0,   0,   0,	10,  10,   4};
+	public static float[] healths	= {1500, 100, 100, 100,	500, 500, 350};
+	public static float[] costs	= {0,    20,  30,  100,	500, 350, 500};
+	public static int[] rows		= {3,    1,   1,   1,	2,   1,   2};
+	public static int[] cols		= {3,    1,   1,   1,	2,   1,   2};
+	public static float[] light	= {8,    2,   2,   2,	8,   3,   2};
+	public static float[] cap		= {4800, 0,   0,   500,	0,   0,   0};
+	public static float[] gen		= {20,   0,   50,  0,	0,   0,   0};
+	public static float[] draw		= {0,    0,   0,   0,	10,  10,   4};
 	
 	
 	// Main Base. #0
