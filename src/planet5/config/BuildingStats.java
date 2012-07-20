@@ -3,6 +3,16 @@ package planet5.config;
 public final class BuildingStats {
 
 	// All
+	static String[] names = {"Main Base", "Relay", "Solar Farm",
+								"Capacitor", "Science Lab", "Laser Turret",
+								"Mortar"};
+	static String[] descriptions = {"The Main Base forms the core of your network and if it falls, you lose.",
+									"The Relay projects an energy field and supplies power to other buildings",
+									"The Solar Farm harvests solar energy for your network. Doesn't generate power at night.",
+									"The Capacitor stores energy for use during the night. Increases your maximum power pool.",
+									"The Science Lab upgrades a variety of buildings and weapons you use.",
+									"The Laser Turret provides high damage short range defense. It fires continuously.",
+									"Tthe Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots."};
 	static float[] healths	= {1500, 100, 100, 100,	500, 500, 350};
 	static float[] costs	= {0,    20,  30,  100,	500, 350, 500};
 	static float[] rows		= {3,    1,   1,   1,	2,   1,   2};
