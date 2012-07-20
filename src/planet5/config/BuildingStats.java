@@ -2,8 +2,18 @@ package planet5.config;
 
 public final class BuildingStats {
 
+	// All
+	static float[] healths	= {1500, 100, 100, 100,	500, 500, 350};
+	static float[] costs	= {0,    20,  30,  100,	500, 350, 500};
+	static float[] rows		= {3,    1,   1,   1,	2,   1,   2};
+	static float[] cols		= {3,    1,   1,   1,	2,   1,   2};
+	static float[] light	= {8,    2,   2,   2,	8,   3,   2};
+	static float[] cap		= {4800, 0,   0,   500,	0,   0,   0};
+	static float[] gen		= {20,   0,   50,  0,	0,   0,   0};
+	static float[] draw		= {0,    0,   0,   0,	10,  10,   4};
 	
-	// Main Base
+	
+	// Main Base. #0
 	static float base_health = 1500f;
 	static float base_cost = 0;
 	static float base_rows = 3;
@@ -13,7 +23,7 @@ public final class BuildingStats {
 	static float base_energy_gen = 20;
 	static float base_draw = 0;
 	
-	// Relay
+	// Relay. #1
 	static float relay_health = 100;
 	static float relay_cost = 20;
 	static float relay_rows = 1;
@@ -23,7 +33,7 @@ public final class BuildingStats {
 	static float relay_energy_gen = 0;
 	static float relay_draw = 0;
 	
-	// Solar Farm
+	// Solar Farm. #2
 	static float farm_health = 100;
 	static float farm_cost = 30;
 	static float farm_rows = 1;
@@ -35,7 +45,7 @@ public final class BuildingStats {
 
 
 	
-	// Capacitor
+	// Capacitor. #3
 	static float capacitor_health = 100;
 	static float capacitor_cost = 100;
 	static float capacitor_rows = 1;
@@ -46,7 +56,7 @@ public final class BuildingStats {
 	static float capacitor_draw = 0;
 
 	
-	// Science Lab
+	// Science Lab. #4
 	static float lab_health = 500;
 	static float lab_cost = 500;
 	static float lab_rows = 2;
@@ -57,7 +67,7 @@ public final class BuildingStats {
 	static float lab_draw = 10;
 
 	
-	// Laser Turret
+	// Laser Turret. #5
 	static float laser_health = 500;
 	static float laser_cost = 350;
 	static float laser_rows = 1;
@@ -69,7 +79,7 @@ public final class BuildingStats {
 	static float laser_draw = 10;
 
 	
-	// Mortar
+	// Mortar. #6
 	static float mortar_health = 350;
 	static float mortar_cost = 500;
 	static float mortar_rows = 2;
