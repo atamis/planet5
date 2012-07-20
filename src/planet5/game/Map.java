@@ -1,8 +1,11 @@
 package planet5.game;
 
+import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
+import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -15,9 +18,12 @@ public class Map {
 	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	Hero hero = new Hero();
 	Applet p;
+	GameFrame game;
+	public int mapX = 100, mapY = 100;
 	
-	public Map(Applet parent, Tile[][] tiles) {
+	public Map(Applet parent, GameFrame game, Tile[][] tiles) {
 		p = parent;
+		this.game = game;
 		this.tiles = tiles;
 	}
 	
@@ -65,101 +71,105 @@ public class Map {
 		// tiles: walls may block light
 		// buildings: produce their own light
 	}
-	
-	public void draw(PVector offset, int size) {
-		for(int x = 0; x < tiles.length; x++) {
-			for(int y = 0; y < tiles[x].length; y++) {
-				Tile t = tiles[x][y];
-				PVector loc = new PVector(x*size, y*size);
-				loc.add(offset);
-				p.stroke(0);
-				if(t.wall) {
-					p.strokeWeight(2);
-				} else {
-					p.strokeWeight(1);
-				}
-				p.fill(t.color);
-				p.rect(loc.x, loc.y, size, size);
-			}
-		}
-	}
 
-	public void draw(Applet p) {
-		p.background(255);
-		draw(new PVector(0, 48), 32);
+	public void draw() {
+		// TODO: TEMP
+		int move = 2;
+		if (p.pressedKeys[KeyEvent.VK_W]) mapY-=move;
+		if (p.pressedKeys[KeyEvent.VK_A]) mapX-=move;
+		if (p.pressedKeys[KeyEvent.VK_S]) mapY+=move;
+		if (p.pressedKeys[KeyEvent.VK_D]) mapX+=move;
+		mapX=p.constrain(mapX, 0, 32*tiles.length-p.width);
+		mapY=p.constrain(mapY, 0, 32*tiles[0].length-p.height+45);
+		
+		draw(32);
 		// TODO: draw the following:
 		// tiles first
 		// then buildings and enemies
 		// then projectiles
-		
-		// gui background
-		p.fill(0);
-		p.rect(0, 0, p.width, 47);
-		
-		// draw gui elements
-		if (placing) {
-			int x = p.mouseX, y = p.mouseY;
-			y -= 48;
-			x /= 32;
-			y /= 32;
-			// TODO: account for how big the rectangle is
-			if (x < tiles.length && y < tiles[0].length) {
-				p.strokeWeight(2);
-				p.fill(p.color(255, 0, 0, 128));
-				p.rect(x * 32, y * 32 + 48, 64, 64);
-			}
-		}
 	}
 
-	public void draw(PApplet p, PVector offset, int size) {
+	public void draw(int size) {
+		p.translate(-mapX, -mapY);
 		for(int x = 0; x < tiles.length; x++) {
 			for(int y = 0; y < tiles[x].length; y++) {
 				Tile t = tiles[x][y];
 				PVector loc = new PVector(x*size, y*size);
-				loc.add(offset);
-				p.stroke(0);
-				if(t.wall) {
-					p.strokeWeight(2);
-				} else {
-					p.strokeWeight(1);
+				
+				// dont draw invisible ones
+				int width = p.width;
+				int height = p.height - 45;
+				if (loc.x < -size+mapX || loc.y < -size+mapY || loc.x > width+mapX || loc.y > height+mapY) {
+					continue;
 				}
-				p.fill(t.color);
+				
+				p.noStroke();
+				//p.stroke(0);
+				if(t.wall) {
+					//Color c = new Color(t.color);
+					//p.fill(p.color(255-c.getRed(), 255-c.getGreen(), 255-c.getBlue()));
+					p.fill(p.color(0));
+				} else {
+					p.fill(t.color);
+				}
+				//p.fill(t.color);
 				p.rect(loc.x, loc.y, size, size);
 			}
 		}
+		
+		if (game.placingBuilding != -1) {
+			if (p.mouseY > 45) {
+				int x = p.mouseX, y = p.mouseY;
+				x += mapX;
+				y += mapY;
+				y -= 45;
+				x /= 32;
+				y /= 32;
+				boolean good = true;
+				int width=3,height=3;
+				for(int i = 0; i < width; i++) {
+					for (int j = 0; j < height; j++) {
+						int c = x+i, r = y+j;
+						if (c >= tiles.length || r >= tiles[0].length || tiles[c][r].wall) {
+							good = false;
+						}
+					}
+				}
+				
+				if(good){
+					p.fill(p.color(32, 128, 0, 128));
+				}else{
+					p.fill(p.color(255, 0, 0, 128));
+				}
+				p.rect(32 * x, 32 * y, width*size, height*size);
+			}
+		}
+		
+		p.translate(mapX, mapY);
 	}
 	
-	public static Map reallyRandomLevel(Applet p, int width, int height, Random r) {
+	public static Map reallyRandomLevel(Applet p, GameFrame game, int width, int height, Random r) {
 		Tile[][] tiles = new Tile[width][height];
 		for(int x = 0; x < tiles.length; x++) {
 			for(int y = 0; y < tiles[x].length; y++) {
 				tiles[x][y] = new Tile(0xffffff, r.nextBoolean());
 			}
 		}
-		return new Map(p, tiles);
+		return new Map(p, game, tiles);
 	}
 	
-	public static Map noiseRandomLevel(Applet p, int width, int height) {
+	public static Map noiseRandomLevel(Applet p, GameFrame game, int width, int height) {
 		Tile[][] tiles = new Tile[width][height];
 		for(int x = 0; x < tiles.length; x++) {
 			for(int y = 0; y < tiles[x].length; y++) {
 				tiles[x][y] = new Tile(0xffffff, (p.noise(x*0.1f, y*0.1f) > 0.5));
+				float xf = x * 0.03f, yf = y * 0.03f;
+				tiles[x][y].color = p.color(255 * p.noise(xf, yf),
+						255 * p.noise(xf, 0, yf),
+						255 * p.noise(0, xf, yf));
 			}
 		}
-		return new Map(p, tiles);
+		return new Map(p, game, tiles);
 
-	}
-	public void reset_TEMP() {
-		placing = false;
-	}
-
-	boolean placing = false;
-	public void placeBuilding_TEMP() {
-		placing = true;
-	}
-	public void placeBuildingActual_TEMP() {
-		if (placing) {
-			
-		}
 	}
 }

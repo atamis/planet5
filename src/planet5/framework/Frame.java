@@ -62,9 +62,9 @@ public abstract class Frame {
 	protected void keyPressed() {}
 
 	// button event listeners
-	protected void buttonPressed(String command) {}
+	public void buttonPressed(String command) {}
 
-	protected void buttonClicked(String command) {}
+	public void buttonClicked(String command) {}
 
 	// mouse event listeners that process mouse input before passing the event
 	// to the child class

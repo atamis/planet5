@@ -16,7 +16,6 @@ import planet5.framework.Button;
 import planet5.framework.Frame;
 
 public class AboutFrame extends Frame {
-
 	public AboutFrame(Applet parent) {
 		super(parent);
 
@@ -48,7 +47,7 @@ public class AboutFrame extends Frame {
 	}
 
 	@Override
-	protected void buttonClicked(String command) {
+	public void buttonClicked(String command) {
 		if (command.equals("Back")) {
 			p.transitionFrame(Game.menuFrame, Game.fullFadeTransition);
 		}

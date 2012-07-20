@@ -1,6 +1,5 @@
 package planet5;
 
-import ddf.minim.Minim;
 import planet5.config.Fonts;
 import planet5.frames.AboutFrame;
 import planet5.frames.CampaignFrame;
@@ -36,7 +35,7 @@ public class Game extends Applet {
 		// load configuration
 		Fonts.load(this);
 		
-		setFrame(menuFrame);
+		setFrame(campaignFrame);
 	}
 
 	public static void main(String[] args) {

@@ -22,7 +22,7 @@ public class Applet extends PApplet implements MouseWheelListener {
 	Transition currentTransition = null;
 
 	// stores whether a key is pressed, using key codes
-	boolean[] pressedKeys = new boolean[65536];
+	public boolean[] pressedKeys = new boolean[65536];
 
 	public Applet() {
 		addMouseWheelListener(this);

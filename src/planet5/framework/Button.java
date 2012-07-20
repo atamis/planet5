@@ -16,22 +16,22 @@ public abstract class Button {
 	protected PApplet p;
 
 	// the frame that will listen to this button click
-	Frame listener;
+	protected Frame listener;
 
 	// text to be displayed on the button
-	private String text;
+	protected String text;
 
 	// the command describing this button's action when clicked
-	private String command;
+	protected String command;
 
 	// the location and size of the button
-	private Rectangle bounds;
+	protected Rectangle bounds;
 
 	// whether the button is enabled
-	private boolean enabled = true;
+	protected boolean enabled = true;
 
 	// whether the mouse was pressed inside the button
-	private boolean pressedInside = false;
+	protected boolean pressedInside = false;
 
 	// constructor
 	public Button(Rectangle bounds, String text, String command) {
