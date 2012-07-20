@@ -13,12 +13,12 @@ import processing.core.PVector;
 public class Map {
 	// the time of day stored in milliseconds
 	int timeOfDay;
-	Tile[][] tiles;
-	ArrayList<Building> buildings = new ArrayList<Building>();
-	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-	Hero hero = new Hero();
-	Applet p;
-	GameFrame game;
+	public Tile[][] tiles;
+	public ArrayList<Building> buildings = new ArrayList<Building>();
+	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public Hero hero = new Hero();
+	public Applet p;
+	public GameFrame game;
 	public int mapX = 100, mapY = 100;
 	
 	public Map(Applet parent, GameFrame game, Tile[][] tiles) {
