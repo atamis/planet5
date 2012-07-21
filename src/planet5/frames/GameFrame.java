@@ -83,7 +83,7 @@ public class GameFrame extends Frame {
 		// update building placement
 		if (intKey >= 1 && intKey <= BuildingStats.rows.length - 1) {
 			placingBuilding = intKey;
-		} else if (p.keyCode == KeyEvent.VK_ESCAPE) {
+		} else if (p.keyCode == KeyEvent.VK_ESCAPE || p.keyCode == KeyEvent.VK_SPACE) {
 			placingBuilding = -1;
 		}
 	}
