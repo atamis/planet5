@@ -15,7 +15,7 @@ public class GameFrame extends Frame {
 	public int lastDrawTime;
 
 	// bar variables
-	public static final int barHeight = 45;
+	public static final int BAR_HEIGHT = 45;
 	
 	// building variables
 	public int placingBuilding = -1;
@@ -33,9 +33,9 @@ public class GameFrame extends Frame {
 	@Override
 	protected void draw() {
 		updateGameTime();
-		p.translate(0, barHeight);
+		p.translate(0, BAR_HEIGHT);
 		map.draw();
-		p.translate(0, -barHeight);
+		p.translate(0, -BAR_HEIGHT);
 		
 		drawBar();
 	}
@@ -52,14 +52,23 @@ public class GameFrame extends Frame {
 		// TODO: replace this
 		p.fill(32);
 		p.noStroke();
-		p.rect(0, 0, p.width, barHeight);
+		p.rect(0, 0, p.width, BAR_HEIGHT);
 		
 		// background shadow
 		p.strokeWeight(1);
 		int alpha = 255;
 		for (int i = 0; alpha >= 2; i++) {
 			p.stroke(0, 0, 0, alpha);
-			p.line(0, barHeight + i, p.width, barHeight + i);
+			p.line(0, BAR_HEIGHT + i, p.width, BAR_HEIGHT + i);
+			//if (map.mapX == 0) {
+				//p.line(i, BAR_HEIGHT, i, p.height);
+			//}
+			//if (map.mapX == map.tileWidth * map.TILE_SIZE - p.width) {
+				//p.line(p.width - i - 1, BAR_HEIGHT + i, p.width - i - 1, p.height);
+			//}
+			//if (map.mapY == map.tileHeight * map.TILE_SIZE - p.height + BAR_HEIGHT) {
+				//p.line(0, p.height - i - 1, p.width, p.height - i - 1);
+			//}
 			alpha /= 1.5;
 		}
 	}
@@ -69,7 +78,7 @@ public class GameFrame extends Frame {
 	public void keyPressed() {
 		int intKey = p.key - '0';	// the key as an integer
 		
-		//hero.keyPressed(keyCode)
+		map.hero.keyPressed();
 		
 		// update building placement
 		if (intKey >= 1 && intKey <= BuildingStats.rows.length - 1) {
@@ -87,7 +96,7 @@ public class GameFrame extends Frame {
 		
 		// TODO check if an enemy can be selected
 		
-		if (placingBuilding != -1) {
+		if (p.mouseButton == p.LEFT && placingBuilding != -1) {
 			map.placeBuilding();
 		}
 	}

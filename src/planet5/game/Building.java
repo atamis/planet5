@@ -28,7 +28,7 @@ public class Building {
 		p.strokeWeight(1);
 		p.textFont(Fonts.consolas16);
 		p.fill(0xFF808080);
-		p.rect(x, y, width * TILE_SIZE, height * TILE_SIZE);
+		p.rect(x, y, width * TILE_SIZE - 1, height * TILE_SIZE - 1);
 		p.fill(0);
 		p.text("" + type, x + 8, y + 8);
 	}

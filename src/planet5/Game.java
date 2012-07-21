@@ -35,9 +35,6 @@ public class Game extends Applet {
 		
 		// TODO: change back to menuFrame
 		setFrame(campaignFrame);
-		
-		this.println(color(32, 128, 0, 128));
-		println(color(255, 0, 0, 128));
 	}
 
 	public static void main(String[] args) {

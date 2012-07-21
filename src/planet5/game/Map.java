@@ -16,7 +16,7 @@ import processing.core.PVector;
 
 public class Map {
 	// copied constants
-	public static final int BAR_HEIGHT = GameFrame.barHeight;
+	public static final int BAR_HEIGHT = GameFrame.BAR_HEIGHT;
 	public static final int TILE_SIZE = Globals.TILE_SIZE;
 
 	// color constants
@@ -30,6 +30,8 @@ public class Map {
 	
 	// tile variables
 	public Tile[][] tiles;
+	public int tileWidth;
+	public int tileHeight;
 	public int mapX = 0;
 	public int mapY = 0;
 	
@@ -38,7 +40,7 @@ public class Map {
 	
 	// unit variables
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-	public Hero hero = new Hero();
+	public Hero hero;
 
 	// other variables
 	int timeOfDay;
@@ -48,6 +50,17 @@ public class Map {
 		p = parent;
 		this.game = game;
 		this.tiles = tiles;
+		tileWidth = tiles[0].length;
+		tileHeight = tiles.length;
+		
+		// TODO: better placing
+		for (int i = 0; hero == null && i < tileHeight; i++) {
+			for (int j = 0; hero == null && j < tileWidth; j++) {
+				if (!tiles[i][j].wall) {
+					hero = new Hero(p, this, i * TILE_SIZE + TILE_SIZE / 2, j * TILE_SIZE + TILE_SIZE / 2);
+				}
+			}
+		}
 	}
 
 	// timePassed is the amount of milliseconds between the last update and this
@@ -68,7 +81,16 @@ public class Map {
 	}
 
 	private void updateHero(int timePassed) {
-		// TODO
+		hero.update(timePassed);
+		
+		// update map position
+		mapX = (int) hero.x - p.width / 2;
+		mapY = (int) hero.y - (p.height - BAR_HEIGHT) / 2;
+
+		// constrain map position
+		mapX = p.constrain(mapX, 0, tileWidth * TILE_SIZE - p.width);
+		mapY = p.constrain(mapY, 0, tileHeight * TILE_SIZE - p.height
+				+ BAR_HEIGHT);
 	}
 
 	private void updateBuildings(int timePassed) {
@@ -96,27 +118,11 @@ public class Map {
 	}
 
 	public void draw() {
-		// TODO: TEMP
-		int move = 2;
-		if (p.pressedKeys[KeyEvent.VK_W])
-			mapY -= move;
-		if (p.pressedKeys[KeyEvent.VK_A])
-			mapX -= move;
-		if (p.pressedKeys[KeyEvent.VK_S])
-			mapY += move;
-		if (p.pressedKeys[KeyEvent.VK_D])
-			mapX += move;
-		// TODO: keep
-		mapX = p.constrain(mapX, 0, 32 * tiles.length - p.width);
-		mapY = p.constrain(mapY, 0, 32 * tiles[0].length - p.height
-				+ BAR_HEIGHT);
-
-		// TODO: draw the following:
-		// tiles first
-		// then buildings and enemies
-		// then projectiles
 		drawTiles();
 		drawBuildings();
+		hero.draw(-mapX, -mapY);
+		// TODO: draw enemies
+		// TODO: draw projectiles
 	}
 
 	// basic drawing methods
@@ -196,15 +202,33 @@ public class Map {
 	}
 
 	public boolean canPlaceBuilding(int x, int y, int w, int h) {
+		// TODO: refactor this
+		int left = (hero.x - hero.RADIUS) / TILE_SIZE;
+		int up = (hero.y - hero.RADIUS) / TILE_SIZE;
+		int right = (hero.x + hero.RADIUS) / TILE_SIZE;
+		int down = (hero.y + hero.RADIUS) / TILE_SIZE;
+		
+		// loop through the tiles this building covers
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
+				// calculate column and row
 				int c = x + i, r = y + j;
-				if (c >= tiles.length || r >= tiles[0].length
+				
+				// check for placing over walls and buildings
+				if (c >= tileWidth|| r >= tileHeight
 						|| tiles[c][r].wall || tiles[c][r].building != null) {
+					return false;
+				}
+				
+				// check for placing over hero
+				if ((c == left || c == right) && (r == up || r == down)) {
 					return false;
 				}
 			}
 		}
+		
+		
+		// TODO: check for placing over enemies
 
 		return true;
 	}
