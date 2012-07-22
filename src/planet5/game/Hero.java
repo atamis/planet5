@@ -2,6 +2,7 @@ package planet5.game;
 
 import java.awt.event.KeyEvent;
 
+import planet5.Game;
 import planet5.config.BuildingStats;
 import planet5.config.Globals;
 import planet5.frames.GameFrame;
@@ -11,45 +12,59 @@ import processing.core.PApplet;
 public class Hero {
 	// copied constants
 	public static final int TILE_SIZE = Globals.TILE_SIZE;
-	public static final int RADIUS = 12;
-	public static final int HERO_SIZE = 2 * RADIUS + 1;
+	public static final int HERO_SIZE = 32;
 	
+	// constants
+	public static final int SPEED = 2;
+	
+	// hero variables
 	public int x;
 	public int y;
+	public int hp;
+	public int maxHp;
+	
+	// reference variables
 	public Applet p;
 	public Map map;
+	
+	// store most recent key pressed
+	public int mostRecentWs = 0;
+	public int mostRecentAd = 0;
 	
 	public Hero(Applet p, Map map, int x, int y) {
 		this.x = x;
 		this.y = y;
 		this.p = p;
 		this.map = map;
+		maxHp = 100;
+		hp = 100;
 	}
 	
 	public boolean checkCollision() {
-		int left = (x - RADIUS) / TILE_SIZE;
-		int up = (y - RADIUS) / TILE_SIZE;
-		int right = (x + RADIUS) / TILE_SIZE;
-		int down = (y + RADIUS) / TILE_SIZE;
+		int left = x / TILE_SIZE;
+		int up = y / TILE_SIZE;
+		int right = (x + HERO_SIZE - 1) / TILE_SIZE;
+		int down = (y + HERO_SIZE - 1) / TILE_SIZE;
 		
-		if (x - RADIUS < 0 || y - RADIUS < 0 || right >= map.tileWidth || down >= map.tileHeight) {
+		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
 			return true;
 		}
 		
 		// TODO: refactor
-		if (map.tiles[left][up].wall || map.tiles[right][up].wall || 
-				map.tiles[left][down].wall || map.tiles[right][down].wall) {
+		if (map.tiles[up][left].wall || map.tiles[up][right].wall || 
+				map.tiles[down][left].wall || map.tiles[down][right].wall) {
 			return true;
 		}
 
-		if (map.tiles[left][up].building != null || map.tiles[right][up].building != null || 
-				map.tiles[left][down].building != null || map.tiles[right][down].building != null) {
+		if (map.tiles[up][left].building != null || map.tiles[up][right].building != null || 
+				map.tiles[down][left].building != null || map.tiles[down][right].building != null) {
 			return true;
 		}
 		
 		
 		return false;
 	}
+	
 	public int sign(int num) {
 		if (num > 0) {
 			return 1;
@@ -59,30 +74,42 @@ public class Hero {
 			return -1;
 		}
 	}
-	public void update(int timePassed) {
-		// TODO: use timePassed value
-		int move = 2;
+	
+	public void update() {
+		int speed = Game.speed * SPEED;
 		int xMove = 0;
 		int yMove = 0;
-		if (p.pressedKeys[KeyEvent.VK_W]) {
-			yMove -= move;
-		}
-		if (p.pressedKeys[KeyEvent.VK_A]) {
-			xMove -= move;
-		}
-		if (p.pressedKeys[KeyEvent.VK_S]) {
-			yMove += move;
-		}
-		if (p.pressedKeys[KeyEvent.VK_D]) {
-			xMove += move;
-		}//TODO: refactor
 		
+		// calculate total pixels to move
+		if (p.pressedKeys[KeyEvent.VK_W] && p.pressedKeys[KeyEvent.VK_S]) {
+			yMove = mostRecentWs;
+		} else if (p.pressedKeys[KeyEvent.VK_W]) {
+			yMove = -speed;
+		} else if (p.pressedKeys[KeyEvent.VK_S]) {
+			yMove = speed;
+		}
+		
+		if (p.pressedKeys[KeyEvent.VK_A] && p.pressedKeys[KeyEvent.VK_D]) {
+			xMove = mostRecentAd;
+		} else if (p.pressedKeys[KeyEvent.VK_A]) {
+			xMove = -speed;
+		} else if (p.pressedKeys[KeyEvent.VK_D]) {
+			xMove = speed;
+		}
+		
+		// find the sign of move
 		int xSign = sign(xMove);
 		int ySign = sign(yMove);
-		xMove = p.abs(xMove);
-		yMove = p.abs(yMove);
 		
-		// TODO
+		// take absolute value of move
+		if (xMove < 0) {
+			xMove = -xMove;
+		}
+		if (yMove < 0) {
+			yMove = -yMove;
+		}
+		
+		// move pixel by pixel
 		boolean moved;
 		do {
 			moved = false;
@@ -107,20 +134,24 @@ public class Hero {
 				}
 			}
 		} while (moved);
-		
-		// constrain hero position
-		//x = p.constrain(x, RADIUS + 1, map.tileWidth * TILE_SIZE - RADIUS);
-		//y = p.constrain(y, RADIUS + 1, map.tileHeight * TILE_SIZE - RADIUS);
 	}
 	
 	public void draw(int dx, int dy) {
 		p.noStroke();
 		p.fill(0xFF204080);
-		//p.ellipse(x + dx, y + dy, 2 * RADIUS, 2 * RADIUS);
-		p.rect(x + dx - RADIUS, y + dy - RADIUS, HERO_SIZE, HERO_SIZE);
+		p.rect(x + dx, y + dy, HERO_SIZE, HERO_SIZE);
 	}
 
 	public void keyPressed() {
-		
+		int speed = Game.speed * SPEED;
+		if (p.key == 'w') {
+			mostRecentWs = -speed;
+		} else if (p.key == 's') {
+			mostRecentWs = speed;
+		} else if (p.key == 'a') {
+			mostRecentAd = -speed;
+		} else if (p.key == 'd') {
+			mostRecentAd = speed;
+		}
 	}
 }
