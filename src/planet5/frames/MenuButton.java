@@ -4,10 +4,18 @@ import java.awt.Rectangle;
 
 import planet5.config.Fonts;
 import planet5.framework.Button;
+import processing.core.PFont;
 
 public class MenuButton extends Button {
-	public MenuButton(Rectangle bounds, String text) {
+	public PFont font;
+	public boolean center;
+	public boolean pressed;
+	
+	public MenuButton(Rectangle bounds, String text, PFont font, boolean center) {
 		super(bounds, text, text);
+		this.font = font;
+		this.center = center;
+		this.pressed = false;
 	}
 
 	// painting methods
@@ -33,14 +41,28 @@ public class MenuButton extends Button {
 	
 	// helper painting methods
 	private void paintButton(int color) {
+		if (pressed) {
+			color = 176;
+		}
+		
 		p.noStroke();
 		p.fill(p.color(color - 160));
 		p.rect(getX(), getY(), getWidth(), getHeight());
 		
 		p.noStroke();
 		p.fill(p.color(color + 16));
-		p.textFont(Fonts.consolas32);
-		p.textAlign(p.LEFT, p.CENTER);
-		p.text(" " + getText(), getX(), getY() - p.textDescent() / 2, getWidth(), getHeight());
+		p.textFont(font);
+		
+		if (center) {
+			p.textAlign(p.CENTER, p.CENTER);
+		} else {
+			p.textAlign(p.LEFT, p.CENTER);
+		}
+		
+		String text = getText();
+		if (!center) {
+			text = " " + text;
+		}
+		p.text(text, getX(), getY() - p.textDescent() / 2, getWidth(), getHeight());
 	}
 }

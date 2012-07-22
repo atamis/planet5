@@ -7,6 +7,7 @@ import planet5.framework.Button;
 
 public class ConfirmButton extends Button {
 	public boolean confirm = false;
+	public int x, y;
 	
 	public ConfirmButton(Rectangle bounds, String text) {
 		super(bounds, text, text);
@@ -35,8 +36,11 @@ public class ConfirmButton extends Button {
 
 	@Override
 	public void update() {
-		if (!bounds.contains(p.mouseX, p.mouseY))
+		final int CONFIRM_BOX = 0;
+		if (!bounds.contains(p.mouseX, p.mouseY) || 
+				p.abs(x - p.mouseX) > CONFIRM_BOX || p.abs(y - p.mouseY) > CONFIRM_BOX) {
 			confirm = false;
+		}
 		super.update();
 	}
 	
@@ -48,7 +52,7 @@ public class ConfirmButton extends Button {
 		
 		p.noStroke();
 		p.fill(p.color(color + 16));
-		p.textFont(Fonts.consolas32);
+		p.textFont(Fonts.consolas16);
 		p.textAlign(p.CENTER, p.CENTER);
 		
 		String text = getText();
@@ -68,6 +72,8 @@ public class ConfirmButton extends Button {
 				confirm = false;
 			} else {
 				confirm = true;
+				x = p.mouseX;
+				y = p.mouseY;
 			}
 		}
 	}

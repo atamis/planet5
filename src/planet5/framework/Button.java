@@ -13,25 +13,25 @@ import processing.core.PApplet;
 
 public abstract class Button {
 	// provides many methods and variables
-	protected PApplet p;
+	public PApplet p;
 
 	// the frame that will listen to this button click
-	protected Frame listener;
+	public Frame listener;
 
 	// text to be displayed on the button
-	protected String text;
+	public String text;
 
 	// the command describing this button's action when clicked
-	protected String command;
+	public String command;
 
 	// the location and size of the button
-	protected Rectangle bounds;
+	public Rectangle bounds;
 
 	// whether the button is enabled
-	protected boolean enabled = true;
+	public boolean enabled = true;
 
 	// whether the mouse was pressed inside the button
-	protected boolean pressedInside = false;
+	public boolean pressedInside = false;
 
 	// constructor
 	public Button(Rectangle bounds, String text, String command) {

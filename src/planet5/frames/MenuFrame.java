@@ -16,7 +16,7 @@ import planet5.framework.Frame;
 
 public class MenuFrame extends Frame {
 	// menu buttons
-	private final String[] buttonTexts = { "Play Campaign", "Play Survival", "About" };
+	private final String[] buttonTexts = { "Play Campaign", "Play Survival", "Settings", "About" };
 	private final int menuBorder = 1;
 	private final int menuX = 64, menuY = 350;
 	private final int buttonHeightOffset = 50;
@@ -31,7 +31,7 @@ public class MenuFrame extends Frame {
 			int y = menuY + i * buttonHeightOffset;
 			int w = buttonWidth;
 			int h = buttonHeight;
-			addButton(new MenuButton(new Rectangle(x, y, w, h), buttonTexts[i]));
+			addButton(new MenuButton(new Rectangle(x, y, w, h), buttonTexts[i], Fonts.consolas32, false));
 		}
 	}
 
@@ -61,6 +61,10 @@ public class MenuFrame extends Frame {
 		}
 		else if (command.equals("Play Survival")) {
 			
+		}
+		else if (command.equals("Settings")) {
+			Game.settingsFrame.phase = 0;
+			p.transitionFrame(Game.settingsFrame, Game.fullFadeTransition);
 		}
 		else if (command.equals("About")) {
 			p.transitionFrame(Game.aboutFrame, Game.fullFadeTransition);

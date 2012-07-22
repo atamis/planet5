@@ -3,24 +3,24 @@ package planet5.config;
 public final class BuildingStats {
 
 	// All
-	static String[] names = {"Main Base", "Relay", "Solar Farm",
+	public static String[] names = {"Main Base", "Relay", "Solar Farm",
 								"Capacitor", "Science Lab", "Laser Turret",
 								"Mortar"};
-	static String[] descriptions = {"The Main Base forms the core of your network and if it falls, you lose.",
+	public static String[] descriptions = {"The Main Base forms the core of your network and if it falls, you lose.",
 									"The Relay projects an energy field and supplies power to other buildings",
 									"The Solar Farm harvests solar energy for your network. Doesn't generate power at night.",
 									"The Capacitor stores energy for use during the night. Increases your maximum power pool.",
 									"The Science Lab upgrades a variety of buildings and weapons you use.",
 									"The Laser Turret provides high damage short range defense. It fires continuously.",
-									"Tthe Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots."};
-	public static float[] healths	= {1500, 100, 100, 100,	500, 500, 350};
-	public static float[] costs	= {0,    20,  30,  100,	500, 350, 500};
+									"The Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots."};
+	public static int[] healths	= {1500, 100, 100, 100,	500, 500, 350};
+	public static int[] costs	= {0,    20,  30,  100,	500, 350, 500};
 	public static int[] rows		= {3,    1,   1,   1,	2,   1,   2};
 	public static int[] cols		= {3,    1,   1,   1,	2,   1,   2};
-	public static float[] light	= {8,    2,   2,   2,	8,   3,   2};
-	public static float[] cap		= {4800, 0,   0,   500,	0,   0,   0};
-	public static float[] gen		= {20,   0,   50,  0,	0,   0,   0};
-	public static float[] draw		= {0,    0,   0,   0,	10,  10,   4};
+	public static int[] light	= {256,    64,   64,   64,	256,   96,   64};
+	public static int[] cap		= {4800, 0,   0,   500,	0,   0,   0};
+	public static int[] gen		= {20,   0,   50,  0,	0,   0,   0};
+	public static int[] draw		= {0,    0,   0,   0,	10,  10,   4};
 	
 	
 	// Main Base. #0

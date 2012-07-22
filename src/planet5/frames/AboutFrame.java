@@ -20,7 +20,7 @@ public class AboutFrame extends Frame {
 		super(parent);
 
 		// add back button
-		addButton(new MenuButton(new Rectangle(32, 32, 110, 63), "Back"));
+		addButton(new MenuButton(new Rectangle(32, 32, 110, 63), "Back", Fonts.consolas32, true));
 	}
 
 	@Override
