@@ -33,6 +33,7 @@ public class Map {
 			255, 255, 255, 255, 255, 224, 192, 160, 128, 96, 64, 32 };
 	public final int[] enemySpawnCount = { 5, 6, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4 };
+	public int[][] path;
 	public int tileWidth;
 	public int tileHeight;
 	public int mapX = 0;
@@ -56,13 +57,15 @@ public class Map {
 
 		hero = new Hero(p, this, 0, 0);
 		// TODO: better placement
-		/*for (int i = 0; hero == null && i < tileHeight; i++) {
+		for (int i = 0; hero == null && i < tileHeight; i++) {
 			for (int j = 0; hero == null && j < tileWidth; j++) {
 				if (!tiles[i][j].wall) {
 					hero = new Hero(p, this, j * TILE_SIZE, i * TILE_SIZE);
 				}
 			}
-		}*/
+		}
+		
+		Building base = null;
 		for (int i = 0; buildings.size() == 0 && i < tileHeight; i++) {
 			for (int j = 0; buildings.size() == 0 && j < tileWidth; j++) {
 				boolean good = true;
@@ -76,7 +79,7 @@ public class Map {
 					}
 				}
 				if (good) {
-					Building base = new Building(0, j, i);
+					base = new Building(0, j, i);
 					buildings.add(base);
 					for (int k = 0; k < BuildingStats.cols[0]; k++) {
 						for (int m = 0; m < BuildingStats.rows[0]; m++) {
@@ -85,6 +88,40 @@ public class Map {
 					}
 				}
 			}
+		}
+
+		// calculate path array
+		calculatePathing(base);
+	}
+	
+	public void calculatePathing(Building base) {
+		path = new int[tileHeight][tileWidth];
+		
+		class AStarItem implements Comparable {
+			public int dist, row, col;
+			
+			public AStarItem (int dist, int row, int col) {
+				this.dist = dist;
+				this.row = row;
+				this.col = col;
+			}
+			
+			@Override
+			public int compareTo(Object other) {
+				return dist - ((AStarItem) other).dist;
+			}
+		}
+		
+		ArrayList<AStarItem> AStarStack = new ArrayList<AStarItem>();
+		for (int i = 0; i < BuildingStats.cols[0]; i++) {
+			for (int j = 0; j < BuildingStats.rows[0]; j++) {
+				AStarStack.add(new AStarItem(0, base.row + j, base.col + i));
+			}
+		}
+		
+		while (AStarStack.size() != 0) {
+			
+			
 		}
 	}
 
@@ -137,14 +174,15 @@ public class Map {
 
 	private void spawnEnemies() {
 		int enemiesToSpawn = enemySpawnCount[game.hour];
-		double chance = enemiesToSpawn / 100.0;
+		double chance = enemiesToSpawn / 100.0; // TODO multiply
+		// TODO: use enemies.size()
 		game.gameTime = 0;
 		for (int i = 0; i < tileHeight; i++) {
 			for (int j = 0; j < tileWidth; j++) {
 				if (!tiles[i][j].wall && tiles[i][j].building == null &&
 						lighting[i][j] < 128 && Math.random() < 0.0001) {
-					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE);
-					enemies.add(enemy);
+					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE, this, game);
+					enemies.add(enemy);// TODO: calculate a path
 				}
 				/*
 				if (!tiles[i][j].wall && tiles[i][j].building == null &&
@@ -157,7 +195,7 @@ public class Map {
 	}
 
 	private void updateEnemies() {
-		// TODO
+		// TODO: move along path or attack
 	}
 	// method takes ~30us to 0.1ms
 	private void recalculateLighting() {
@@ -300,7 +338,7 @@ public class Map {
 	}
 	public void drawEnemies() {
 		for (Enemy enemy : enemies) {
-			enemy.draw(p);
+			enemy.draw();
 		}
 	}
 	public void drawProjectiles() {
@@ -366,7 +404,7 @@ public class Map {
 		Rectangle building = new Rectangle(x * TILE_SIZE, y * TILE_SIZE, w * TILE_SIZE, h * TILE_SIZE);
 		for (Enemy enemy : enemies) {
 			if (building.intersects(enemy.bounds)) {
-				return true;
+				return false;
 			}
 		}
 		

@@ -14,7 +14,7 @@ public abstract class Frame {
 	// variables
 	private ArrayList<Button> buttons = new ArrayList<Button>();
 
-	protected Applet p;
+	public Applet p;
 
 	public Frame(Applet parent) {
 		this.p = parent;
