@@ -54,14 +54,15 @@ public class Map {
 		tileHeight = tiles.length;
 		lighting = new int[tileHeight][tileWidth];
 
+		hero = new Hero(p, this, 0, 0);
 		// TODO: better placement
-		for (int i = 0; hero == null && i < tileHeight; i++) {
+		/*for (int i = 0; hero == null && i < tileHeight; i++) {
 			for (int j = 0; hero == null && j < tileWidth; j++) {
 				if (!tiles[i][j].wall) {
 					hero = new Hero(p, this, j * TILE_SIZE, i * TILE_SIZE);
 				}
 			}
-		}
+		}*/
 		for (int i = 0; buildings.size() == 0 && i < tileHeight; i++) {
 			for (int j = 0; buildings.size() == 0 && j < tileWidth; j++) {
 				boolean good = true;

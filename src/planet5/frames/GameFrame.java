@@ -40,7 +40,7 @@ public class GameFrame extends Frame {
 
 	public GameFrame(Applet parent) {
 		super(parent);
-		map = (new VoronoiPerlinNoiseGenerator()).gen(p, this, 40, 50);
+		map = (new CaveGenerator()).gen(p, this, 200, 200);
 		gameTime = 8 * 25 * 60; // start at 8 am TODO make sure no monsters spawn
 		
 		// add buttons
