@@ -35,7 +35,6 @@ public abstract class Button {
 
 	// constructor
 	public Button(Rectangle bounds, String text, String command) {
-		//TODO: textAlign(...baseline
 		this.bounds = bounds;
 		this.text = text;
 		this.command = command;

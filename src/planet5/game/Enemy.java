@@ -1,18 +1,21 @@
 package planet5.game;
 
+import java.awt.Rectangle;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
 public class Enemy {
-	public PVector loc;
+	public static final int ENEMY_SIZE = 4;
+	public Rectangle bounds;
 	
-	public Enemy(PVector loc) {
-		this.loc = loc;
+	public Enemy(int x, int y) {
+		bounds = new Rectangle(x, y, ENEMY_SIZE, ENEMY_SIZE);
 	}
 	
 	public void draw(PApplet p) {
-		p.fill(0x0000ff);
 		p.noStroke();
-		p.ellipse(loc.x, loc.y, 4, 4);
+		p.fill(0x0000ff);
+		p.rect(bounds.x, bounds.y, ENEMY_SIZE, ENEMY_SIZE);
 	}
 }

@@ -31,50 +31,17 @@ public class Hero {
 	public int mostRecentWs = 0;
 	public int mostRecentAd = 0;
 	
+	// constructor
 	public Hero(Applet p, Map map, int x, int y) {
 		this.x = x;
 		this.y = y;
 		this.p = p;
 		this.map = map;
 		maxHp = 100;
-		hp = 100;
+		hp = maxHp;
 	}
-	
-	public boolean checkCollision() {
-		int left = x / TILE_SIZE;
-		int up = y / TILE_SIZE;
-		int right = (x + HERO_SIZE - 1) / TILE_SIZE;
-		int down = (y + HERO_SIZE - 1) / TILE_SIZE;
-		
-		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
-			return true;
-		}
-		
-		// TODO: refactor
-		if (map.tiles[up][left].wall || map.tiles[up][right].wall || 
-				map.tiles[down][left].wall || map.tiles[down][right].wall) {
-			return true;
-		}
 
-		if (map.tiles[up][left].building != null || map.tiles[up][right].building != null || 
-				map.tiles[down][left].building != null || map.tiles[down][right].building != null) {
-			return true;
-		}
-		
-		
-		return false;
-	}
-	
-	public int sign(int num) {
-		if (num > 0) {
-			return 1;
-		} else if (num == 0) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-	
+	// moves the hero, checking for wall and building collision
 	public void update() {
 		int speed = Game.speed * SPEED;
 		int xMove = 0;
@@ -136,12 +103,65 @@ public class Hero {
 		} while (moved);
 	}
 	
-	public void draw(int dx, int dy) {
-		p.noStroke();
-		p.fill(0xFF204080);
-		p.rect(x + dx, y + dy, HERO_SIZE, HERO_SIZE);
+	private int sign(int num) {
+		if (num > 0) {
+			return 1;
+		} else if (num == 0) {
+			return 0;
+		} else {
+			return -1;
+		}
 	}
 
+	private boolean checkCollision() {
+		int left = x / TILE_SIZE;
+		int up = y / TILE_SIZE;
+		int right = (x + HERO_SIZE - 1) / TILE_SIZE;
+		int down = (y + HERO_SIZE - 1) / TILE_SIZE;
+		
+		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
+			return true;
+		}
+		
+		if (map.tiles[up][left].wall || map.tiles[up][right].wall || 
+				map.tiles[down][left].wall || map.tiles[down][right].wall) {
+			return true;
+		}
+
+		if (map.tiles[up][left].building != null || map.tiles[up][right].building != null || 
+				map.tiles[down][left].building != null || map.tiles[down][right].building != null) {
+			return true;
+		}
+		
+		
+		return false;
+	}
+	
+	// draws the hero
+	public void draw() {
+		int x = this.x - map.mapX;
+		int y = this.y - map.mapY;
+		
+		final int hpHeight = 8;
+		
+		p.noStroke();
+		
+		// hero background
+		p.fill(0xFF204080);
+		p.rect(x, y + hpHeight, HERO_SIZE, HERO_SIZE - hpHeight);
+		
+		// hp bar background
+		p.fill(0);
+		p.rect(x, y, HERO_SIZE, hpHeight);
+		
+		// hp bar
+		int fill = (HERO_SIZE - 2) * hp / maxHp;
+		p.fill(0xFFC00000);
+		p.rect(x + 1, y + 1, fill, hpHeight - 2);
+	}
+
+	// key event listener
+	// handles the user pressing opposite keys simultaneously
 	public void keyPressed() {
 		int speed = Game.speed * SPEED;
 		if (p.key == 'w') {

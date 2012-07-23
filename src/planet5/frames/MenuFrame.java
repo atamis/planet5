@@ -57,7 +57,7 @@ public class MenuFrame extends Frame {
 	public void buttonClicked(String command) {
 		if (command.equals("Play Campaign")) {
 			p.transitionFrame(Game.campaignFrame, Game.fullFadeTransition);
-			// TODO: restart level
+			// TODO: restart level? (for survival)
 		}
 		else if (command.equals("Play Survival")) {
 			

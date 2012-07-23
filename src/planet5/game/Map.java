@@ -1,6 +1,7 @@
 package planet5.game;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -28,8 +29,10 @@ public class Map {
 	// tile variables
 	public Tile[][] tiles;
 	public int[][] lighting;
-	final int[] hourToLighting = { 0, 0, 0, 0, 32, 64, 96, 128, 160, 192, 224,
-			255, 255, 255, 255, 255, 255, 224, 192, 160, 128, 96, 64, 32 };
+	public final int[] hourToLighting = { 0, 0, 0, 0, 32, 64, 96, 128, 160, 192, 224, 255, 
+			255, 255, 255, 255, 255, 224, 192, 160, 128, 96, 64, 32 };
+	public final int[] enemySpawnCount = { 5, 6, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4 };
 	public int tileWidth;
 	public int tileHeight;
 	public int mapX = 0;
@@ -42,9 +45,6 @@ public class Map {
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	public Hero hero;
 
-	// other variables
-	int timeOfDay;
-
 	// constructors
 	public Map(Applet parent, GameFrame game, Tile[][] tiles) {
 		p = parent;
@@ -52,8 +52,6 @@ public class Map {
 		this.tiles = tiles;
 		tileWidth = tiles[0].length;
 		tileHeight = tiles.length;
-		// tiles[y][x]
-
 		lighting = new int[tileHeight][tileWidth];
 
 		// TODO: better placement
@@ -64,8 +62,6 @@ public class Map {
 				}
 			}
 		}
-
-		// TODO: better placement
 		for (int i = 0; buildings.size() == 0 && i < tileHeight; i++) {
 			for (int j = 0; buildings.size() == 0 && j < tileWidth; j++) {
 				boolean good = true;
@@ -91,17 +87,20 @@ public class Map {
 		}
 	}
 
-	// timePassed is the amount of milliseconds between the last update and this
-	// one
 	// both update and draw are repeatedly called. update is called first
 	public void update() {
+		calculateVariables();
 		updateMap();
 		updateHero();
 		updateBuildings();
+		recalculateLighting();
 		spawnEnemies();
 		updateEnemies();
-		recalculateLighting();
-		// checkGameEvents
+		checkGameEvents();
+	}
+	
+	public void calculateVariables() {
+		
 	}
 
 	private void updateMap() {
@@ -109,7 +108,7 @@ public class Map {
 	}
 
 	private void updateHero() {
-		if (game.paused) {
+		if (game.paused || game.help) {
 			return;
 		}
 
@@ -126,36 +125,49 @@ public class Map {
 	}
 
 	private void updateBuildings() {
-		// TODO
+		// update energy
+		for (Building building : buildings) {
+			game.energy += BuildingStats.gen[building.type];
+		}
+		if (game.energy > game.maxEnergy) {
+			game.energy = game.maxEnergy;
+		}
 	}
 
 	private void spawnEnemies() {
-		// TODO: use the following to spawn enemies:
-		// timeOfDay: how many monsters to spawn
-		// tiles: where to spawn the monsters
-		// and maybe more
+		int enemiesToSpawn = enemySpawnCount[game.hour];
+		double chance = enemiesToSpawn / 100.0;
+		game.gameTime = 0;
+		for (int i = 0; i < tileHeight; i++) {
+			for (int j = 0; j < tileWidth; j++) {
+				if (!tiles[i][j].wall && tiles[i][j].building == null &&
+						lighting[i][j] < 128 && Math.random() < 0.0001) {
+					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE);
+					enemies.add(enemy);
+				}
+				/*
+				if (!tiles[i][j].wall && tiles[i][j].building == null &&
+						lighting[i][j] < 128 && Math.random() < chance) {
+					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE);
+					enemies.add(enemy);
+				}//*/
+			}
+		}
 	}
 
 	private void updateEnemies() {
 		// TODO
 	}
-
+	// method takes ~30us to 0.1ms
 	private void recalculateLighting() {
-		// TODO: use the following to recalculate the lighting of tiles:
-		// timeOfDay: cover entire map
-		// tiles: walls may block light
-		// buildings: produce their own light
-		// hero: produces lighting
-
+		// TODO: walls block light
+		
 		// global lighting based on time of day
-		// optimized: saved ~0.06 ms
 		int hour = (game.gameTime / 1500) % 24;
 		for (int i = 0; i < tileHeight; i++) {
 			Arrays.fill(lighting[i], hourToLighting[hour]);
 		}
 
-		// TODO: only allow building on places with light or something
-		// TODO: also energy fields u no
 		// buildings produce light
 		for (Building building : buildings) {
 			produceLight(building.col, building.row, building.width,
@@ -163,65 +175,74 @@ public class Map {
 		}
 
 		// hero produces light
-		produceLight((hero.x + hero.HERO_SIZE / 2) / hero.HERO_SIZE,
-				(hero.y + hero.HERO_SIZE / 2) / hero.HERO_SIZE, 1, 1, 16 * 32);
+		produceLight2(hero.x + hero.HERO_SIZE / 2, hero.y + hero.HERO_SIZE / 2, 16 * 32);
 	}
-
-	private void produceLight(int col, int row, int width, int height,
-			int brightness) {
-		int x = 32 * col + 32 * (width - 1) / 2;// TODO
-		int y = 32 * row + 32 * (height - 1) / 2;
-		width -= 1;
-		height -= 1;
-
-		for (int j = 0; j < brightness / TILE_SIZE; j++) {
-			// top and bottom
-			for (int i = col; i <= col + width; i++) {
-				addLight(x, y, i, row, brightness);
-				addLight(x, y, i, row + height, brightness);
+	
+	private void produceLight(int col, int row, int width, int height, int brightness) {
+		--width;
+		--height;
+		
+		// calculate how much to loop
+		int radius = brightness / TILE_SIZE;
+		int xMax = col + width + radius;
+		int yMax = row + height + radius;
+		int xCenter = col * TILE_SIZE + width * TILE_SIZE / 2;
+		int yCenter = row * TILE_SIZE + height * TILE_SIZE / 2;
+		
+		// calculate 
+		for (int i = col - radius; i < xMax; i++) {
+			for (int j = row - radius; j < yMax; j++) {
+				addLight(xCenter, yCenter, i, j, brightness);
 			}
-
-			// left and right
-			for (int i = row + 1; i <= row + height - 1; i++) {
-				addLight(x, y, col, i, brightness);
-				addLight(x, y, col + width, i, brightness);
+		}
+	}
+	private void produceLight2(int x, int y, int brightness) {
+		// calculate how much to loop
+		int radius = brightness / TILE_SIZE;
+		int xMax = x / TILE_SIZE + radius;
+		int yMax = y / TILE_SIZE + radius;
+		
+		// calculate 
+		for (int i = x / TILE_SIZE - radius; i < xMax; i++) {
+			for (int j = y / TILE_SIZE - radius; j < yMax; j++) {
+				addLight(x, y, i, j, brightness);
 			}
-			--col;
-			--row;
-			width += 2;
-			height += 2;
 		}
 	}
 
 	private void addLight(int x, int y, int col, int row, int brightness) {
+		// don't draw anything that's out of bounds
 		if (col < 0 || row < 0 || col >= tileWidth || row >= tileHeight) {
 			return;
 		}
-		// TODO: refactor
-		int value = lighting[row][col];
-		int add = brightness
-				- (int) (p.sqrt(p.sq(x - col * 32) + p.sq(y - row * 32)));
-		value += p.max(0, add);
-		value = p.constrain(value, 0, 255);
-		lighting[row][col] = value;
-	}
-
-	public void draw() {
-		drawTiles();
-		drawBuildings();
-		hero.draw(-mapX, -mapY);
-		// TODO: draw enemies
-		// TODO: draw projectiles
-
-		// draw place building transparency
-		if (isPlacingBuilding()) {
-			drawBuildingPlaceover();
+		
+		int add = brightness - (int) (Math.sqrt(p.sq(x - col * TILE_SIZE) + p.sq(y - row * TILE_SIZE)));
+		if (add < 0) {
+			add = 0;
+		}
+		
+		lighting[row][col] += add;
+		if (lighting[row][col] > 255) {
+			lighting[row][col] = 255;
 		}
 	}
 
-	// basic drawing methods
+	public void checkGameEvents() {
+		
+	}
+	
+	// drawing methods
+	public void draw() {
+		drawTiles();
+		drawBuildings();
+		hero.draw();
+		drawEnemies();
+		drawProjectiles();
+		drawBuildingPlaceover();
+	}
+
+	// method takes ~2.1ms
 	public void drawTiles() {
-		// optimized: saved ~1ms
 		p.translate(-mapX, -mapY);
 		p.noStroke();
 
@@ -236,10 +257,10 @@ public class Map {
 			for (int y = yMin; y < yMax; y++) {
 				// use lighting
 				int alpha = lighting[y][x];
-
-				// TODO: dont draw if building over it?
-				// if (tiles[y][x].building != null)
-				// continue;
+				
+				// TODO: don't draw tile if building is over it?
+				//if (tiles[y][x].building != null)
+				//	continue;
 
 				// use a different color for walls
 				if (tiles[y][x].wall) {
@@ -260,8 +281,7 @@ public class Map {
 
 		p.translate(mapX, mapY);
 	}
-
-	private void drawBuildings() {
+	public void drawBuildings() {
 		// draw all the buildings
 		for (Building building : buildings) {
 			// calculate variables
@@ -277,13 +297,19 @@ public class Map {
 			}
 		}
 	}
-
-	// building related methods
-	public boolean isPlacingBuilding() {
-		return (game.placingBuilding != -1 && p.mouseY > BAR_HEIGHT);
+	public void drawEnemies() {
+		for (Enemy enemy : enemies) {
+			enemy.draw(p);
+		}
 	}
-
+	public void drawProjectiles() {
+		
+	}
 	public void drawBuildingPlaceover() {
+		if (!isPlacingBuilding()) {
+			return;
+		}
+		
 		p.translate(-mapX, -mapY);
 
 		int x = (p.mouseX + mapX) / 32;
@@ -303,8 +329,14 @@ public class Map {
 		p.translate(mapX, mapY);
 	}
 
+	// building related methods
+	public boolean isPlacingBuilding() {
+		return (game.placingBuilding != -1 && p.mouseY > BAR_HEIGHT);
+	}
+
+	// TODO: only allow building on places with light or something
+	// TODO: also energy fields u no
 	public boolean canPlaceBuilding(int x, int y, int w, int h) {
-		// TODO: refactor this
 		int left = hero.x / TILE_SIZE;
 		int up = hero.y / TILE_SIZE;
 		int right = (hero.x + hero.HERO_SIZE - 1) / TILE_SIZE;
@@ -328,9 +360,15 @@ public class Map {
 				}
 			}
 		}
-
-		// TODO: check for placing over enemies
-
+		
+		// check for placing over enemies
+		Rectangle building = new Rectangle(x * TILE_SIZE, y * TILE_SIZE, w * TILE_SIZE, h * TILE_SIZE);
+		for (Enemy enemy : enemies) {
+			if (building.intersects(enemy.bounds)) {
+				return true;
+			}
+		}
+		
 		return true;
 	}
 

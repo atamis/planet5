@@ -74,7 +74,6 @@ public class SettingsFrame extends Frame {
 	
 	@Override
 	public void buttonPressed(String command) {
-		fpsButtons[Game.instance.speed - 1].pressed = false;
 		int newSpeed = 1;
 		
 		if (command.equals("60")) {
@@ -89,8 +88,11 @@ public class SettingsFrame extends Frame {
 			newSpeed = 5;
 		} else if (command.equals("10")) {
 			newSpeed = 6;
+		} else {
+			return;
 		}
-		
+
+		fpsButtons[Game.instance.speed - 1].pressed = false;
 		Game.instance.changeSpeed(newSpeed);
 		fpsButtons[Game.instance.speed - 1].pressed = true;
 	}

@@ -22,10 +22,15 @@ public class GameFrame extends Frame {
 	public Button pauseButton;
 	public boolean paused = false;
 	public boolean help = false;
-	public int gameTime;
 	public int lastFrameRateUpdate = 0;
 	public int lastFrameRate = 10;
 	public int maxEnergy = 1000, energy = 1000;
+	
+	// game time
+	public int gameTime;
+	public int day;
+	public int hour;
+	public int minute;
 	
 	// building variables
 	public int placingBuilding = -1;
@@ -33,11 +38,10 @@ public class GameFrame extends Frame {
 	// colors
 	public static final int MONO_32 = 0xFF202020;
 
-	
 	public GameFrame(Applet parent) {
 		super(parent);
 		map = (new VoronoiPerlinNoiseGenerator()).gen(p, this, 40, 50);
-		gameTime = 0; // TODO: start at 6am?
+		gameTime = 8 * 25 * 60; // start at 8 am TODO make sure no monsters spawn
 		
 		// add buttons
 		// TODO: help => resume = unpaused???
@@ -51,45 +55,62 @@ public class GameFrame extends Frame {
 	@Override
 	protected void draw() {
 		updateGame();
+		
 		p.translate(0, BAR_HEIGHT);
 		map.draw();
 		p.translate(0, -BAR_HEIGHT);
-
+		
 		drawBar();
 		drawShadows();
 	}
 
 	void updateGame() {
 		if (!paused && !help) {
-			gameTime += Game.speed;
+			updateGameTime();
 		}
 		
-		if (p.focused) {
-			map.update();
-		}
+		map.update();
 		
 		// remove building buy if not enough energy
 		if (placingBuilding != -1 && energy < BuildingStats.costs[placingBuilding]) {
 			placingBuilding = -1;
 		}
 	}
+	
+	public void updateGameTime() {
+		gameTime += Game.speed;
+		minute = gameTime / 25;
+		day = minute / (24 * 60);
+		minute %= 24 * 60;
+		hour = minute / (60);
+		minute %= 60;
+	}
 
+	// TODO: to greatly increase draw time, don't redraw everything
+	// TODO: redrawing the bar
+	//		buttons, turret select, time of day, fps counter, energy bar
+	// TODO: redrawing the map
+	//		movement: difficult (complete redraw if tiles are not one color rectangles)
+	//		building placing: simple
+	// 		enemy movement: 
+	//		lighting: simple (redraw all affected tiles)
+	// method takes ~335us
 	void drawBar() {
-		drawBarBackground();
-		drawBarBuildings();
+		drawBarBackground();	// ~45us
+		drawBarBuildings();		// ~80us
 
 		int energy_bar_start = 6 * (BAR_HEIGHT - 1) + 1;
 		int energy_bar_width = p.width - 6 * (BAR_HEIGHT - 1) - 1;
+		int energy_bar_fill = (int) p.map(energy, 0, maxEnergy, 0, energy_bar_width);
 		
-		// Draw the max energy bar.
+		// maximum energy bar
+		// ~17us
 		p.fill(64, 64, 0);
-		p.rect(energy_bar_start, BAR_HEIGHT / 2 + 2, energy_bar_width, BAR_HEIGHT / 2 - 1);
-
-		// Draw the current energy bar.
+		p.rect(energy_bar_start + energy_bar_fill, BAR_HEIGHT / 2 + 2, energy_bar_width - energy_bar_fill, BAR_HEIGHT / 2 - 1);
+		
+		// current energy bar
 		p.fill(128, 128, 0);
-		p.rect(energy_bar_start, BAR_HEIGHT / 2 + 2,
-				p.map(energy, 0, maxEnergy, 0, energy_bar_width),
-				BAR_HEIGHT / 2 - 1);
+		p.rect(energy_bar_start, BAR_HEIGHT / 2 + 2, energy_bar_fill, BAR_HEIGHT / 2 - 1);
 
 		// Draw the energy text.
 		p.textAlign(p.CENTER, p.CENTER);
@@ -100,20 +121,15 @@ public class GameFrame extends Frame {
 		// Draw the timer
 		p.fill(255);
 		p.textAlign(p.LEFT, p.CENTER);
-		int minutes = gameTime / 25;
-		int days = minutes / (24 * 60);
-		minutes %= 24 * 60;
-		int hours = minutes / (60);
-		minutes %= 60;
 		String part = "AM";
-		if (hours >= 12) {
-			hours -= 12;
+		if (hour >= 12) {
+			hour -= 12;
 			part = "PM";
 		}
-		if (hours == 0) {
-			hours = 12;
+		if (hour == 0) {
+			hour = 12;
 		}
-		String time = String.format("Day %d, %d:%02d %s", days + 1, hours, minutes, part);
+		String time = String.format("Day %d, %d:%02d %s", day + 1, hour, minute, part);
 		p.text(time, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16, BAR_HEIGHT / 2 - 1);
 		
 		p.textAlign(p.RIGHT, p.CENTER);
@@ -123,7 +139,6 @@ public class GameFrame extends Frame {
 			lastFrameRateUpdate = p.millis();
 		}
 	}
-
 	void drawBarBackground() {
 		// TODO: can optimize by drawing lines for left, rectangle for middle top, lines for right
 		p.fill(MONO_32);
@@ -131,7 +146,6 @@ public class GameFrame extends Frame {
 		p.fill(0);
 		p.rect(p.width - 3 * 64, 0, 3 * 64, 23);
 	}
-
 	private void drawBarBuildings() {
 		p.noStroke();
 		p.textFont(Fonts.consolas16);
@@ -164,6 +178,8 @@ public class GameFrame extends Frame {
 		}
 	}
 	
+	// method takes ~450us
+	// TODO: try using loadPixels() for faster drawing
 	void drawShadows() {
 		// background shadow
 		p.strokeWeight(1);
@@ -191,7 +207,7 @@ public class GameFrame extends Frame {
 	// key event handlers
 	@Override
 	public void keyPressed() {
-		int intKey = p.key - '0'; // the key as an integer
+		int intKey = p.key - '0';
 
 		map.hero.keyPressed();
 
@@ -211,8 +227,7 @@ public class GameFrame extends Frame {
 	// mouse event handlers
 	@Override
 	public void mousePressed() {
-		// TODO buy building
-		for (int i = 0; i < 6; i++) { // TODO: optimize
+		for (int i = 0; i < 6; i++) {
 			int boxX = i * (BAR_HEIGHT - 1) + 1;
 			boolean buyable = (energy >= BuildingStats.costs[i + 1]);
 			if (buyable && p.mouseButton == p.LEFT && p.mouseX >= boxX && p.mouseY >= 1 &&
@@ -237,7 +252,7 @@ public class GameFrame extends Frame {
 
 	@Override
 	public void mouseReleased() {
-
+		
 	}
 
 	// button event handlers

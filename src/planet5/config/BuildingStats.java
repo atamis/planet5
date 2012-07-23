@@ -19,7 +19,7 @@ public final class BuildingStats {
 	public static int[] cols		= {3,    1,   1,   1,	2,   1,   2};
 	public static int[] light	= {256,    64,   64,   64,	256,   96,   64};
 	public static int[] cap		= {4800, 0,   0,   500,	0,   0,   0};
-	public static int[] gen		= {20,   0,   50,  0,	0,   0,   0};
+	public static int[] gen		= {1,   0,   5,  0,	0,   0,   0};
 	public static int[] draw		= {0,    0,   0,   0,	10,  10,   4};
 	
 	
