@@ -11,6 +11,8 @@ import planet5.framework.Applet;
 import planet5.framework.Button;
 import planet5.framework.Frame;
 import planet5.game.Map;
+import planet5.game.gen.CaveGenerator;
+import planet5.game.gen.VoronoiPerlinNoiseGenerator;
 
 public class GameFrame extends Frame {
 	public Map map;
@@ -34,7 +36,7 @@ public class GameFrame extends Frame {
 	
 	public GameFrame(Applet parent) {
 		super(parent);
-		map = Map.noiseRandomLevel(p, this, 40, 50);
+		map = (new VoronoiPerlinNoiseGenerator()).gen(p, this, 40, 50);
 		gameTime = 0; // TODO: start at 6am?
 		
 		// add buttons
