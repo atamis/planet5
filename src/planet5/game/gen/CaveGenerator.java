@@ -1,5 +1,6 @@
 package planet5.game.gen;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import planet5.config.BuildingStats;
@@ -23,7 +24,10 @@ public class CaveGenerator implements Generator {
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				tiles[x][y] = new Tile(0xffffff, true);
+				float hue = (float) 0.1;
+				float sat = p.map(p.noise(x*0.05f, y * 0.05f), 0, 1, (float) 0.52, 1);
+				float val = p.map(p.noise(x*0.053f + 1, y * 0.053f + 1), 0, 1, (float) 0.25, 1);;
+				tiles[x][y] = new Tile(Color.HSBtoRGB(hue, sat, val), true);
 			}
 		}
 
@@ -63,6 +67,19 @@ public class CaveGenerator implements Generator {
 		tiles = GenUtil.graphicsToTiles(pg, tiles);
 		pg.endDraw();
 
+		for (int x = 0; x < tiles.length; x++) {
+			for (int y = 0; y < tiles[x].length; y++) {
+				float hue = (float) 0.1;
+				float sat = p.map(p.noise(x*0.05f, y * 0.05f), 0, 1, (float) 0.52, 1);
+				float val = p.map(p.noise(x*0.053f + 1, y * 0.053f + 1), 0, 1, (float) 0.25, 1);;
+				if(tiles[x][y].wall)
+					val = p.max(0.0f, val - 0.2f);
+				tiles[x][y].color = Color.HSBtoRGB(hue, sat, val);
+			}
+		}
+
+		
+		
 		Map map = new Map(p, game, tiles);
 		
 		int x = (int) (width/2.0);

@@ -374,16 +374,16 @@ public class Map {
 				//	continue;
 
 				// use a different color for walls
-				if (tiles[y][x].wall) {
+				/*if (tiles[y][x].wall) {
 					int mono = alpha * 128 / 255;
 					p.fill(p.color(mono, mono, mono));
-				} else {
+				} else {*/
 					Color c = new Color(tiles[y][x].color);
 					int r = c.getRed() * alpha / 255;
 					int g = c.getGreen() * alpha / 255;
 					int b = c.getBlue() * alpha / 255;
 					p.fill(p.color(r, g, b));
-				}
+				//}
 
 				// draw the tile
 				p.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
