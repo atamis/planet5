@@ -1,10 +1,12 @@
 package planet5.game;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import planet5.Game;
 import planet5.config.BuildingStats;
 import planet5.config.Globals;
 import planet5.frames.GameFrame;
@@ -16,11 +18,10 @@ public class Map {
 	// copied constants
 	public static final int BAR_HEIGHT = GameFrame.BAR_HEIGHT;
 	public static final int TILE_SIZE = Globals.TILE_SIZE;
-
-	// color constants
-	public static final int TRANSPARENT_RED = 0x80FF0000;
-	public static final int TRANSPARENT_GREEN = 0x80208000;
-	// public static final int GRAY = 0xFF808080;
+	
+	// constants
+	final int FIELD_RADIUS = 8;
+	final int FIELD_RADIUS_SQ = TILE_SIZE * TILE_SIZE * FIELD_RADIUS * FIELD_RADIUS;
 
 	// reference variables
 	public Applet p;
@@ -29,22 +30,20 @@ public class Map {
 	// tile variables
 	public Tile[][] tiles;
 	public int[][] lighting;
+	public boolean[][] field;
 	public final int[] hourToLighting = { 0, 0, 0, 0, 32, 64, 96, 128, 160, 192, 224, 255, 
 			255, 255, 255, 255, 255, 224, 192, 160, 128, 96, 64, 32 };
-	public final int[] enemySpawnCount = { 5, 6, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4 };
+	public final double[] enemySpawnChances = { 0.0005, 0.0006, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0.0001, 0.0002, 0.0003, 0.0004 };
 	public int[][] path;
-	public int tileWidth;
-	public int tileHeight;
-	public int mapX = 0;
-	public int mapY = 0;
+	public int tileWidth, tileHeight;
+	public int mapX = 0, mapY = 0;
 
-	// building variables
+	// building and variables
 	public ArrayList<Building> buildings = new ArrayList<Building>();
-
-	// unit variables
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	public Hero hero;
+	public Building base;
 
 	// constructors
 	public Map(Applet parent, GameFrame game, Tile[][] tiles) {
@@ -54,6 +53,7 @@ public class Map {
 		tileWidth = tiles[0].length;
 		tileHeight = tiles.length;
 		lighting = new int[tileHeight][tileWidth];
+		field = new boolean[tileHeight][tileWidth];
 
 		hero = new Hero(p, this, 0, 0);
 		// TODO: better placement
@@ -65,7 +65,6 @@ public class Map {
 			}
 		}
 		
-		Building base = null;
 		for (int i = 0; buildings.size() == 0 && i < tileHeight; i++) {
 			for (int j = 0; buildings.size() == 0 && j < tileWidth; j++) {
 				boolean good = true;
@@ -89,62 +88,73 @@ public class Map {
 				}
 			}
 		}
-
-		// calculate path array
-		calculatePathing(base);
 	}
-	
-	public void calculatePathing(Building base) {
+	public void calculatePathing() {
 		path = new int[tileHeight][tileWidth];
-		
-		class AStarItem implements Comparable {
-			public int dist, row, col;
-			
-			public AStarItem (int dist, int row, int col) {
-				this.dist = dist;
-				this.row = row;
-				this.col = col;
-			}
-			
-			@Override
-			public int compareTo(Object other) {
-				return dist - ((AStarItem) other).dist;
-			}
+		for (int i = 0; i < path.length; i++) {
+			Arrays.fill(path[i], Integer.MAX_VALUE);
 		}
+
+		ArrayList<Point> stack = new ArrayList<Point>();
 		
-		ArrayList<AStarItem> AStarStack = new ArrayList<AStarItem>();
 		for (int i = 0; i < BuildingStats.cols[0]; i++) {
 			for (int j = 0; j < BuildingStats.rows[0]; j++) {
-				AStarStack.add(new AStarItem(0, base.row + j, base.col + i));
+				path[base.row + j][base.col + i] = 0;
+				stack.add(new Point(base.col + i, base.row + j));
 			}
 		}
 		
-		while (AStarStack.size() != 0) {
+		int dist = 1;
+		ArrayList<Point> nextStack = new ArrayList<Point>();
+		while (stack.size() != 0) {
+			Point p = stack.remove(0);
 			
+			if (p.x != 0 && path[p.y][p.x - 1] > dist && !tiles[p.y][p.x - 1].wall) {
+				path[p.y][p.x - 1] = dist;
+				nextStack.add(new Point(p.x - 1, p.y));
+			}
+			if (p.y != 0 && path[p.y - 1][p.x] > dist && !tiles[p.y - 1][p.x].wall) {
+				path[p.y - 1][p.x] = dist;
+				nextStack.add(new Point(p.x, p.y - 1));
+			}
+			if (p.x != tileWidth - 1 && path[p.y][p.x + 1] > dist && !tiles[p.y][p.x + 1].wall) {
+				path[p.y][p.x + 1] = dist;
+				nextStack.add(new Point(p.x + 1, p.y));
+			}
+			if (p.y != tileHeight - 1 && path[p.y + 1][p.x] > dist && !tiles[p.y + 1][p.x].wall) {
+				path[p.y + 1][p.x] = dist;
+				nextStack.add(new Point(p.x, p.y + 1));
+			}
 			
+			if (stack.size() == 0) {
+				stack = nextStack;
+				nextStack = new ArrayList<Point>();
+				++dist;
+			}
 		}
 	}
 
 	// both update and draw are repeatedly called. update is called first
 	public void update() {
-		calculateVariables();
-		updateMap();
-		updateHero();
-		updateBuildings();
+		if (!game.help && !game.paused) {
+			calculateVariables();
+			updateMap();
+			updateHero();
+			updateBuildings();
+		}
 		recalculateLighting();
-		spawnEnemies();
-		updateEnemies();
-		checkGameEvents();
+		if (!game.help && !game.paused) { 
+			spawnEnemies();
+			updateEnemies();
+			checkGameEvents();
+		}
 	}
-	
 	public void calculateVariables() {
 		
 	}
-
 	private void updateMap() {
 		// TODO
 	}
-
 	private void updateHero() {
 		if (game.paused || game.help) {
 			return;
@@ -161,44 +171,79 @@ public class Map {
 		mapY = p.constrain(mapY, 0, tileHeight * TILE_SIZE - p.height
 				+ BAR_HEIGHT);
 	}
-
 	private void updateBuildings() {
-		// update energy
+		// update energy, kill enemies
 		for (Building building : buildings) {
-			game.energy += BuildingStats.gen[building.type];
+			if (building.powered) {
+				game.energy += Game.speed * BuildingStats.gen[building.type];
+
+				int range = 0;
+				// check for reload time, assign range
+				if (building.type == 5) {
+					if (game.gameTime - building.lastFireTime < 25) {
+						
+					}
+					range = 32 * 4; // TODO: put constants elsewhere
+				} else if (building.type == 6) {
+					range = 32 * 8;
+				} else {
+					continue;
+				}
+				
+				// find the closest enemy
+				Enemy target = null;
+				for (Enemy enemy : enemies) {
+					
+				}
+				if (target == null) {
+					continue;
+				}
+				
+				// deal damage, remove dead enemies
+				if (building.type == 5) {
+					
+				} else if (building.type == 6) {
+					// aoe
+				}
+				
+				// set reload time
+				
+			}
 		}
+		
+		// limit max energy
 		if (game.energy > game.maxEnergy) {
 			game.energy = game.maxEnergy;
 		}
 	}
-
 	private void spawnEnemies() {
-		int enemiesToSpawn = enemySpawnCount[game.hour];
-		double chance = enemiesToSpawn / 100.0; // TODO multiply
-		// TODO: use enemies.size()
-		game.gameTime = 0;
+		int maxEnemyCount = tileWidth * tileHeight / 900;
+		double chance = Game.speed * enemySpawnChances[game.hour] * 0.01;
+		
 		for (int i = 0; i < tileHeight; i++) {
 			for (int j = 0; j < tileWidth; j++) {
-				if (!tiles[i][j].wall && tiles[i][j].building == null &&
-						lighting[i][j] < 128 && Math.random() < 0.0001) {
-					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE, this, game);
-					enemies.add(enemy);// TODO: calculate a path
+				if (enemies.size() >= maxEnemyCount) {
+					return;
 				}
-				/*
+				
 				if (!tiles[i][j].wall && tiles[i][j].building == null &&
 						lighting[i][j] < 128 && Math.random() < chance) {
-					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE);
+					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE, this, game);
 					enemies.add(enemy);
-				}//*/
+				}
 			}
 		}
 	}
-
 	private void updateEnemies() {
-		// TODO: move along path or attack
+		for (Enemy enemy : enemies) {
+			// TODO: attack, kill buildings
+			// flash screen red when hero/base damaged
+			enemy.move();
+		}
 	}
-	// method takes ~30us to 0.1ms
+	
 	private void recalculateLighting() {
+		// method takes ~30us to 0.1ms
 		// TODO: walls block light
 		
 		// global lighting based on time of day
@@ -209,14 +254,15 @@ public class Map {
 
 		// buildings produce light
 		for (Building building : buildings) {
-			produceLight(building.col, building.row, building.width,
-					building.height, BuildingStats.light[building.type]);
+			if (BuildingStats.light[building.type] != 0 && building.powered) {
+				produceLight(building.col, building.row, building.width,
+						building.height, BuildingStats.light[building.type]);
+			}
 		}
 
 		// hero produces light
 		produceLight2(hero.x + hero.HERO_SIZE / 2, hero.y + hero.HERO_SIZE / 2, 16 * 32);
 	}
-	
 	private void produceLight(int col, int row, int width, int height, int brightness) {
 		--width;
 		--height;
@@ -248,14 +294,13 @@ public class Map {
 			}
 		}
 	}
-
 	private void addLight(int x, int y, int col, int row, int brightness) {
 		// don't draw anything that's out of bounds
 		if (col < 0 || row < 0 || col >= tileWidth || row >= tileHeight) {
 			return;
 		}
 		
-		int add = brightness - (int) (Math.sqrt(p.sq(x - col * TILE_SIZE) + p.sq(y - row * TILE_SIZE)));
+		int add = brightness - (int) (Math.hypot(x - col * TILE_SIZE, y - row * TILE_SIZE));
 		if (add < 0) {
 			add = 0;
 		}
@@ -267,7 +312,9 @@ public class Map {
 	}
 
 	public void checkGameEvents() {
-		
+		if (hero.hp == 0 || base.hp == 0) {
+			// TODO: lose
+		}
 	}
 	
 	// drawing methods
@@ -277,11 +324,13 @@ public class Map {
 		hero.draw();
 		drawEnemies();
 		drawProjectiles();
-		drawBuildingPlaceover();
+		if (!game.help) {
+			drawBuildingPlaceover();
+			drawField();
+		}
 	}
-
-	// method takes ~2.1ms
 	public void drawTiles() {
+		// method takes ~2.1ms
 		p.translate(-mapX, -mapY);
 		p.noStroke();
 
@@ -315,12 +364,28 @@ public class Map {
 
 				// draw the tile
 				p.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				if (field[y][x]) {
+					p.fill(0);
+					//p.rect(x * TILE_SIZE, y * TILE_SIZE, 4, 4);
+				}
+				if (!tiles[y][x].wall) {
+					p.fill(0);
+				//	p.text(path[y][x], x * TILE_SIZE + 8, y * TILE_SIZE + 8);
+				}
 			}
 		}
 
 		p.translate(mapX, mapY);
 	}
 	public void drawBuildings() {
+		// TODO: use this?
+		Building hoveredBuilding = null;
+		if (p.mouseX >= BAR_HEIGHT) {
+			int x = (p.mouseX + mapX) / TILE_SIZE;
+			int y = (p.mouseY + mapY - BAR_HEIGHT) / TILE_SIZE; // TODO: refactor, update every tick?
+			hoveredBuilding = tiles[y][x].building;
+		}
+		
 		// draw all the buildings
 		for (Building building : buildings) {
 			// calculate variables
@@ -332,7 +397,11 @@ public class Map {
 			// only draw building if it will show up
 			if (x + w >= 0 && y + h >= 0 && x <= p.width
 					&& y <= p.height - BAR_HEIGHT) {
-				building.draw(p, x, y);
+				if (building == game.selectedBuilding) {
+					building.draw(p, x, y, p.millis());
+				} else {
+					building.draw(p, x, y, -1);
+				}
 			}
 		}
 	}
@@ -358,30 +427,54 @@ public class Map {
 
 		// draw a transparency showing where the building will be placed
 		if (canPlaceBuilding(x, y, w, h)) {
-			p.fill(TRANSPARENT_GREEN);
+			p.fill(0x80208000);
 		} else {
-			p.fill(TRANSPARENT_RED);
+			p.fill(0x80FF0000);
 		}
 		p.noStroke();
 		p.rect(x * TILE_SIZE, y * TILE_SIZE, w * TILE_SIZE, h * TILE_SIZE);
 
 		p.translate(mapX, mapY);
 	}
+	public void drawField() {
+		// TODO: improve performance
+		if (game.placingBuilding != -1) {
+			p.translate(-mapX, -mapY);
+
+			// calculate bounding x and y values
+			int xMin = mapX / TILE_SIZE;
+			int yMin = mapY / TILE_SIZE;
+			int xMax = (p.width + mapX - 1) / TILE_SIZE + 1;
+			int yMax = (p.height + mapY - BAR_HEIGHT - 1) / TILE_SIZE + 1;
+
+			// draw the tiles
+			p.fill(p.color(64, 128, 255, 64));
+			for (int i = xMin; i < xMax; i++) {
+				for (int j = yMin; j < yMax; j++) {
+					if (field[j][i]) {
+						p.rect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+					}
+				}
+			}
+
+			p.translate(mapX, mapY);
+		}
+	}
 
 	// building related methods
 	public boolean isPlacingBuilding() {
 		return (game.placingBuilding != -1 && p.mouseY > BAR_HEIGHT);
 	}
-
-	// TODO: only allow building on places with light or something
-	// TODO: also energy fields u no
 	public boolean canPlaceBuilding(int x, int y, int w, int h) {
+		// TODO: only allow building on places with light or something
+		// TODO: also energy fields u no
 		int left = hero.x / TILE_SIZE;
 		int up = hero.y / TILE_SIZE;
 		int right = (hero.x + hero.HERO_SIZE - 1) / TILE_SIZE;
 		int down = (hero.y + hero.HERO_SIZE - 1) / TILE_SIZE;
 
 		// loop through the tiles this building covers
+		boolean energized = false;
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
 				// calculate column and row
@@ -392,12 +485,20 @@ public class Map {
 						|| tiles[r][c].building != null) {
 					return false;
 				}
+				
+				if (field[r][c]) {
+					//energized = true;
+				}
 
 				// check for placing over hero
 				if ((c == left || c == right) && (r == up || r == down)) {
 					return false;
 				}
 			}
+		}
+		
+		if (!energized) {
+			//return false;
 		}
 		
 		// check for placing over enemies
@@ -410,7 +511,6 @@ public class Map {
 		
 		return true;
 	}
-
 	public void placeBuilding() {
 		int x = (p.mouseX + mapX) / 32;
 		int y = (p.mouseY + mapY - BAR_HEIGHT) / 32;
@@ -421,18 +521,135 @@ public class Map {
 		if (isPlacingBuilding() && canPlaceBuilding(x, y, w, h)) {
 			Building placedBuilding = new Building(buildingType, x, y);
 			game.energy -= BuildingStats.costs[buildingType];
-			buildings.add(placedBuilding);
-			for (int i = 0; i < w; i++) {
-				for (int j = 0; j < h; j++) {
-					int c = x + i, r = y + j;
-					tiles[r][c].building = placedBuilding;
+			addBuilding(placedBuilding);
+		}
+	}
+	public void setBase(Building base) {
+		// TODO: use these 3 methods and refactor?
+		this.base = base;
+		if (buildings.size() == 0) {
+			buildings.add(base);
+		} else {
+			buildings.set(0, base);
+		}
+
+		for (int i = 0; i < base.height; i++) {
+			for (int j = 0; j < base.width; j++) {
+				tiles[base.row + i][base.col + j].building = base;
+			}
+		}
+		recalculateField();
+	}
+	public void addBuilding(Building building) {
+		buildings.add(building);
+		for (int i = 0; i < building.height; i++) {
+			for (int j = 0; j < building.width; j++) {
+				tiles[building.row + i][building.col + j].building = building;
+			}
+		}
+		recalculateField();
+	}
+	public void sellBuilding(Building building) {
+		buildings.remove(building);
+		for (int i = 0; i < building.height; i++) {
+			for (int j = 0; j < building.width; j++) {
+				tiles[building.row + i][building.col + j].building = null;
+			}
+		}
+		recalculateField();
+	}
+	public void recalculateField() {
+		for (int i = 0; i < tileHeight; i++) {
+			Arrays.fill(field[i], false);
+		}
+		
+		// TODO: can optimize this but probably unnecessary
+		calculatePoweredBuildings();
+
+		for (Building building : buildings) {
+			if (building.type <= 1 && building.powered) { // or <= 2
+				int x = building.col * TILE_SIZE + (building.width - 1) * TILE_SIZE / 2; 
+				int y = building.row * TILE_SIZE + (building.height - 1) * TILE_SIZE / 2;
+				int left = Math.max(0, building.col - FIELD_RADIUS);
+				int right = Math.min(tileWidth - 1, building.col + building.width + FIELD_RADIUS);
+				int top = Math.max(0, building.row - FIELD_RADIUS);
+				int bottom = Math.min(tileHeight - 1, building.row + building.height + FIELD_RADIUS);
+				
+				for (int i = left; i < right; i++) {
+					for (int j = top; j < bottom; j++) {
+						int dx = i * TILE_SIZE - x;
+						int dy = j * TILE_SIZE - y;
+						if (dx * dx + dy * dy < FIELD_RADIUS_SQ) {
+							field[j][i] = true;
+						}
+					}
 				}
 			}
 		}
 	}
+	public void calculatePoweredBuildings() {
+		// clear everything
+		for (Building building : buildings) {
+			building.powered = false;
+			building.powerSource = null;
+		}
+		
+		// power all the buildings
+		ArrayList<Building> stack = new ArrayList<Building>();
+		ArrayList<Building> nextStack = new ArrayList<Building>();
+		stack.add(base);
+		base.powered = true;
+		
+		while (stack.size() != 0) {
+			Building source = stack.remove(0);
+			
+			for (Building building : buildings) {
+				if (!building.powered) {
+					if (willPower(source, building)) {
+						building.powered = true;
+						if (building.type == 1) {
+							nextStack.add(building);
+						}
+					}
+				}
+			}
+			
+			if (stack.size() == 0) {
+				stack = nextStack;
+				nextStack = new ArrayList<Building>();
+			}
+		}
 
-	public void removeBuilding() {
-		// TODO: parameters too
+		// calculate energy values
+		int energy = game.energy;
+		int maxEnergy = 0;
+		for (Building building : buildings) {
+			if (building.powered) {
+				maxEnergy += BuildingStats.cap[building.type];
+			}
+		}
+		if (energy > maxEnergy) {
+			energy = maxEnergy;
+		}
+		game.maxEnergy = maxEnergy;
+		game.energy = energy;
+		
+		// calculate connections
+		// TODO: power sources must lead to base AND if multiple, connect to closest
+		// TODO: buildings connect to closest one
+		for (Building building : buildings) {
+			
+		}
 	}
-
+	private boolean willPower(Building source, Building building) {
+		int x1 = source.col * TILE_SIZE + source.width * TILE_SIZE / 2; 
+		int y1 = source.row * TILE_SIZE + source.height * TILE_SIZE / 2;
+		int x2 = building.col * TILE_SIZE + building.width * TILE_SIZE / 2; 
+		int y2 = building.row * TILE_SIZE + building.height * TILE_SIZE / 2;
+		
+		int dx = x1 - x2;
+		int dy = y1 - y2;
+		
+		return (dx * dx + dy * dy < FIELD_RADIUS_SQ);
+	}
 }

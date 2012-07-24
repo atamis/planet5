@@ -7,33 +7,33 @@ import java.util.concurrent.TimeUnit;
 import planet5.Game;
 import planet5.config.BuildingStats;
 import planet5.config.Fonts;
+import planet5.config.Globals;
 import planet5.framework.Applet;
 import planet5.framework.Button;
 import planet5.framework.Frame;
+import planet5.game.Building;
 import planet5.game.Map;
 import planet5.game.gen.CaveGenerator;
 import planet5.game.gen.VoronoiPerlinNoiseGenerator;
 
 public class GameFrame extends Frame {
 	public Map map;
+	public static final int TILE_SIZE = Globals.TILE_SIZE;
 
 	// bar variables
 	public static final int BAR_HEIGHT = 45;
 	public Button pauseButton;
-	public boolean paused = false;
-	public boolean help = false;
-	public int lastFrameRateUpdate = 0;
-	public int lastFrameRate = 10;
-	public int maxEnergy = 1000, energy = 1000;
+	public boolean paused = false, help = false;
+	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
+	public int energy = 0, maxEnergy = 1000;
 	
 	// game time
 	public int gameTime;
-	public int day;
-	public int hour;
-	public int minute;
+	public int day, hour, minute;
 	
 	// building variables
 	public int placingBuilding = -1;
+	public Building selectedBuilding = null;
 
 	// colors
 	public static final int MONO_32 = 0xFF202020;
@@ -41,7 +41,15 @@ public class GameFrame extends Frame {
 	public GameFrame(Applet parent) {
 		super(parent);
 		map = (new CaveGenerator()).gen(p, this, 200, 200);
-		gameTime = 8 * 25 * 60; // start at 8 am TODO make sure no monsters spawn
+		
+		// TODO: REMOVE THESE 3 LINES LATER
+		map.buildings.remove(0);
+		map.base = map.buildings.get(0);
+		map.recalculateField();
+
+		// calculate path array
+		map.calculatePathing();
+		gameTime = 0 * 25 * 60; // start at 8 am TODO make sure no monsters spawn
 		
 		// add buttons
 		// TODO: help => resume = unpaused???
@@ -76,7 +84,6 @@ public class GameFrame extends Frame {
 			placingBuilding = -1;
 		}
 	}
-	
 	public void updateGameTime() {
 		gameTime += Game.speed;
 		minute = gameTime / 25;
@@ -86,16 +93,16 @@ public class GameFrame extends Frame {
 		minute %= 60;
 	}
 
-	// TODO: to greatly increase draw time, don't redraw everything
-	// TODO: redrawing the bar
-	//		buttons, turret select, time of day, fps counter, energy bar
-	// TODO: redrawing the map
-	//		movement: difficult (complete redraw if tiles are not one color rectangles)
-	//		building placing: simple
-	// 		enemy movement: 
-	//		lighting: simple (redraw all affected tiles)
-	// method takes ~335us
 	void drawBar() {
+		// TODO: to greatly increase draw time, don't redraw everything
+		// TODO: redrawing the bar
+		//		buttons, turret select, time of day, fps counter, energy bar
+		// TODO: redrawing the map
+		//		movement: difficult (complete redraw if tiles are not one color rectangles)
+		//		building placing: simple
+		// 		enemy movement: 
+		//		lighting: simple (redraw all affected tiles)
+		// method takes ~335us
 		drawBarBackground();	// ~45us
 		drawBarBuildings();		// ~80us
 
@@ -146,7 +153,7 @@ public class GameFrame extends Frame {
 		p.fill(0);
 		p.rect(p.width - 3 * 64, 0, 3 * 64, 23);
 	}
-	private void drawBarBuildings() {
+	void drawBarBuildings() {
 		p.noStroke();
 		p.textFont(Fonts.consolas16);
 		p.textAlign(p.CENTER, p.CENTER);
@@ -177,10 +184,9 @@ public class GameFrame extends Frame {
 					BAR_HEIGHT - 1);
 		}
 	}
-	
-	// method takes ~450us
-	// TODO: try using loadPixels() for faster drawing
 	void drawShadows() {
+		// method takes ~450us
+		// TODO: try using loadPixels() for faster drawing
 		// background shadow
 		p.strokeWeight(1);
 		int alpha = 255;
@@ -214,13 +220,18 @@ public class GameFrame extends Frame {
 		// update building placement
 		if (intKey >= 1 && intKey <= BuildingStats.rows.length - 1) {
 			if (placingBuilding == intKey) {
-				placingBuilding = -1;
+				// TODO: UI
+				//placingBuilding = -1;
 			} else {
 				placingBuilding = intKey;
 			}
 		} else if (p.keyCode == KeyEvent.VK_ESCAPE
 				|| p.keyCode == KeyEvent.VK_SPACE) {
 			placingBuilding = -1;
+		} else if (p.keyCode == KeyEvent.VK_Q) {
+			if (selectedBuilding != null) {
+				map.sellBuilding(selectedBuilding);
+			}
 		}
 	}
 
@@ -229,9 +240,8 @@ public class GameFrame extends Frame {
 	public void mousePressed() {
 		for (int i = 0; i < 6; i++) {
 			int boxX = i * (BAR_HEIGHT - 1) + 1;
-			boolean buyable = (energy >= BuildingStats.costs[i + 1]);
-			if (buyable && p.mouseButton == p.LEFT && p.mouseX >= boxX && p.mouseY >= 1 &&
-					energy >= BuildingStats.costs[i + 1] &&
+			if (p.mouseButton == p.LEFT && p.mouseX >= boxX && p.mouseY >= 1 &&
+					energy >= BuildingStats.costs[i + 1] && energy >= BuildingStats.costs[i + 1] &&
 					p.mouseX <= boxX + BAR_HEIGHT - 2 && p.mouseY <= BAR_HEIGHT) {
 				if (placingBuilding == i + 1) {
 					placingBuilding = -1;
@@ -241,15 +251,32 @@ public class GameFrame extends Frame {
 			}
 		}
 		
-		// TODO check if a building can be selected
+		// do building related options
+		if (p.mouseX >= BAR_HEIGHT) {
+			int x = (p.mouseX + map.mapX) / TILE_SIZE;
+			int y = (p.mouseY + map.mapY - BAR_HEIGHT) / TILE_SIZE; // TODO: refactor, update every tick?
+			Building building = map.tiles[y][x].building;
 
-		// TODO check if an enemy can be selected
+			// check if a building can be sold
+			if (building != null && selectedBuilding == building) {
+				map.sellBuilding(building);
+			}
+
+			// check if a building can be selected
+			if (building != null && building != map.base) {
+				selectedBuilding = building;
+				placingBuilding = -1;
+			} else {
+				selectedBuilding = null;
+			}
+		}
+
+		// TODO check if an enemy can be selected (or hover?)
 
 		if (p.mouseButton == p.LEFT && placingBuilding != -1 && !help) {
 			map.placeBuilding();
 		}
 	}
-
 	@Override
 	public void mouseReleased() {
 		
