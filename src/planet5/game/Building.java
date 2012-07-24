@@ -20,6 +20,7 @@ public class Building {
 	int maxHp;
 	int lastFireTime = 0;
 	
+	Enemy target = null;
 	boolean powered = false;
 	Building powerSource = null;
 	

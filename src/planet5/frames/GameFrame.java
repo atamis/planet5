@@ -94,6 +94,7 @@ public class GameFrame extends Frame {
 	}
 
 	void drawBar() {
+		p.noStroke();
 		// TODO: to greatly increase draw time, don't redraw everything
 		// TODO: redrawing the bar
 		//		buttons, turret select, time of day, fps counter, energy bar

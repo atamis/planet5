@@ -37,20 +37,51 @@ public class Enemy {
 		// calculate total pixels to move
 		int x = bounds.x / TILE_SIZE;
 		int y = bounds.y / TILE_SIZE;
+		int right = (bounds.x + ENEMY_SIZE) / TILE_SIZE;
+		int bot = (bounds.y + ENEMY_SIZE) / TILE_SIZE;
+		int targetX = x;
+		int targetY = y;
 
 		int currentDistance = map.path[y][x];
 		if (x != 0 && map.path[y][x - 1] < currentDistance) {
-			xMove = -speed;
+			targetX = x - 1;
 		} else if (x != map.tileWidth - 1
 				&& map.path[y][x + 1] < currentDistance) {
-			xMove = speed;
+			targetX=x+1;
 		}
 
 		if (y != 0 && map.path[y - 1][x] < currentDistance) {
-			yMove = -speed;
-		} else if (y != map.tileHeight - 1
-				&& map.path[y + 1][x] < currentDistance) {
-			yMove = speed;
+			targetY=y-1;
+		} else if (y != map.tileHeight - 1 && map.path[y + 1][x] < currentDistance) {
+			targetY = y+1;
+		}
+		
+		if (x != right) {
+			if (targetX == right) {
+				xMove = speed;
+			} else {
+				xMove = -speed;
+			}
+		} else {
+			if (targetX == x + 1) {
+				xMove = speed;
+			} else if (targetX == x - 1) {
+				xMove = -speed;
+			}
+		}
+		
+		if (y != bot) {
+			if (targetY == bot) {
+				yMove = speed;
+			} else {
+				yMove = -speed;
+			}
+		} else {
+			if (targetY == y + 1) {
+				yMove = speed;
+			} else if (targetY == y - 1) {
+				yMove = -speed;
+			}
 		}
 
 		// find the sign of move
