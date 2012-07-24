@@ -4,6 +4,7 @@ import planet5.Game;
 import planet5.config.BuildingStats;
 import planet5.config.Fonts;
 import planet5.config.Globals;
+import planet5.config.SpriteMaster;
 import processing.core.PApplet;
 
 public class Building {
@@ -43,7 +44,8 @@ public class Building {
 		p.textFont(Fonts.consolas16);
 		p.fill(0xFF808080);
 		
-		p.rect(x, y + hpHeight, width * TILE_SIZE - 1, height * TILE_SIZE - hpHeight - 1);
+		//p.rect(x, y + hpHeight, width * TILE_SIZE - 1, height * TILE_SIZE - hpHeight - 1);
+		p.image(SpriteMaster.instance(p).building_sprites[type], x, y);
 		if (selectedTime != -1) {
 			int alpha = (selectedTime / 2) % 511;
 			if (alpha > 255)// TODO: fine tuning
