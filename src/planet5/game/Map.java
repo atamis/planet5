@@ -177,37 +177,45 @@ public class Map {
 			if (building.powered) {
 				game.energy += Game.speed * BuildingStats.gen[building.type];
 
+				// reset variables
+				building.target = null;
+				
 				int range = 0;
 				// check for reload time, assign range
 				if (building.type == 5) {
-					if (game.gameTime - building.lastFireTime < 25) {
-						
-					}
 					range = 32 * 4; // TODO: put constants elsewhere
 				} else if (building.type == 6) {
+					if (game.gameTime - building.lastFireTime < 25) {
+						continue;
+					}
 					range = 32 * 8;
 				} else {
 					continue;
 				}
 				
 				// find the closest enemy
-				Enemy target = null;
+				int min = Integer.MAX_VALUE;
 				for (Enemy enemy : enemies) {
-					
+					int dist = dist(building, enemy);
+					if (dist < range && dist < min) {//TODO: can change to only <min if min=range init
+						min = dist;
+						building.target = enemy;
+					}
 				}
-				if (target == null) {
+				if (building.target == null) {
 					continue;
 				}
 				
 				// deal damage, remove dead enemies
 				if (building.type == 5) {
-					
+					// TODO: constant
+					building.target.hp -= 10;
 				} else if (building.type == 6) {
 					// aoe
 				}
 				
 				// set reload time
-				
+				building.lastFireTime = game.gameTime;
 			}
 		}
 		
@@ -215,6 +223,13 @@ public class Map {
 		if (game.energy > game.maxEnergy) {
 			game.energy = game.maxEnergy;
 		}
+	}
+	private int dist(Building turret, Enemy enemy) {
+		int x1 = turret.col * TILE_SIZE + turret.width * TILE_SIZE / 2; 
+		int y1 = turret.row * TILE_SIZE + turret.height * TILE_SIZE / 2;
+		int x2 = enemy.bounds.x + enemy.ENEMY_SIZE / 2; 
+		int y2 = enemy.bounds.y + enemy.ENEMY_SIZE / 2;
+		return (int) Math.hypot(x1 - x2, y1 - y2);
 	}
 	private void spawnEnemies() {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
@@ -236,8 +251,16 @@ public class Map {
 	}
 	private void updateEnemies() {
 		for (Enemy enemy : enemies) {
-			// TODO: attack, kill buildings
-			// flash screen red when hero/base damaged
+			// find a target
+			
+			
+			// target buildings first
+			
+			
+			// then target hero
+			
+			
+			// TODO: flash screen red when hero/base damaged
 			enemy.move();
 		}
 	}
@@ -411,7 +434,30 @@ public class Map {
 		}
 	}
 	public void drawProjectiles() {
-		
+		p.stroke(0xFFFF0000);
+		p.strokeWeight(2);
+		for (Building building : buildings) {
+			int x = building.col * TILE_SIZE - mapX;
+			int y = building.row * TILE_SIZE - mapY;
+			int w = building.width * TILE_SIZE;
+			int h = building.height * TILE_SIZE;
+
+			if (x + w >= 0 && y + h >= 0 && x <= p.width
+					&& y <= p.height - BAR_HEIGHT) {
+				Enemy e = building.target;
+				if (e != null) {
+					p.line(x + (building.width) * TILE_SIZE / 2,
+							y + (building.height) * TILE_SIZE / 2,
+							e.bounds.x + e.ENEMY_SIZE / 2 - mapX,
+							e.bounds.y + e.ENEMY_SIZE / 2 - mapY);
+					
+					if (e.hp < 0) {
+						enemies.remove(e);
+					}
+				}
+			}
+		}
+		p.noStroke();
 	}
 	public void drawBuildingPlaceover() {
 		if (!isPlacingBuilding()) {
@@ -644,12 +690,21 @@ public class Map {
 	private boolean willPower(Building source, Building building) {
 		int x1 = source.col * TILE_SIZE + source.width * TILE_SIZE / 2; 
 		int y1 = source.row * TILE_SIZE + source.height * TILE_SIZE / 2;
-		int x2 = building.col * TILE_SIZE + building.width * TILE_SIZE / 2; 
-		int y2 = building.row * TILE_SIZE + building.height * TILE_SIZE / 2;
 		
-		int dx = x1 - x2;
-		int dy = y1 - y2;
+		for (int i = 0; i < building.width; i++) {
+			for (int j = 0; j < building.height; j++) {
+				int x2 = (building.col + i) * TILE_SIZE + building.width * TILE_SIZE / 2; 
+				int y2 = (building.row + j) * TILE_SIZE + building.height * TILE_SIZE / 2;
+				
+				int dx = x1 - x2;
+				int dy = y1 - y2;
+				
+				if (dx * dx + dy * dy < FIELD_RADIUS_SQ) {
+					return true;
+				}
+			}
+		}
 		
-		return (dx * dx + dy * dy < FIELD_RADIUS_SQ);
+		return false;
 	}
 }
