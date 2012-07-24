@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import planet5.Game;
 import planet5.config.BuildingStats;
+import planet5.config.EnemyStats;
+import planet5.config.Fonts;
 import planet5.config.Globals;
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
@@ -38,6 +40,7 @@ public class Map {
 	public int[][] path;
 	public int tileWidth, tileHeight;
 	public int mapX = 0, mapY = 0;
+	public int lose = -1, win = -1;
 
 	// building and variables
 	public ArrayList<Building> buildings = new ArrayList<Building>();
@@ -134,16 +137,29 @@ public class Map {
 		}
 	}
 
+	// game ending methods
+	public void gameLost() {
+		lose = 0;
+	}
+	public void gameWon() {
+		win = 0;
+	}
+	
+	// game stopping methods
+	public boolean gamePaused() {
+		return game.paused || game.help || win != -1 || lose != -1;
+	}
+	
 	// both update and draw are repeatedly called. update is called first
 	public void update() {
-		if (!game.help && !game.paused) {
+		if (!gamePaused()) {
 			calculateVariables();
 			updateMap();
 			updateHero();
 			updateBuildings();
 		}
 		recalculateLighting();
-		if (!game.help && !game.paused) { 
+		if (!gamePaused()) { 
 			spawnEnemies();
 			updateEnemies();
 			checkGameEvents();
@@ -175,13 +191,18 @@ public class Map {
 		// update energy, kill enemies
 		for (Building building : buildings) {
 			if (building.powered) {
-				game.energy += Game.speed * BuildingStats.gen[building.type];
-
+				if (game.hour >= 8 && game.hour < 20) {
+					game.energy += Game.speed * BuildingStats.gen[building.type];
+				}
+				
 				// reset variables
 				building.target = null;
 				
 				int range = 0;
 				// check for reload time, assign range
+				if (game.energy < BuildingStats.draw[building.type]) {
+					continue;
+				}
 				if (building.type == 5) {
 					range = 32 * 4; // TODO: put constants elsewhere
 				} else if (building.type == 6) {
@@ -214,6 +235,9 @@ public class Map {
 					// aoe
 				}
 				
+				// consume energy
+				game.energy -= BuildingStats.draw[building.type];
+				
 				// set reload time
 				building.lastFireTime = game.gameTime;
 			}
@@ -243,7 +267,8 @@ public class Map {
 				
 				if (!tiles[i][j].wall && tiles[i][j].building == null &&
 						lighting[i][j] < 128 && Math.random() < chance) {
-					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE, this, game);
+					int type = (int) (3 * Math.random());
+					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE, type, this, game);
 					enemies.add(enemy);
 				}
 			}
@@ -252,16 +277,53 @@ public class Map {
 	private void updateEnemies() {
 		for (Enemy enemy : enemies) {
 			// find a target
+			enemy.attacked = false;
+			Rectangle inflated = new Rectangle(enemy.bounds);
+			inflated.grow(1, 1);
+			int damage = (int) EnemyStats.damage[enemy.type];
 			
+			// target base first
+			if (inflated.intersects(base.col * TILE_SIZE, base.row * TILE_SIZE, base.width * TILE_SIZE, base.height * TILE_SIZE)) {
+				enemy.attacked = true;
+				base.hp -= damage;
+				if (base.hp <= 0) {
+					base.hp = 0;
+					// TODO: explosion
+				}
+				// TODO: static screen
+			}
 			
-			// target buildings first
+			// target buildings next
+			if (!enemy.attacked) {
+				for (Building building : buildings) {
+					if (inflated.intersects(building.col * TILE_SIZE, building.row * TILE_SIZE, building.width * TILE_SIZE, building.height * TILE_SIZE)) {
+						enemy.attacked = true;
+						building.hp -= damage;
+						if (building.hp <= 0) {
+							building.hp = 0;
+							removeBuilding(building);
+							// TODO: explosion
+						}
+						break;
+					}
+				}
+			}
 			
+			// target hero otherwise
+			if (!enemy.attacked) {
+				if (inflated.intersects(hero.x, hero.y, hero.HERO_SIZE, hero.HERO_SIZE)) {
+					enemy.attacked = true;
+					hero.hp -= damage;
+					if (hero.hp < 0) {
+						hero.hp = 0;
+					}
+					// TODO: red screen
+				}
+			}
 			
-			// then target hero
-			
-			
-			// TODO: flash screen red when hero/base damaged
-			enemy.move();
+			if (!enemy.attacked) {
+				enemy.move();
+			}
 		}
 	}
 	
@@ -335,8 +397,8 @@ public class Map {
 	}
 
 	public void checkGameEvents() {
-		if (hero.hp == 0 || base.hp == 0) {
-			// TODO: lose
+		if (hero.hp <= 0 || base.hp <= 0) {
+			gameLost();
 		}
 	}
 	
@@ -351,6 +413,7 @@ public class Map {
 			drawBuildingPlaceover();
 			drawField();
 		}
+		drawLoseWin();
 	}
 	public void drawTiles() {
 		// method takes ~2.1ms
@@ -506,7 +569,19 @@ public class Map {
 			p.translate(mapX, mapY);
 		}
 	}
-
+	public void drawLoseWin() {
+		p.textFont(Fonts.consolas32);
+		p.textSize(64);
+		p.textAlign(p.CENTER, p.CENTER);
+		if (win != -1) {
+			p.fill(0xFF4080FF);
+			p.text("You Win", 0, 0, p.width, p.height);
+		} else if (lose != -1) {
+			p.fill(0xFFC00000);
+			p.text("You Lose", 0, 0, p.width, p.height);
+		}
+	}
+	
 	// building related methods
 	public boolean isPlacingBuilding() {
 		return (game.placingBuilding != -1 && p.mouseY > BAR_HEIGHT);
@@ -596,6 +671,10 @@ public class Map {
 		recalculateField();
 	}
 	public void sellBuilding(Building building) {
+		// TODO:
+		removeBuilding(building);
+	}
+	public void removeBuilding(Building building) {
 		buildings.remove(building);
 		for (int i = 0; i < building.height; i++) {
 			for (int j = 0; j < building.width; j++) {

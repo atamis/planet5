@@ -43,6 +43,9 @@ public class Hero {
 
 	// moves the hero, checking for wall and building collision
 	public void update() {
+		if (hp <= 0) {
+			return;
+		}
 		int speed = Game.speed * SPEED;
 		int xMove = 0;
 		int yMove = 0;
@@ -146,6 +149,9 @@ public class Hero {
 	
 	// draws the hero
 	public void draw() {
+		if (hp <= 0) {
+			return;
+		}
 		int x = this.x - map.mapX;
 		int y = this.y - map.mapY;
 		

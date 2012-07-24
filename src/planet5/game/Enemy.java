@@ -15,13 +15,15 @@ public class Enemy {
 
 	public static final int SPEED = 1;
 
+	public boolean attacked = false;
+	public int type;
 	public Rectangle bounds;
 	public Map map;
 	public GameFrame game;
 	public int hp;
 	public int maxHp;
 
-	public Enemy(int x, int y, Map map, GameFrame game) {
+	public Enemy(int x, int y, int type, Map map, GameFrame game) {
 		bounds = new Rectangle(x + (TILE_SIZE - ENEMY_SIZE) / 2, y
 				+ (TILE_SIZE - ENEMY_SIZE) / 2, ENEMY_SIZE, ENEMY_SIZE);
 		this.map = map;
@@ -184,7 +186,11 @@ public class Enemy {
 		int col = bounds.x / TILE_SIZE;
 		int zero = 0 * map.lighting[row][col] / 255;
 		int full = 255 * map.lighting[row][col] / 255;
-		p.fill(p.color(zero, zero, full));
+		if (attacked) {
+			p.fill(p.color(full, zero, zero));
+		} else {
+			p.fill(p.color(zero, zero, full));
+		}
 		p.rect(x, y + hpHeight, ENEMY_SIZE, ENEMY_SIZE - hpHeight);
 
 		// hp bar background

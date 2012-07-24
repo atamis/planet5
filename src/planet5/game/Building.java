@@ -37,6 +37,10 @@ public class Building {
 	public void draw(PApplet p, int x, int y, int selectedTime) {
 		final int hpHeight = 8;
 		
+		if (hp <= 0) {
+			return;
+		}
+		
 		p.noStroke();
 		
 		// background
