@@ -28,6 +28,7 @@ public class GameFrame extends Frame {
 	public int energy = 0, maxEnergy = 1000;
 	
 	// game time
+	public static final int GAME_START_TIME = 8 * 25 * 60;	// start at 8 am
 	public int gameTime;
 	public int day, hour, minute;
 	
@@ -49,7 +50,7 @@ public class GameFrame extends Frame {
 
 		// calculate path array
 		map.calculatePathing();
-		gameTime = 0 * 25 * 60; // start at 8 am TODO make sure no monsters spawn
+		gameTime = GAME_START_TIME;
 		
 		// add buttons
 		// TODO: help => resume = unpaused???
@@ -73,7 +74,7 @@ public class GameFrame extends Frame {
 	}
 
 	void updateGame() {
-		if (!paused && !help) {
+		if (!map.gamePaused()) {
 			updateGameTime();
 		}
 		
@@ -226,9 +227,11 @@ public class GameFrame extends Frame {
 			} else {
 				placingBuilding = intKey;
 			}
-		} else if (p.keyCode == KeyEvent.VK_ESCAPE
-				|| p.keyCode == KeyEvent.VK_SPACE) {
+		} else if (p.keyCode == KeyEvent.VK_ESCAPE) {
 			placingBuilding = -1;
+			selectedBuilding = null;
+		} else if (p.keyCode == KeyEvent.VK_SPACE) {
+			selectedBuilding = null;
 		} else if (p.keyCode == KeyEvent.VK_Q) {
 			if (selectedBuilding != null) {
 				map.sellBuilding(selectedBuilding);
