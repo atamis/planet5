@@ -22,7 +22,6 @@ public final class BuildingStats {
 	public static int[] gen		= {1,   0,   5,  0,	0,   0,   0};
 	public static int[] draw		= {0,    0,   0,   0,	10,  10,   4};
 	
-	
 	// Main Base. #0
 	static float base_health = 1500f;
 	static float base_cost = 0;

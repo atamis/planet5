@@ -56,6 +56,8 @@ public class Hero {
 			yMove = speed;
 		}
 		
+		// TODO: move to center of squares to prevent glitching
+		
 		if (p.pressedKeys[KeyEvent.VK_A] && p.pressedKeys[KeyEvent.VK_D]) {
 			xMove = mostRecentAd;
 		} else if (p.pressedKeys[KeyEvent.VK_A]) {
@@ -119,6 +121,12 @@ public class Hero {
 		int right = (x + HERO_SIZE - 1) / TILE_SIZE;
 		int down = (y + HERO_SIZE - 1) / TILE_SIZE;
 		
+		for (Enemy enemy : map.enemies) {
+			if (enemy.bounds.intersects(x, y, HERO_SIZE, HERO_SIZE)) {
+				return true;
+			}
+		}
+		
 		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
 			return true;
 		}
@@ -132,7 +140,6 @@ public class Hero {
 				map.tiles[down][left].building != null || map.tiles[down][right].building != null) {
 			return true;
 		}
-		
 		
 		return false;
 	}
