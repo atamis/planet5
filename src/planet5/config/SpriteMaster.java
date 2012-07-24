@@ -6,6 +6,9 @@ import processing.core.PImage;
 public class SpriteMaster {
 	private final static int TILE_SIZE = Globals.TILE_SIZE;
 
+	public PImage raw_building_sprite;
+
+	
 	// 0 - main base
 	// 1 - relay
 	// 2 - farm
@@ -14,7 +17,10 @@ public class SpriteMaster {
 	// 5 - laser
 	// 6 - mortar
 	public PImage[] building_sprites;
-	public PImage raw_building_sprite;
+	public PImage laser_gun;
+	public PImage mortar_gun;
+	public PImage hero;
+	public PImage enemy;
 
 	public SpriteMaster(PApplet p) {
 		System.out.println("Loading sprites.");
@@ -63,6 +69,32 @@ public class SpriteMaster {
 		height = BuildingStats.rows[6] * TILE_SIZE;
 		building_sprites[6] = p.createImage(width, height, p.ARGB);
 		building_sprites[6].copy(raw_building_sprite, 5 * TILE_SIZE, 0, width, height, 0, 0, width, height);
+
+		
+		// laser gun
+		width = BuildingStats.cols[5] * TILE_SIZE;
+		height = BuildingStats.rows[5] * TILE_SIZE;
+		laser_gun = p.createImage(width, height, p.ARGB);
+		laser_gun.copy(raw_building_sprite, 0, 3 * TILE_SIZE, width, height, 0, 0, width, height);
+		
+		// mortar gun
+		width = BuildingStats.cols[6] * TILE_SIZE;
+		height = BuildingStats.rows[6] * TILE_SIZE;
+		mortar_gun = p.createImage(width, height, p.ARGB);
+		mortar_gun.copy(raw_building_sprite, 1 * TILE_SIZE, 3 * TILE_SIZE, width, height, 0, 0, width, height);
+		
+		// hero
+		width = 1 * TILE_SIZE;
+		height = 1 * TILE_SIZE;
+		hero = p.createImage(width, height, p.ARGB);
+		hero.copy(raw_building_sprite, 3 * TILE_SIZE, 3 * TILE_SIZE, width, height, 0, 0, width, height);
+		
+		// enemy
+		width = (int) (0.5 * TILE_SIZE);
+		height = (int) (0.5 * TILE_SIZE);
+		enemy = p.createImage(width, height, p.ARGB);
+		enemy.copy(raw_building_sprite, 4 * TILE_SIZE, 3 * TILE_SIZE, width, height, 0, 0, width, height);
+
 
 	}
 
