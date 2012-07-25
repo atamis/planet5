@@ -164,6 +164,10 @@ public class Enemy {
 
 		return false;
 	}
+	
+	public PVector screenLoc() {
+		return new PVector(bounds.x - map.mapX, bounds.y - map.mapY);
+	}
 
 	// TODO: 3 duplicate methods with hero.java
 

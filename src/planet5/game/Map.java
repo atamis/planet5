@@ -509,10 +509,7 @@ public class Map {
 					&& y <= p.height - BAR_HEIGHT) {
 				Enemy e = building.target;
 				if (e != null) {
-					p.line(x + (building.width) * TILE_SIZE / 2,
-							y + (building.height) * TILE_SIZE / 2,
-							e.bounds.x + e.ENEMY_SIZE / 2 - mapX,
-							e.bounds.y + e.ENEMY_SIZE / 2 - mapY);
+					
 					
 					if (e.hp < 0) {
 						enemies.remove(e);
