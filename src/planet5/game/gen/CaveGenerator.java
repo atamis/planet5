@@ -19,8 +19,8 @@ public class CaveGenerator implements Generator {
 		Tile[][] tiles = new Tile[width][height];
 		// Number of "caverns" and the number of connections each cavern has to
 		// other caverns.
-		int num_points = width/4;
-		int num_connections = width/10;
+		int num_points = width/5;
+		int num_connections = p.max(2, width/100);
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
