@@ -71,7 +71,7 @@ public class Building {
 		// hpHeight - 1);
 		p.image(SpriteMaster.instance(p).building_sprites[type], x, y);
 		// laser gun
-		if (type == 5) {
+		if (type == 5 || type == 6) {
 			if (target != null) {
 
 				p.pushStyle();
@@ -88,9 +88,13 @@ public class Building {
 			p.translate(x + (BuildingStats.cols[type] * TILE_SIZE) / 2, y
 					+ (BuildingStats.rows[type] * TILE_SIZE) / 2);
 			p.rotate(rad);
-			PImage laser_gun = SpriteMaster.instance(p).laser_gun;
+			PImage sprite;
+			if(type == 5)
+				sprite = SpriteMaster.instance(p).laser_gun;
+			else
+				sprite = SpriteMaster.instance(p).mortar_gun;
 
-			p.image(laser_gun, -laser_gun.width / 2, -laser_gun.height / 2);
+			p.image(sprite, -sprite.width / 2, -sprite.height / 2);
 			p.popMatrix();
 		}
 		if (selectedTime != -1) {
