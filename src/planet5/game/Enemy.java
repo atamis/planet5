@@ -1,5 +1,6 @@
 package planet5.game;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
@@ -15,6 +16,7 @@ public class Enemy {
 	public static final int ENEMY_SIZE = 16;
 
 	private int kiloX, kiloY;
+	public Point center;
 	public boolean attacked = false;
 	public int type;
 	public Rectangle bounds;
@@ -29,6 +31,7 @@ public class Enemy {
 				+ (TILE_SIZE - ENEMY_SIZE) / 2, ENEMY_SIZE, ENEMY_SIZE);
 		this.kiloX = x * 1000;
 		this.kiloY = y * 1000;
+		center = new Point(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
 		this.map = map;
 		this.p = p;
 		maxHp = EnemyStats.hp[type];
@@ -140,6 +143,8 @@ public class Enemy {
 				}
 			}
 		} while (moved);
+		
+		center.setLocation(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
 	}
 
 	private boolean checkCollision() {

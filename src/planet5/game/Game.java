@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import planet5.Main;
 import planet5.config.BuildingStats;
@@ -66,6 +67,7 @@ public class Game {
 	// building and variables
 	public ArrayList<Building> buildings = new ArrayList<Building>();
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	public Hero hero;
 	public Building base;
 	
@@ -145,6 +147,7 @@ public class Game {
 
 		// calculate path array
 		calculatePathing();
+		recalculateField();
 		gameMillis = GAME_START_TIME;
 		
 		// TODO:... refactor
@@ -253,6 +256,7 @@ public class Game {
 			updateMap();	// 8486 ... not even used
 			updateHero(elapsedMillis);	// 117468 if moving, 3573 if not
 			updateBuildings(elapsedMillis);	// 5360-12059 with a lot of buildings
+			updateProjectiles(elapsedMillis);
 			spawnEnemies(elapsedMillis);	// 9351930 => 2234
 			updateEnemies(elapsedMillis);	// 12836684 => 200099
 			checkGameEvents();	// 1787
@@ -285,8 +289,15 @@ public class Game {
 	}
 	private void updateBuildings(int elapsedMillis) {
 		// update energy, kill enemies
+		boolean recalc = false;
 		for (Building building : buildings) {
 			if (building.powered) {
+				if (building.update(elapsedMillis))
+					recalc = true;
+				
+				if (building.buildTime != -1)
+					continue;
+				
 				if (building == base) {
 					curEnergy += elapsedMillis * BuildingStats.gen[base.type];
 				} else if (hour >= 8 && hour < 20) {
@@ -298,7 +309,7 @@ public class Game {
 				
 				int range = 0;
 				// check for reload time, assign range
-				if (curEnergy < BuildingStats.draw[building.type]) {
+				if (curEnergy < elapsedMillis * BuildingStats.draw[building.type]) {
 					continue;
 				}
 				if (building.type == 5) {
@@ -321,9 +332,9 @@ public class Game {
 						building.target = enemy;
 					}
 				}
-				if (building.target == null) {
+				
+				if (building.target == null)
 					continue;
-				}
 				
 				// deal damage, remove dead enemies
 				if (building.type == 5) {
@@ -335,16 +346,30 @@ public class Game {
 				}
 				
 				// consume energy
-				curEnergy -= BuildingStats.draw[building.type];
+				// TODO: lasers consume elapsedMillis*
+				// TODO: mortars don't consume elapsedMillis*
+				curEnergy -= elapsedMillis * BuildingStats.draw[building.type];
 				
 				// set reload time
 				building.lastFireTime = gameMillis;
 			}
 		}
 		
+		if (recalc)
+			recalculateField();
+		
 		// limit max energy
-		if (curEnergy > maxEnergy) {
+		if (curEnergy > maxEnergy)
 			curEnergy = maxEnergy;
+	}
+	private void updateProjectiles(int elapsedMillis) {
+		Iterator<Projectile> iterator = projectiles.iterator();
+		while (iterator.hasNext()) {
+			Projectile projectile = iterator.next();
+			if (projectile.remove)
+				iterator.remove();
+			else
+				projectile.update(elapsedMillis);
 		}
 	}
 	private int dist(Building turret, Enemy enemy) {
@@ -393,15 +418,25 @@ public class Game {
 			}
 			
 			// target buildings next
+			// TODO: for the total thing: boolean removed = false;
 			if (!enemy.attacked) {
-				for (Building building : buildings) {
+				Iterator<Building> iterator = buildings.iterator();
+				while (iterator.hasNext()) {
+					Building building = iterator.next();
 					if (inflated.intersects(building.col * TILE_SIZE, building.row * TILE_SIZE, building.width * TILE_SIZE, building.height * TILE_SIZE)) {
 						enemy.attacked = true;
 						building.hp -= damage;
 						if (building.hp <= 0) {
 							building.hp = 0;
-							removeBuilding(building);
-							// TODO: explosion
+							
+							// o_o
+							iterator.remove();
+							for (int i = 0; i < building.height; i++) {
+								for (int j = 0; j < building.width; j++) {
+									tiles[building.row + i][building.col + j].building = null;
+								}
+							}
+							recalculateField();
 						}
 						break;
 					}
@@ -424,6 +459,13 @@ public class Game {
 				enemy.move(elapsedMillis);
 			}
 		}
+		
+		Iterator<Enemy> iterator = enemies.iterator();
+		while (iterator.hasNext()) {
+			Enemy enemy = iterator.next();
+			if (enemy.curHp <= 0)
+				iterator.remove();
+		}
 	}
 	
 	private void recalculateLighting() {
@@ -437,7 +479,7 @@ public class Game {
 
 		// buildings produce light
 		for (Building building : buildings) {
-			if (BuildingStats.light[building.type] != 0 && building.powered) {
+			if (BuildingStats.light[building.type] != 0 && building.powered && building.buildTime == -1) {
 				produceLight(building.col, building.row, building.width,
 						building.height, BuildingStats.light[building.type]);
 			}
@@ -566,6 +608,7 @@ public class Game {
 	public void setBase(Building base) {
 		// TODO: use these 3 methods and refactor?
 		this.base = base;
+		base.buildTime = -1;
 		if (buildings.size() == 0) {
 			buildings.add(base);
 		} else {
@@ -614,7 +657,7 @@ public class Game {
 		calculatePoweredBuildings();
 
 		for (Building building : buildings) {
-			if (building.type <= 1 && building.powered) { // or <= 2
+			if (building.type <= 1 && building.powered && building.buildTime == -1) { // or <= 2
 				int x = building.col * TILE_SIZE + (building.width - 1) * TILE_SIZE / 2; 
 				int y = building.row * TILE_SIZE + (building.height - 1) * TILE_SIZE / 2;
 				int left = Math.max(0, building.col - FIELD_RADIUS);
@@ -671,7 +714,7 @@ public class Game {
 		int energy = this.curEnergy;
 		int maxEnergy = 0;
 		for (Building building : buildings) {
-			if (building.powered) {
+			if (building.powered && building.buildTime == -1) {
 				maxEnergy += BuildingStats.cap[building.type];
 			}
 		}

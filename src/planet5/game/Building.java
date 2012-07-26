@@ -23,7 +23,7 @@ public class Building {
 	int lastFireTime = 0;
 	float rad;
 
-	public int startBuildTime;
+	public int buildTime, buildHealth;
 	Enemy target = null;
 	boolean powered = false;
 	Building powerSource = null;
@@ -33,15 +33,26 @@ public class Building {
 		this.type = type;
 		this.row = y;
 		this.col = x;
-		this.startBuildTime = gameTime;
+		this.buildTime = 0;
+		this.buildHealth = 0;
 		this.width = BuildingStats.cols[type];
 		this.height = BuildingStats.rows[type];
 		maxHp = BuildingStats.healths[type];
 		hp = maxHp; // = 1 ? or another bar?
 	}
 	
-	public void update() {
-		// TODO: ..
+	public boolean update(int elapsedMillis) {
+		if (buildTime != -1) {
+			if (buildTime < 5000) {
+				buildTime += elapsedMillis;
+				buildHealth += elapsedMillis;
+			}
+			if (buildTime >= 5000) {
+				buildTime = -1;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void calcAngle(PApplet p, int x, int y) {
@@ -124,6 +135,10 @@ public class Building {
 		// hp bar
 		int fill = (width * TILE_SIZE - 2) * hp / maxHp;
 		p.fill(0xFFC00000);
+		if (buildTime != -1) {
+			fill = (width * TILE_SIZE - 2) * buildHealth * hp / maxHp / 5000;
+			p.fill(0xFF204080);
+		}
 		p.rect(x + 1, y + 1, fill, hpHeight - 2);
 
 		// text
@@ -137,7 +152,6 @@ public class Building {
 		if (!powered) {
 			// TODO: optimize
 			p.text("!", x + 8, y + 8);
-
 		} else if (powerSource != null) {
 
 		}
