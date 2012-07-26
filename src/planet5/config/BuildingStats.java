@@ -57,8 +57,8 @@ public class BuildingStats {
 
 	public static float getDraw(int i) {
 		if (i == 4 || i == 5 || i == 6)
-			return damage[i] + damage_delta
-					* UpgradeStats.level[Upgrades.damage];
+			return draw[i] + draw_delta
+					* UpgradeStats.level[Upgrades.draw];
 		else
 			return 0;
 
