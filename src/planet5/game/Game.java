@@ -341,16 +341,17 @@ public class Game {
 					}
 				}
 				
-				if (building.target == null)
+				if (building.target == null || building.target.isDead() || building.target.willBeDead())
 					continue;
 				
 				// deal damage, remove dead enemies
 				if (building.type == 5) {
 					// TODO: constant
-					building.target.curHp -= 10;
+					building.target.takeDamage(10);
 				} else if (building.type == 6) {
 					Projectile pr = new Projectile(this, p, building.col * TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE + TILE_SIZE);
 					pr.target = building.target;
+					pr.target.takeFutureDamage(Projectile.DAMAGE);
 					projectiles.add(pr);
 					//building.target = null;
 				}
@@ -484,7 +485,7 @@ public class Game {
 		Iterator<Enemy> iterator = enemies.iterator();
 		while (iterator.hasNext()) {
 			Enemy enemy = iterator.next();
-			if (enemy.curHp <= 0)
+			if (enemy.isDead())
 				iterator.remove();
 		}
 	}
