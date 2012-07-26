@@ -1,27 +1,69 @@
 package planet5.config;
 
-public final class BuildingStats {
+public class BuildingStats {
 
 	// All
-	public static String[] names = {"Main Base", "Relay", "Solar Farm",
-								"Capacitor", "Science Lab", "Laser Turret",
-								"Mortar"};
-	public static String[] descriptions = {"The Main Base forms the core of your network and if it falls, you lose.",
-									"The Relay projects an energy field and supplies power to other buildings",
-									"The Solar Farm harvests solar energy for your network. Doesn't generate power at night.",
-									"The Capacitor stores energy for use during the night. Increases your maximum power pool.",
-									"The Science Lab upgrades a variety of buildings and weapons you use.",
-									"The Laser Turret provides high damage short range defense. It fires continuously.",
-									"The Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots."};
-	public static int[] healths	= {1500, 100, 100, 100,	500, 500, 350};
-	public static int[] costs	= {0,    20,  30,  100,	500, 350, 500};
-	public static int[] rows		= {3,    1,   1,   1,	2,   1,   2};
-	public static int[] cols		= {3,    1,   1,   1,	2,   1,   2};
-	public static int[] light	= {256,    64,   64,   64,	256,   96,   64};
-	public static int[] cap		= {4800, 0,   0,   500,	0,   0,   0};
-	public static int[] gen		= {1,   0,   5,  0,	0,   0,   0};
-	public static int[] draw		= {0,    0,   0,   0,	10,  10,   4};
-	
+	public static String[] names = { "Main Base", "Relay", "Solar Farm",
+			"Capacitor", "Science Lab", "Laser Turret", "Mortar" };
+	public static String[] descriptions = {
+			"The Main Base forms the core of your network and if it falls, you lose.",
+			"The Relay projects an energy field and supplies power to other buildings",
+			"The Solar Farm harvests solar energy for your network. Doesn't generate power at night.",
+			"The Capacitor stores energy for use during the night. Increases your maximum power pool.",
+			"The Science Lab upgrades a variety of buildings and weapons you use.",
+			"The Laser Turret provides high damage short range defense. It fires continuously.",
+			"The Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots." };
+	private static float[] healths = { 1500, 100, 100, 100, 500, 500, 350 };
+	public static int[] costs = { 0, 20, 30, 100, 500, 350, 500 };
+	public static int[] rows = { 3, 1, 1, 1, 2, 1, 2 };
+	public static int[] cols = { 3, 1, 1, 1, 2, 1, 2 };
+	public static int[] light = { 256, 64, 64, 64, 256, 96, 64 };
+	private static float[] cap = { 4800, 0, 0, 500, 0, 0, 0 };
+	private static float[] gen = { 1, 0, 5, 0, 0, 0, 0 };
+	private static float[] draw = { 0, 0, 0, 0, 10, 10, 4 };
+	private static float[] damage = { 0, 0, 0, 0, 0, 4, 20, 100 };
+
+	public static float health_delta = 0.1f;
+	public static float cap_delta = 0.01f;
+	public static float gen_delta = 0.01f;
+	public static float damage_delta = 0.01f;
+	public static float draw_delta = 0.01f;
+
+	public static float getHealth(int i) {
+		return healths[i] + health_delta * UpgradeStats.level[Upgrades.health];
+	}
+
+	public static float getCap(int i) {
+		if (cap[i] == 0)
+			return 0;
+		else
+			return cap[i] + cap_delta * UpgradeStats.level[Upgrades.cap];
+	}
+
+	public static float getGen(int i) {
+		if (gen[i] == 0)
+			return 0;
+		else
+			return gen[i] + gen_delta * UpgradeStats.level[Upgrades.gen];
+	}
+
+	public static float getDamage(int i) {
+		if (i == 5 || i == 6)
+			return damage[i] + damage_delta
+					* UpgradeStats.level[Upgrades.damage];
+		else
+			return 0;
+	}
+
+	public static float getDraw(int i) {
+		if (i == 4 || i == 5 || i == 6)
+			return damage[i] + damage_delta
+					* UpgradeStats.level[Upgrades.damage];
+		else
+			return 0;
+
+	}
+
 	// Main Base. #0
 	static float base_health = 1500f;
 	static float base_cost = 0;
@@ -31,7 +73,7 @@ public final class BuildingStats {
 	static float base_capacitance = 4800;
 	static float base_energy_gen = 20;
 	static float base_draw = 0;
-	
+
 	// Relay. #1
 	static float relay_health = 100;
 	static float relay_cost = 20;
@@ -41,7 +83,7 @@ public final class BuildingStats {
 	static float relay_capacitance = 0;
 	static float relay_energy_gen = 0;
 	static float relay_draw = 0;
-	
+
 	// Solar Farm. #2
 	static float farm_health = 100;
 	static float farm_cost = 30;
@@ -52,8 +94,6 @@ public final class BuildingStats {
 	static float farm_energy_gen = 50;
 	static float farm_draw = 0;
 
-
-	
 	// Capacitor. #3
 	static float capacitor_health = 100;
 	static float capacitor_cost = 100;
@@ -64,7 +104,6 @@ public final class BuildingStats {
 	static float capacitor_energy_gen = 0;
 	static float capacitor_draw = 0;
 
-	
 	// Science Lab. #4
 	static float lab_health = 500;
 	static float lab_cost = 500;
@@ -75,7 +114,6 @@ public final class BuildingStats {
 	static float lab_energy_gen = 0;
 	static float lab_draw = 10;
 
-	
 	// Laser Turret. #5
 	static float laser_health = 500;
 	static float laser_cost = 350;
@@ -87,7 +125,6 @@ public final class BuildingStats {
 	static float laser_damage = 4;
 	static float laser_draw = 10;
 
-	
 	// Mortar. #6
 	static float mortar_health = 350;
 	static float mortar_cost = 500;

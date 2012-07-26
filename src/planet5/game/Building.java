@@ -5,6 +5,8 @@ import planet5.config.BuildingStats;
 import planet5.config.Fonts;
 import planet5.config.Globals;
 import planet5.config.SpriteMaster;
+import planet5.config.UpgradeStats;
+import planet5.config.Upgrades;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -18,8 +20,8 @@ public class Building {
 	int row, col;
 	int width, height;
 
-	int hp;
-	int maxHp;
+	float hp;
+	float maxHp;
 	int lastFireTime = 0;
 	float rad;
 
@@ -27,6 +29,7 @@ public class Building {
 	Enemy target = null;
 	boolean powered = false;
 	Building powerSource = null;
+	int current_upgrade = Upgrades.health;
 	
 	public Building(int type, int x, int y, int gameTime) {
 		rad = 0;
@@ -37,7 +40,7 @@ public class Building {
 		this.buildHealth = 0;
 		this.width = BuildingStats.cols[type];
 		this.height = BuildingStats.rows[type];
-		maxHp = BuildingStats.healths[type];
+		maxHp = BuildingStats.getHealth(type);
 		hp = maxHp; // = 1 ? or another bar?
 	}
 	
@@ -52,6 +55,18 @@ public class Building {
 				return true;
 			}
 		}
+		
+		if(type == 4) {
+			UpgradeStats.level[current_upgrade] += elapsedMillis;
+		}
+
+		float oldMaxHp = maxHp;
+		maxHp = BuildingStats.getHealth(type);
+		if (maxHp > oldMaxHp)
+			hp += maxHp - oldMaxHp;
+		
+
+		
 		return false;
 	}
 
@@ -133,10 +148,10 @@ public class Building {
 		p.rect(x, y, width * TILE_SIZE, hpHeight);
 
 		// hp bar
-		int fill = (width * TILE_SIZE - 2) * hp / maxHp;
+		int fill = (int) ((width * TILE_SIZE - 2) * hp / maxHp);
 		p.fill(0xFFC00000);
 		if (buildTime != -1) {
-			fill = (width * TILE_SIZE - 2) * buildHealth * hp / maxHp / 5000;
+			fill = (int) ((width * TILE_SIZE - 2) * buildHealth * hp / maxHp / 5000);
 			p.fill(0xFF204080);
 		}
 		p.rect(x + 1, y + 1, fill, hpHeight - 2);

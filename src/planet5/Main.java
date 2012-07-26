@@ -1,5 +1,7 @@
 package planet5;
 
+import planet5.config.BaseBuildingStats;
+import planet5.config.BuildingStats;
 import planet5.config.Fonts;
 import planet5.frames.AboutFrame;
 import planet5.frames.CampaignFrame;
