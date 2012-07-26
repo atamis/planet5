@@ -29,7 +29,7 @@ public class Building {
 	Enemy target = null;
 	boolean powered = false;
 	Building powerSource = null;
-	int current_upgrade = Upgrades.health;
+	int current_upgrade = Upgrades.gen;
 	
 	public Building(int type, int x, int y, int gameTime) {
 		rad = 0;

@@ -251,7 +251,7 @@ public final class GameRenderer {
 				}
 			}
 			
-			if (e != null && e.curHp < 0) {
+			if (e != null && e.isDead()) {
 				game.enemies.remove(e); // shouldn't be here
 			}
 		}

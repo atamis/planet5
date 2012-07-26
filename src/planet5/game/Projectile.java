@@ -14,7 +14,7 @@ public class Projectile {
 	private static final int DETONATE_RADIUS_SQ = 4 * 4;
 	private static final int EXPLOSION_RADIUS_SQ = 32 * 32;
 	private static final float SPEED = 0.2f;
-	private static final int DAMAGE = 50;
+	public static final int DAMAGE = 50;
 	
 	private float floatX, floatY;
 	public Rectangle bounds;
@@ -61,8 +61,8 @@ public class Projectile {
 			// kill nearby enemies
 			for (Enemy e : map.enemies) {
 				if (e.center.distanceSq(center) < EXPLOSION_RADIUS_SQ) {
-					e.curHp -= DAMAGE;
-					if (e.curHp <= 0) {
+					e.processFutureDamage(DAMAGE);
+					if (e.isDead()) {
 						
 					}
 				}
@@ -72,7 +72,7 @@ public class Projectile {
 			remove = true;
 		}
 		
-		if (target.curHp <= 0)
+		if (target.isDead())
 			remove = true;
 	}
 	
@@ -85,8 +85,6 @@ public class Projectile {
 				|| y >= p.height - map.BAR_HEIGHT) {
 			return;
 		}
-		
-		// TODO: draw with rotation
 
 		p.pushMatrix();
 		p.translate(x, y);

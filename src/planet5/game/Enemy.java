@@ -23,8 +23,29 @@ public class Enemy {
 	public Game map;
 	private PApplet p;
 
-	int curHp = 0, maxHp = 0, computedHp = 0;
+	private int curHp = 0, maxHp = 0, computedHp = 0;
 	private int speed;
+	
+	public int getComputedHp() {
+		return computedHp;
+	}
+	public boolean isDead() {
+		return curHp <= 0;
+	}
+	public boolean willBeDead() {
+		return computedHp <= 0;
+	}
+	
+	public void takeFutureDamage(int damage) {
+		computedHp -= damage;
+	}
+	public void processFutureDamage(int damage) {
+		curHp -= damage;
+	}
+	public void takeDamage(int damage) {
+		curHp -= damage;
+		computedHp -= damage;
+	}
 
 	public Enemy(int x, int y, int type, Game map, PApplet p) {
 		bounds = new Rectangle(x + (TILE_SIZE - ENEMY_SIZE) / 2, y
@@ -36,7 +57,7 @@ public class Enemy {
 		this.p = p;
 		maxHp = EnemyStats.hp[type];
 		speed = EnemyStats.speed[type];
-		curHp = maxHp;
+		computedHp = curHp = maxHp;
 	}
 	
 	private int sign(int num) {
