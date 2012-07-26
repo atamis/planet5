@@ -9,9 +9,25 @@ public final class EnemyStats {
 	 * #3: Fast. Very fast, lots of damage, but very little health.
 	 */
 	// HP. Damage until it dies.
-	public static int[] hp = {30, 60, 20};
+	private static int[] hp = {30, 60, 20};
 	// Damage per second
-	public static int[] damage = {3, 6, 4};
+	private static int[] damage = {3, 6, 4};
 	// Speed per second.
-	public static int[] speed = {10, 5, 20};
+	private static int[] speed = {10, 5, 20};
+	
+	public static float hp_delta = 0.001f;
+	public static float damage_delta = 0.001f;
+	public static float speed_delta = 0.0001f;
+	
+	public static int getHP(int i) {
+		return (int) (hp[i] + hp_delta * EnemyLevel.level);
+	}
+	
+	public static int getDamage(int i) {
+		return (int) (damage[i] + damage_delta * EnemyLevel.level);
+	}
+	
+	public static int getSpeed(int i) {
+		return (int) (speed[i] + speed_delta * EnemyLevel.level);
+	}
 }

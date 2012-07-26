@@ -3,7 +3,10 @@ package planet5.game;
 import java.awt.Color;
 
 import planet5.config.BuildingStats;
+import planet5.config.EnemyStats;
 import planet5.config.Fonts;
+import planet5.config.Globals;
+import planet5.config.UpgradeStats;
 import processing.core.PApplet;
 
 public final class GameRenderer {
@@ -43,6 +46,43 @@ public final class GameRenderer {
 		drawBarBuildings();		// ~80us
 		drawBarUi();
 		drawShadows();
+		
+		if(Globals.DEBUG)
+		drawDebug();
+	}
+
+	private static void drawDebug() {
+		int width = 100, height = 200;
+		
+		p.pushMatrix();
+		p.pushStyle();
+		p.translate(0, p.height-height);
+		p.fill(200, 200, 200, 100);
+		
+		p.rect(0, 0, width, height);
+		
+		p.fill(0);
+		p.stroke(0, 255, 0);
+		p.textFont(Fonts.consolas16);
+		p.textAlign(p.LEFT, p.TOP);
+		p.textSize(12);
+		
+		String[] strings = {"Health: " + UpgradeStats.level[0],
+				"Gen: " + UpgradeStats.level[1],
+				"MHealth: " + EnemyStats.getHP(0),
+				"MDamage: " + EnemyStats.getDamage(0),
+				"MSpeed: " + EnemyStats.getSpeed(0)};
+		
+		for(int i = 0; i < height/p.textAscent() + 5; i++) {
+			p.pushMatrix();
+			p.translate(0, i * (p.textAscent() + 5));
+			p.text(strings[i%strings.length], 0, 0);
+			//p.rect(0, 0, 10, 10);
+			p.popMatrix();
+		}
+		
+		p.popStyle();
+		p.popMatrix();
 	}
 
 	// drawing methods

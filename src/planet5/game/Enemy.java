@@ -55,8 +55,8 @@ public class Enemy {
 		center = new Point(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
 		this.map = map;
 		this.p = p;
-		maxHp = EnemyStats.hp[type];
-		speed = EnemyStats.speed[type];
+		maxHp = EnemyStats.getHP(type);
+		speed = EnemyStats.getSpeed(type);
 		computedHp = curHp = maxHp;
 	}
 	

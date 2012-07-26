@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import planet5.Main;
 import planet5.config.BuildingStats;
+import planet5.config.EnemyLevel;
 import planet5.config.EnemyStats;
 import planet5.config.Fonts;
 import planet5.config.Globals;
@@ -127,6 +128,7 @@ public class Game {
 		lastUpdateTime = System.currentTimeMillis();
 		
 		UpgradeStats.reset();
+		EnemyLevel.reset();
 
 		// TODO
 		hero = new Hero(p, this, 0, 0);
@@ -262,6 +264,7 @@ public class Game {
 			spawnEnemies(elapsedMillis); // 9351930 => 2234
 			updateEnemies(elapsedMillis); // 12836684 => 200099
 			checkGameEvents(); // 1787
+			EnemyLevel.level += elapsedMillis;
 		}
 
 		// remove building buy if not enough energy
@@ -395,7 +398,7 @@ public class Game {
 
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		maxEnemyCount = 500;
+		maxEnemyCount = 100000;
 		double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
 		for (int i = 0; i < tileHeight; i++) {
@@ -422,7 +425,7 @@ public class Game {
 			Rectangle inflated = new Rectangle((int) enemy.bounds.x,
 					(int) enemy.bounds.y, enemy.ENEMY_SIZE, enemy.ENEMY_SIZE);
 			inflated.grow(1, 1);
-			int damage = (int) EnemyStats.damage[enemy.type];
+			int damage = (int) EnemyStats.getDamage(enemy.type);
 
 			// target base first
 			if (inflated.intersects(base.col * TILE_SIZE, base.row * TILE_SIZE,
