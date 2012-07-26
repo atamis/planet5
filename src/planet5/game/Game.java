@@ -15,6 +15,7 @@ import planet5.config.BuildingStats;
 import planet5.config.EnemyStats;
 import planet5.config.Fonts;
 import planet5.config.Globals;
+import planet5.config.UpgradeStats;
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import planet5.framework.Button;
@@ -124,6 +125,8 @@ public class Game {
 
 	private void restartGame() {
 		lastUpdateTime = System.currentTimeMillis();
+		
+		UpgradeStats.reset();
 
 		// TODO
 		hero = new Hero(p, this, 0, 0);
