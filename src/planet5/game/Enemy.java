@@ -144,7 +144,7 @@ public class Enemy {
 			}
 		} while (moved);
 		
-		center.setLocation(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
+		center.setLocation(this.bounds.x + ENEMY_SIZE / 2, this.bounds.y + ENEMY_SIZE / 2);
 	}
 
 	private boolean checkCollision() {

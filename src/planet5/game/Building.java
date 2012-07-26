@@ -63,7 +63,7 @@ public class Building {
 			PVector e = target.screenLoc();
 			e.add(Enemy.ENEMY_SIZE / 2, Enemy.ENEMY_SIZE / 2, 0);
 			p.line(c.x, c.y, e.x, e.y);
-			System.out.println(c);
+			//System.out.println(c);
 			rad = p.HALF_PI + (float) p.atan2((e.y - c.y), (e.x - c.x));
 		}
 	}
@@ -94,10 +94,11 @@ public class Building {
 				p.pushStyle();
 				p.stroke(0xFFFF0000);
 				p.strokeWeight(2);
-
-				p.line(x + (width * TILE_SIZE) / 2, y + (height * TILE_SIZE)
-						/ 2, target.screenLoc().x + target.ENEMY_SIZE / 2,
-						target.screenLoc().y + target.ENEMY_SIZE / 2);
+				if (type == 5) {
+					p.line(x + (width * TILE_SIZE) / 2, y + (height * TILE_SIZE)
+							/ 2, target.screenLoc().x + target.ENEMY_SIZE / 2,
+							target.screenLoc().y + target.ENEMY_SIZE / 2);
+				}
 				p.popStyle();
 			}
 

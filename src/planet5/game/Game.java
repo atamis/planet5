@@ -341,8 +341,10 @@ public class Game {
 					// TODO: constant
 					building.target.curHp -= 10;
 				} else if (building.type == 6) {
-					Projectile pr = new Projectile(this, p);
+					Projectile pr = new Projectile(this, p, building.col * TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE + TILE_SIZE);
 					pr.target = building.target;
+					projectiles.add(pr);
+					//building.target = null;
 				}
 				
 				// consume energy
@@ -381,6 +383,7 @@ public class Game {
 	}
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
+		maxEnemyCount = 500;
 		double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 		
 		for (int i = 0; i < tileHeight; i++) {

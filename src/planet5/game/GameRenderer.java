@@ -244,10 +244,10 @@ public final class GameRenderer {
 			if (x + w >= 0 && y + h >= 0 && x <= p.width
 					&& y <= p.height - BAR_HEIGHT) {
 				if (e != null) {
-					p.line(x + (building.width) * TILE_SIZE / 2,
-							y + (building.height) * TILE_SIZE / 2,
-							e.bounds.x + e.ENEMY_SIZE / 2 - game.mapX,
-							e.bounds.y + e.ENEMY_SIZE / 2 - game.mapY);
+					//p.line(x + (building.width) * TILE_SIZE / 2,
+					//		y + (building.height) * TILE_SIZE / 2,
+					//		e.bounds.x + e.ENEMY_SIZE / 2 - game.mapX,
+					//		e.bounds.y + e.ENEMY_SIZE / 2 - game.mapY);
 				}
 			}
 			
@@ -256,6 +256,10 @@ public final class GameRenderer {
 			}
 		}
 		p.noStroke();
+		
+		// TODO: only draw if can
+		for (Projectile pr : game.projectiles)
+			pr.draw();
 	}
 	static void drawBuildingPlaceover() {
 		if (!game.isPlacingBuilding()) {
