@@ -9,7 +9,7 @@ package planet5.frames;
 
 import java.awt.Rectangle;
 
-import planet5.Game;
+import planet5.Main;
 import planet5.config.Fonts;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
@@ -56,18 +56,18 @@ public class MenuFrame extends Frame {
 	@Override
 	public void buttonClicked(String command) {
 		if (command.equals("Play Campaign")) {
-			p.transitionFrame(Game.campaignFrame, Game.fullFadeTransition);
+			p.transitionFrame(Main.campaignFrame, Main.fullFadeTransition);
 			// TODO: restart level? (for survival)
 		}
 		else if (command.equals("Play Survival")) {
 			
 		}
 		else if (command.equals("Settings")) {
-			Game.settingsFrame.phase = 0;
-			p.transitionFrame(Game.settingsFrame, Game.fullFadeTransition);
+			Main.settingsFrame.phase = 0;
+			p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("About")) {
-			p.transitionFrame(Game.aboutFrame, Game.fullFadeTransition);
+			p.transitionFrame(Main.aboutFrame, Main.fullFadeTransition);
 		}
 	}
 }

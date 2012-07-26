@@ -2,7 +2,7 @@ package planet5.game;
 
 import java.awt.event.KeyEvent;
 
-import planet5.Game;
+import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.Globals;
 import planet5.frames.GameFrame;
@@ -15,54 +15,60 @@ public class Hero {
 	public static final int HERO_SIZE = 32;
 	
 	// constants
-	public static final int SPEED = 2;
+	public static final int SPEED = 100;
 	
 	// hero variables
-	public int x;
-	public int y;
-	public int hp;
-	public int maxHp;
+	public int kiloX, kiloY;
+	public int x, y;
+	public int curHp, maxHp;
 	
 	// reference variables
 	public Applet p;
-	public Map map;
+	public Game map;
 	
 	// store most recent key pressed
 	public int mostRecentWs = 0;
 	public int mostRecentAd = 0;
 	
 	// constructor
-	public Hero(Applet p, Map map, int x, int y) {
+	public Hero(Applet p, Game map, int x, int y) {
 		this.x = x;
 		this.y = y;
 		this.p = p;
 		this.map = map;
 		maxHp = 100;
-		hp = maxHp;
+		curHp = maxHp;
+	}
+	
+	private int sign(int num) {
+		if (num > 0)
+			return 1;
+		else if (num == 0)
+			return 0;
+		else
+			return -1;
 	}
 
 	// moves the hero, checking for wall and building collision
-	public void update() {
-		if (hp <= 0) {
+	public void update(int elapsedMillis) {
+		if (curHp <= 0) {
 			return;
 		}
-		int speed = Game.speed * SPEED;
+		int speed = elapsedMillis * SPEED;
 		int xMove = 0;
 		int yMove = 0;
 		
 		// calculate total pixels to move
 		if (p.pressedKeys[KeyEvent.VK_W] && p.pressedKeys[KeyEvent.VK_S]) {
-			yMove = mostRecentWs;
+			yMove = elapsedMillis * mostRecentWs;
 		} else if (p.pressedKeys[KeyEvent.VK_W]) {
 			yMove = -speed;
 		} else if (p.pressedKeys[KeyEvent.VK_S]) {
 			yMove = speed;
 		}
 		
-		// TODO: move to center of squares to prevent glitching
-		
 		if (p.pressedKeys[KeyEvent.VK_A] && p.pressedKeys[KeyEvent.VK_D]) {
-			xMove = mostRecentAd;
+			xMove = elapsedMillis * mostRecentAd;
 		} else if (p.pressedKeys[KeyEvent.VK_A]) {
 			xMove = -speed;
 		} else if (p.pressedKeys[KeyEvent.VK_D]) {
@@ -70,52 +76,43 @@ public class Hero {
 		}
 		
 		// find the sign of move
-		int xSign = sign(xMove);
-		int ySign = sign(yMove);
+		int move = SPEED;
+		int xSign = move * sign(xMove);
+		int ySign = move * sign(yMove);
 		
 		// take absolute value of move
-		if (xMove < 0) {
-			xMove = -xMove;
-		}
-		if (yMove < 0) {
-			yMove = -yMove;
-		}
+		xMove = Math.abs(xMove);
+		yMove = Math.abs(yMove);
 		
 		// move pixel by pixel
 		boolean moved;
 		do {
 			moved = false;
 			
-			if (xMove != 0) {
-				x += xSign;
-				--xMove;
+			if (xMove > 0) {
+				kiloX += xSign;
+				xMove -= move;
+				x = kiloX / 1000;
 				if (checkCollision()) {
-					x -= xSign;
+					kiloX -= xSign;
+					x = kiloX / 1000;
 				} else {
 					moved = true;
 				}
 			}
 
-			if (yMove != 0) {
-				y += ySign;
-				--yMove;
+			if (yMove > 0) {
+				kiloY += ySign;
+				yMove -= move;
+				y = kiloY / 1000;
 				if (checkCollision()) {
-					y -= ySign;
+					kiloY -= ySign;
+					y = kiloY / 1000;
 				} else {
 					moved = true;
 				}
 			}
 		} while (moved);
-	}
-	
-	private int sign(int num) {
-		if (num > 0) {
-			return 1;
-		} else if (num == 0) {
-			return 0;
-		} else {
-			return -1;
-		}
 	}
 
 	private boolean checkCollision() {
@@ -149,7 +146,7 @@ public class Hero {
 	
 	// draws the hero
 	public void draw() {
-		if (hp <= 0) {
+		if (curHp <= 0) {
 			return;
 		}
 		int x = this.x - map.mapX;
@@ -168,7 +165,7 @@ public class Hero {
 		p.rect(x, y, HERO_SIZE, hpHeight);
 		
 		// hp bar
-		int fill = (HERO_SIZE - 2) * hp / maxHp;
+		int fill = (int) ((HERO_SIZE - 2) * curHp / maxHp);
 		p.fill(0xFFC00000);
 		p.rect(x + 1, y + 1, fill, hpHeight - 2);
 	}
@@ -176,15 +173,14 @@ public class Hero {
 	// key event listener
 	// handles the user pressing opposite keys simultaneously
 	public void keyPressed() {
-		int speed = Game.speed * SPEED;
 		if (p.key == 'w') {
-			mostRecentWs = -speed;
+			mostRecentWs = -SPEED;
 		} else if (p.key == 's') {
-			mostRecentWs = speed;
+			mostRecentWs = SPEED;
 		} else if (p.key == 'a') {
-			mostRecentAd = -speed;
+			mostRecentAd = -SPEED;
 		} else if (p.key == 'd') {
-			mostRecentAd = speed;
+			mostRecentAd = SPEED;
 		}
 	}
 }

@@ -2,11 +2,12 @@ package planet5.game.gen;
 
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
-import planet5.game.Map;
+import planet5.game.Game;
 import planet5.game.Tile;
 
 public class NoiseRandomGenerator implements Generator {
-	public Map gen(Applet p, GameFrame game, int width,
+	@Override
+	public void gen(Applet p, Game game, int width,
 			int height) {
 		Tile[][] tiles = new Tile[height][width];
 		for (int x = 0; x < tiles.length; x++) {
@@ -18,7 +19,7 @@ public class NoiseRandomGenerator implements Generator {
 						255 * p.noise(xf, 0, yf), 255 * p.noise(0, xf, yf));
 			}
 		}
-		return new Map(p, game, tiles);
+		game.tiles = tiles;
 	}
 
 }

@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
 import planet5.game.Enemy;
-import planet5.game.Map;
+import planet5.game.Game;
 import processing.core.PVector;
 
 public class CampaignFrame extends GameFrame {

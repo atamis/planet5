@@ -21,7 +21,7 @@ public class MenuButton extends Button {
 	// painting methods
 	@Override
 	public void paintDisabledState() {
-		paintButton(224);
+		paintButton(192);
 	}
 
 	@Override

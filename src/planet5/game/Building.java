@@ -1,6 +1,6 @@
 package planet5.game;
 
-import planet5.Game;
+import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.Fonts;
 import planet5.config.Globals;
@@ -23,19 +23,25 @@ public class Building {
 	int lastFireTime = 0;
 	float rad;
 
+	public int startBuildTime;
 	Enemy target = null;
 	boolean powered = false;
 	Building powerSource = null;
-
-	public Building(int type, int x, int y) {
+	
+	public Building(int type, int x, int y, int gameTime) {
 		rad = 0;
 		this.type = type;
 		this.row = y;
 		this.col = x;
+		this.startBuildTime = gameTime;
 		this.width = BuildingStats.cols[type];
 		this.height = BuildingStats.rows[type];
 		maxHp = BuildingStats.healths[type];
-		hp = maxHp;
+		hp = maxHp; // = 1 ? or another bar?
+	}
+	
+	public void update() {
+		// TODO: ..
 	}
 
 	public void calcAngle(PApplet p, int x, int y) {

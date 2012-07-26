@@ -9,7 +9,7 @@ package planet5.frames;
 
 import java.awt.Rectangle;
 
-import planet5.Game;
+import planet5.Main;
 import planet5.config.Fonts;
 import planet5.framework.Applet;
 import planet5.framework.Button;
@@ -49,7 +49,7 @@ public class AboutFrame extends Frame {
 	@Override
 	public void buttonClicked(String command) {
 		if (command.equals("Back")) {
-			p.transitionFrame(Game.menuFrame, Game.fullFadeTransition);
+			p.transitionFrame(Main.menuFrame, Main.fullFadeTransition);
 		}
 	}
 }

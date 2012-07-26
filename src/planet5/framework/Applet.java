@@ -40,6 +40,7 @@ public class Applet extends PApplet implements MouseWheelListener {
 		if (currentTransition != null) {
 			currentTransition.draw();
 		} else if (currentFrame != null) {
+			currentFrame.updateButtons();
 			currentFrame.update();
 			currentFrame.paint();
 		}

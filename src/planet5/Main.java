@@ -12,8 +12,8 @@ import planet5.framework.FullFadeTransition;
 import planet5.framework.Transition;
 import processing.core.PApplet;
 
-public class Game extends Applet {
-	public static Game instance;
+public class Main extends Applet {
+	public static Main instance;
 	
 	// frames and transitions
 	public static MenuFrame menuFrame;
@@ -21,14 +21,6 @@ public class Game extends Applet {
 	public static SettingsFrame settingsFrame;
 	public static AboutFrame aboutFrame;
 	public static FullFadeTransition fullFadeTransition;
-	
-	// frame rate
-	public static int speed = 1;
-	
-	public void changeSpeed(int speed) {
-		this.speed = speed;
-		frameRate(60 / speed);
-	}
 	
 	@Override
 	public void setup() {
@@ -53,9 +45,9 @@ public class Game extends Applet {
 
 	public static void main(String[] args) {
 		// windowed mode
-		PApplet.main(new String[] { "planet5.Game" });
+		PApplet.main(new String[] { "planet5.Main" });
 		
 		// presentation mode
-		// PApplet.main(new String[] { "--present", "planet5.Game" });
+		// PApplet.main(new String[] { "--present", "planet5.Main" });
 	}
 }

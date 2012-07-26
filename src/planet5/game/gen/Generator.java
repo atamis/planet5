@@ -2,9 +2,9 @@ package planet5.game.gen;
 
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
-import planet5.game.Map;
+import planet5.game.Game;
 
 public interface Generator {
-	public Map gen(Applet p, GameFrame game, int width,
+	public void gen(Applet p, Game game, int width,
 			int height);
 }

@@ -3,7 +3,8 @@ package planet5.game;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
-import planet5.Game;
+import planet5.Main;
+import planet5.config.EnemyStats;
 import planet5.config.Globals;
 import planet5.frames.GameFrame;
 import processing.core.PApplet;
@@ -13,26 +14,39 @@ public class Enemy {
 	public static final int TILE_SIZE = Globals.TILE_SIZE;
 	public static final int ENEMY_SIZE = 16;
 
-	public static final int SPEED = 1;
-
+	private int kiloX, kiloY;
 	public boolean attacked = false;
 	public int type;
 	public Rectangle bounds;
-	public Map map;
-	public GameFrame game;
-	public int hp;
-	public int maxHp;
+	public Game map;
+	private PApplet p;
 
-	public Enemy(int x, int y, int type, Map map, GameFrame game) {
+	int curHp = 0, maxHp = 0, computedHp = 0;
+	private int speed;
+
+	public Enemy(int x, int y, int type, Game map, PApplet p) {
 		bounds = new Rectangle(x + (TILE_SIZE - ENEMY_SIZE) / 2, y
 				+ (TILE_SIZE - ENEMY_SIZE) / 2, ENEMY_SIZE, ENEMY_SIZE);
+		this.kiloX = x * 1000;
+		this.kiloY = y * 1000;
 		this.map = map;
-		maxHp = 500; // TODO
-		hp = maxHp;
+		this.p = p;
+		maxHp = EnemyStats.hp[type];
+		speed = EnemyStats.speed[type];
+		curHp = maxHp;
+	}
+	
+	private int sign(int num) {
+		if (num > 0)
+			return 1;
+		else if (num == 0)
+			return 0;
+		else
+			return -1;
 	}
 
-	public void move() {
-		int speed = Game.speed * SPEED;
+	public void move(int elapsedMillis) {
+		int speed = elapsedMillis * this.speed;
 		int xMove = 0;
 		int yMove = 0;
 
@@ -87,52 +101,45 @@ public class Enemy {
 		}
 
 		// find the sign of move
-		int xSign = sign(xMove);
-		int ySign = sign(yMove);
-
+		int move = this.speed;
+		int xSign = move * sign(xMove);
+		int ySign = move * sign(yMove);
+		
 		// take absolute value of move
-		if (xMove < 0) {
-			xMove = -xMove;
-		}
-		if (yMove < 0) {
-			yMove = -yMove;
-		}
+		xMove = Math.abs(xMove);
+		yMove = Math.abs(yMove);
 
 		// move pixel by pixel
 		boolean moved;
 		do {
 			moved = false;
 
-			if (xMove != 0) {
-				bounds.x += xSign;
-				--xMove;
+			if (xMove > 0) {
+				xMove -= move;
+				this.kiloX += xSign;
+				this.bounds.x = this.kiloX / 1000;
+				
 				if (checkCollision()) {
-					bounds.x -= xSign;
+					this.kiloX -= xSign;
+					this.bounds.x = this.kiloX / 1000;
 				} else {
 					moved = true;
 				}
 			}
 
-			if (yMove != 0) {
-				bounds.y += ySign;
-				--yMove;
+			if (yMove > 0) {
+				this.kiloY += ySign;
+				yMove -= move;
+				this.bounds.y = this.kiloY / 1000;
+				
 				if (checkCollision()) {
-					bounds.y -= ySign;
+					this.kiloY -= ySign;
+					this.bounds.y = this.kiloY / 1000;
 				} else {
 					moved = true;
 				}
 			}
 		} while (moved);
-	}
-
-	private int sign(int num) {
-		if (num > 0) {
-			return 1;
-		} else if (num == 0) {
-			return 0;
-		} else {
-			return -1;
-		}
 	}
 
 	private boolean checkCollision() {
@@ -169,20 +176,17 @@ public class Enemy {
 		return new PVector(bounds.x - map.mapX, bounds.y - map.mapY);
 	}
 
-	// TODO: 3 duplicate methods with hero.java
-
 	public void draw() {
 		int x = bounds.x - map.mapX;
 		int y = bounds.y - map.mapY;
 
 		// only draw if it actually shows up
-		if (x + ENEMY_SIZE <= 0 || y + ENEMY_SIZE <= 0 || x >= map.p.width
-				|| y >= map.p.height - game.BAR_HEIGHT) {
+		if (x + ENEMY_SIZE <= 0 || y + ENEMY_SIZE <= 0 || x >= p.width
+				|| y >= p.height - map.BAR_HEIGHT) {
 			return;
 		}
 
 		final int hpHeight = 4;
-		PApplet p = map.p;
 
 		// fill
 		p.noStroke();
@@ -202,7 +206,7 @@ public class Enemy {
 		p.rect(x, y, ENEMY_SIZE, hpHeight);
 
 		// hp bar
-		int fill = (ENEMY_SIZE - 2) * hp / maxHp;
+		int fill = (int) ((ENEMY_SIZE - 2) * curHp / maxHp);
 		p.fill(p.color(full, zero, zero));
 		p.rect(x + 1, y + 1, fill, hpHeight - 2);
 	}

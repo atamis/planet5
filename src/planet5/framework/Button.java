@@ -32,6 +32,8 @@ public abstract class Button {
 
 	// whether the mouse was pressed inside the button
 	public boolean pressedInside = false;
+	
+	public boolean visible = true;
 
 	// constructor
 	public Button(Rectangle bounds, String text, String command) {
@@ -84,6 +86,10 @@ public abstract class Button {
 
 	// painting methods
 	protected void paintComponent() {
+		if (!visible) {
+			return;
+		}
+		
 		boolean mouseInside = bounds.contains(p.mouseX, p.mouseY);
 
 		if (!enabled) {
@@ -116,7 +122,7 @@ public abstract class Button {
 
 	// input methods
 	public void mousePressed() {
-		if (p.mouseButton == p.LEFT
+		if (p.mouseButton == p.LEFT && enabled && visible
 				&& bounds.contains(p.mouseX, p.mouseY)) {
 			pressedInside = true;
 			listener.buttonPressed(command);
@@ -125,7 +131,7 @@ public abstract class Button {
 	}
 
 	public void mouseReleased() {
-		if (p.mouseButton == p.LEFT && pressedInside
+		if (p.mouseButton == p.LEFT && pressedInside && enabled && visible
 				&& bounds.contains(p.mouseX, p.mouseY)) {
 			listener.buttonClicked(command);
 			clicked();

@@ -7,7 +7,7 @@ import megamu.mesh.Voronoi;
 
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
-import planet5.game.Map;
+import planet5.game.Game;
 import planet5.game.Tile;
 import processing.core.PConstants;
 import processing.core.PGraphics;
@@ -16,7 +16,7 @@ import processing.core.PVector;
 public class VoronoiPerlinNoiseGenerator implements Generator {
 
 	@Override
-	public Map gen(Applet p, GameFrame game, int width, int height) {
+	public void gen(Applet p, Game game, int width, int height) {
 		Tile[][] tiles = new Tile[width][height];
 
 		// Set up the tiles.
@@ -78,7 +78,7 @@ public class VoronoiPerlinNoiseGenerator implements Generator {
 		}
 
 		// TODO Auto-generated method stub
-		return new Map(p, game, tiles);
+		game.tiles = tiles;
 	}
 
 }

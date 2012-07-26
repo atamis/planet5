@@ -8,14 +8,15 @@ import planet5.config.Globals;
 import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import planet5.game.Building;
-import planet5.game.Map;
+import planet5.game.Game;
 import planet5.game.Tile;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PVector;
 
 public class CaveGenerator implements Generator {
-	public Map gen(Applet p, GameFrame game, int width, int height) {
+	@Override
+	public void gen(Applet p, Game game, int width, int height) {
 		Tile[][] tiles = new Tile[width][height];
 		// Number of "caverns" and the number of connections each cavern has to
 		// other caverns.
@@ -26,7 +27,7 @@ public class CaveGenerator implements Generator {
 			for (int y = 0; y < tiles[x].length; y++) {
 				float hue = (float) 0.1;
 				float sat = p.map(p.noise(x*0.05f, y * 0.05f), 0, 1, (float) 0.52, 1);
-				float val = p.map(p.noise(x*0.053f + 1, y * 0.053f + 1), 0, 1, (float) 0.25, 1);;
+				float val = p.map(p.noise(x*0.053f + 1, y * 0.053f + 1), 0, 1, (float) 0.25, 1);
 				tiles[x][y] = new Tile(Color.HSBtoRGB(hue, sat, val), true);
 			}
 		}
@@ -78,29 +79,19 @@ public class CaveGenerator implements Generator {
 			}
 		}
 
-		
-		
-		Map map = new Map(p, game, tiles);
+		game.tiles = tiles;
 		
 		int x = (int) (width/2.0);
 		int y = (int) (height/2.0);
 		
 		// Put the hero in the center.
-		map.hero.x = x * Globals.TILE_SIZE;
-		map.hero.y = y * Globals.TILE_SIZE;
+		game.hero.x = x * Globals.TILE_SIZE;
+		game.hero.y = y * Globals.TILE_SIZE;
+		game.hero.kiloX = 1000 * game.hero.x;
+		game.hero.kiloY = 1000 * game.hero.y;
 		
-		Building base = new Building(0, x + 1, y);
-		map.buildings.add(base);
-		
-		for (int k = 0; k < BuildingStats.cols[0]; k++) {
-			for (int m = 0; m < BuildingStats.rows[0]; m++) {
-				tiles[y + k][x + m + 1].building = base;
-			}
-		}
-
-		
-		return map;
-
+		Building base = new Building(0, x + 1, y, game.gameMillis);
+		game.setBase(base);
 	}
 
 }

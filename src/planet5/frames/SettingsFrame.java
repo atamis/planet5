@@ -2,7 +2,7 @@ package planet5.frames;
 
 import java.awt.Rectangle;
 
-import planet5.Game;
+import planet5.Main;
 import planet5.config.Fonts;
 import planet5.framework.Applet;
 import planet5.framework.Button;
@@ -51,8 +51,9 @@ public class SettingsFrame extends Frame {
 		int width = 100;
 		p.fill(0xFF204080);
 		//p.fill(255);
-		phase += 8 * Game.speed;
-		for (int i = Game.speed; i <= 6; i++) {
+		/*
+		phase += 8 * Main.speed;
+		for (int i = Main.speed; i <= 6; i++) {
 			//32+16+128, 32+16+64+64+64*i, 110, 63)
 			int stage = 448 * (phase % 4000) / 2000;
 			stage /= i;
@@ -62,13 +63,13 @@ public class SettingsFrame extends Frame {
 			}
 			// max 320?
 			p.rect(32+16+128+128+stage, 32+16+64+64+64*i, 63, 63);
-		}
+		}*/
 	}
 
 	@Override
 	public void buttonClicked(String command) {
 		if (command.equals("Back")) {
-			p.transitionFrame(Game.menuFrame, Game.fullFadeTransition);
+			p.transitionFrame(Main.menuFrame, Main.fullFadeTransition);
 		}
 	}
 	
@@ -92,8 +93,8 @@ public class SettingsFrame extends Frame {
 			return;
 		}
 
-		fpsButtons[Game.instance.speed - 1].pressed = false;
-		Game.instance.changeSpeed(newSpeed);
-		fpsButtons[Game.instance.speed - 1].pressed = true;
+		//fpsButtons[Main.instance.speed - 1].pressed = false;
+		//Main.instance.changeSpeed(newSpeed);
+		//fpsButtons[Main.instance.speed - 1].pressed = true;
 	}
 }

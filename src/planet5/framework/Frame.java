@@ -11,9 +11,7 @@ import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
 public abstract class Frame {
-	// variables
 	private ArrayList<Button> buttons = new ArrayList<Button>();
-
 	public Applet p;
 
 	public Frame(Applet parent) {
@@ -29,6 +27,7 @@ public abstract class Frame {
 		}
 	}
 
+	public void update() { }
 	protected abstract void draw();
 
 	// button methods
@@ -38,7 +37,7 @@ public abstract class Frame {
 		button.listener = this;
 	}
 
-	void update() {
+	void updateButtons() {
 		for (Button button : buttons) {
 			button.update();
 		}
