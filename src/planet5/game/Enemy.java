@@ -180,8 +180,9 @@ public class Enemy {
 		int right = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
 		int down = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
 
-		if (bounds.intersects(map.hero.x, map.hero.y, Hero.HERO_SIZE,
-				Hero.HERO_SIZE)) {
+
+		if (bounds.intersects(map.hero.x, map.hero.y, Hero.SIZE,
+				Hero.SIZE)) {
 			return true;
 		}
 

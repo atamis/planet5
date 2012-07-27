@@ -21,7 +21,7 @@ import planet5.game.gen.CaveGenerator;
 import planet5.game.gen.VoronoiPerlinNoiseGenerator;
 
 public class GameFrame extends Frame implements GameListener {
-	private Game game;
+	Game game;
 	
 	// constructors and initialization
 	public GameFrame(Applet parent) {
