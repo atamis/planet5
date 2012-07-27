@@ -52,10 +52,27 @@ public final class GameRenderer {
 	}
 
 	private static void drawDebug() {
-		int width = 100, height = 200;
+
 		
 		p.pushMatrix();
 		p.pushStyle();
+		
+		
+		p.textFont(Fonts.consolas16);
+		p.textAlign(p.LEFT, p.TOP);
+		p.textSize(12);
+
+		String[] strings = {"Health: " + UpgradeStats.level[0],
+				"Gen: " + UpgradeStats.level[1],
+				"MHealth: " + EnemyStats.getHP(0),
+				"MDamage: " + EnemyStats.getDamage(0),
+				"MSpeed: " + EnemyStats.getSpeed(0),
+				"#Monsters" + game.enemies.size()};
+
+		
+		int width = 100, height = (int) ((strings.length + 3) * (p.textAscent() + 4));
+
+		
 		p.translate(0, p.height-height);
 		p.fill(200, 200, 200, 100);
 		
@@ -63,15 +80,7 @@ public final class GameRenderer {
 		
 		p.fill(0);
 		p.stroke(0, 255, 0);
-		p.textFont(Fonts.consolas16);
-		p.textAlign(p.LEFT, p.TOP);
-		p.textSize(12);
 		
-		String[] strings = {"Health: " + UpgradeStats.level[0],
-				"Gen: " + UpgradeStats.level[1],
-				"MHealth: " + EnemyStats.getHP(0),
-				"MDamage: " + EnemyStats.getDamage(0),
-				"MSpeed: " + EnemyStats.getSpeed(0)};
 		
 		for(int i = 0; i < height/p.textAscent() + 5; i++) {
 			p.pushMatrix();

@@ -25,23 +25,27 @@ public class Enemy {
 
 	private int curHp = 0, maxHp = 0, computedHp = 0;
 	private int speed;
-	
+
 	public int getComputedHp() {
 		return computedHp;
 	}
+
 	public boolean isDead() {
 		return curHp <= 0;
 	}
+
 	public boolean willBeDead() {
 		return computedHp <= 0;
 	}
-	
+
 	public void takeFutureDamage(int damage) {
 		computedHp -= damage;
 	}
+
 	public void processFutureDamage(int damage) {
 		curHp -= damage;
 	}
+
 	public void takeDamage(int damage) {
 		curHp -= damage;
 		computedHp -= damage;
@@ -59,7 +63,7 @@ public class Enemy {
 		speed = EnemyStats.getSpeed(type);
 		computedHp = curHp = maxHp;
 	}
-	
+
 	private int sign(int num) {
 		if (num > 0)
 			return 1;
@@ -87,15 +91,16 @@ public class Enemy {
 			targetX = x - 1;
 		} else if (x != map.tileWidth - 1
 				&& map.path[y][x + 1] < currentDistance) {
-			targetX=x+1;
+			targetX = x + 1;
 		}
 
 		if (y != 0 && map.path[y - 1][x] < currentDistance) {
-			targetY=y-1;
-		} else if (y != map.tileHeight - 1 && map.path[y + 1][x] < currentDistance) {
-			targetY = y+1;
+			targetY = y - 1;
+		} else if (y != map.tileHeight - 1
+				&& map.path[y + 1][x] < currentDistance) {
+			targetY = y + 1;
 		}
-		
+
 		if (x != right) {
 			if (targetX == right) {
 				xMove = speed;
@@ -109,7 +114,7 @@ public class Enemy {
 				xMove = -speed;
 			}
 		}
-		
+
 		if (y != bot) {
 			if (targetY == bot) {
 				yMove = speed;
@@ -128,7 +133,7 @@ public class Enemy {
 		int move = this.speed;
 		int xSign = move * sign(xMove);
 		int ySign = move * sign(yMove);
-		
+
 		// take absolute value of move
 		xMove = Math.abs(xMove);
 		yMove = Math.abs(yMove);
@@ -142,7 +147,7 @@ public class Enemy {
 				xMove -= move;
 				this.kiloX += xSign;
 				this.bounds.x = this.kiloX / 1000;
-				
+
 				if (checkCollision()) {
 					this.kiloX -= xSign;
 					this.bounds.x = this.kiloX / 1000;
@@ -155,7 +160,7 @@ public class Enemy {
 				this.kiloY += ySign;
 				yMove -= move;
 				this.bounds.y = this.kiloY / 1000;
-				
+
 				if (checkCollision()) {
 					this.kiloY -= ySign;
 					this.bounds.y = this.kiloY / 1000;
@@ -164,8 +169,9 @@ public class Enemy {
 				}
 			}
 		} while (moved);
-		
-		center.setLocation(this.bounds.x + ENEMY_SIZE / 2, this.bounds.y + ENEMY_SIZE / 2);
+
+		center.setLocation(this.bounds.x + ENEMY_SIZE / 2, this.bounds.y
+				+ ENEMY_SIZE / 2);
 	}
 
 	private boolean checkCollision() {
@@ -173,8 +179,9 @@ public class Enemy {
 		int up = bounds.y / TILE_SIZE;
 		int right = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
 		int down = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
-		
-		if (bounds.intersects(map.hero.x, map.hero.y, Hero.HERO_SIZE, Hero.HERO_SIZE)) {
+
+		if (bounds.intersects(map.hero.x, map.hero.y, Hero.HERO_SIZE,
+				Hero.HERO_SIZE)) {
 			return true;
 		}
 
@@ -197,7 +204,7 @@ public class Enemy {
 
 		return false;
 	}
-	
+
 	public PVector screenLoc() {
 		return new PVector(bounds.x - map.mapX, bounds.y - map.mapY);
 	}
@@ -227,13 +234,15 @@ public class Enemy {
 		}
 		p.rect(x, y + hpHeight, ENEMY_SIZE, ENEMY_SIZE - hpHeight);
 
-		// hp bar background
-		p.fill(0);
-		p.rect(x, y, ENEMY_SIZE, hpHeight);
+		if (Globals.DRAW_HP) {
+			// hp bar background
+			p.fill(0);
+			p.rect(x, y, ENEMY_SIZE, hpHeight);
 
-		// hp bar
-		int fill = (int) ((ENEMY_SIZE - 2) * curHp / maxHp);
-		p.fill(p.color(full, zero, zero));
-		p.rect(x + 1, y + 1, fill, hpHeight - 2);
+			// hp bar
+			int fill = (int) ((ENEMY_SIZE - 2) * curHp / maxHp);
+			p.fill(p.color(full, zero, zero));
+			p.rect(x + 1, y + 1, fill, hpHeight - 2);
+		}
 	}
 }
