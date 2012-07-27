@@ -1,6 +1,7 @@
 package planet5.game;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import planet5.config.BuildingStats;
 import planet5.config.EnemyStats;
@@ -22,33 +23,78 @@ public final class GameRenderer {
 	public static void init(PApplet parent) {
 		p = parent;
 	}
+
+	int t = 0;
+	static long[] avg = new long[13];
+	static long[] min = new long[13];
+	static long[] max = new long[13];
+	static void stat(int idx, long num) {
+		
+	}
 	
 	public static void draw(Game game) {
+		long start = System.nanoTime();
+		long t = System.nanoTime();
+		
 		p.pushMatrix();
 		p.translate(0, BAR_HEIGHT);
 		GameRenderer.game = game;
 		
 		drawTiles();
-		drawBuildings();
-		game.hero.draw();
-		drawEnemies();
-		drawProjectiles();
+		
+		stat(0, (System.nanoTime()-t));t=System.nanoTime();
+		
+		drawBuildings(); t=System.nanoTime();
+		
+		p.translate(-game.mapX, -game.mapY);
+		game.hero.draw(); t=System.nanoTime();
+		
+		p.translate(game.mapX, game.mapY);
+		drawEnemies(); t=System.nanoTime();
+		
+		drawProjectiles();t=System.nanoTime();
+		
 		if (!game.help) {
-			drawBuildingPlaceover();
-			drawField();
+			drawBuildingPlaceover(); t=System.nanoTime();
+			
+			drawField();t=System.nanoTime();
+			
 		}
-		drawLoseWin();
+		drawLoseWin();t=System.nanoTime();
+		
 		
 		p.popMatrix();
 		
 		// draw bar
-		drawBarBackground();	// ~45us
-		drawBarBuildings();		// ~80us
-		drawBarUi();
-		drawShadows();
+		drawBarBackground();	// ~45ust=System.nanoTime();
+		
+		drawBarBuildings();		// ~80ust=System.nanoTime();
+		
+		drawBarUi(); t=System.nanoTime();
+		
+		drawShadows();t=System.nanoTime();
+		
+
+		
+		if(++t % 10 == 0 && t % 2 == 1 && t % 2 == 0){
+			p.println();
+			p.println("drawTiles: " + (System.nanoTime() - t) + "ns"); 
+			p.println("drawBuildings: " + (System.nanoTime() - t) + "ns");
+			p.println("hero.draw: " + (System.nanoTime() - t) + "ns");
+			p.println("drawEnemies: " + (System.nanoTime() - t) + "ns");
+			p.println("drawProjectiles: " + (System.nanoTime() - t) + "ns"); 
+			p.println("drawBuildingPlaceover: " + (System.nanoTime() - t) + "ns");
+			p.println("drawField: " + (System.nanoTime() - t) + "ns"); 
+			p.println("drawLoseWin: " + (System.nanoTime() - t) + "ns"); 
+			p.println("drawBarBackground: " + (System.nanoTime() - t) + "ns"); 
+			p.println("drawBarBuildings: " + (System.nanoTime() - t) + "ns"); 
+			p.println("drawBarUi: " + (System.nanoTime() - t) + "ns");
+			p.println("drawShadows: " + (System.nanoTime() - t) + "ns"); 
+			p.println("total: " + (System.nanoTime() - start) + "ns");
+		}
 		
 		if(Globals.DEBUG)
-		drawDebug();
+			drawDebug();
 	}
 
 	private static void drawDebug() {
@@ -110,6 +156,11 @@ public final class GameRenderer {
 			}
 			if (game.help) {
 				
+			} else if (game.selectedBuilding != null && game.selectedBuilding.type == 4 && i == game.selectedBuilding.current_upgrade) {
+				int alpha = (p.millis() / 2) % 511;
+				if (alpha > 255)
+					alpha = 511 - alpha;
+				p.fill(p.color(32, 128, 0, alpha / 2 + 128));
 			} else if (i == game.placingBuilding - 1) {
 				int alpha = (p.millis() / 2) % 511;
 				if (alpha > 255)
@@ -121,7 +172,15 @@ public final class GameRenderer {
 			}
 			p.rect(boxX, 1, BAR_HEIGHT - 2, BAR_HEIGHT - 1);
 			p.fill(0);
-			p.text("" + (i + 1), boxX, 1 - p.textDescent() / 2, BAR_HEIGHT - 2,
+			
+			String text = "" + (i + 1);
+			if (game.selectedBuilding != null && game.selectedBuilding.type == 4) {
+				if (i == 5)
+					text = "X";
+				else
+					text = "[" + text + "]";
+			}
+			p.text(text, boxX, 1 - p.textDescent() / 2, BAR_HEIGHT - 2,
 					BAR_HEIGHT - 1);
 		}
 	}
@@ -172,6 +231,10 @@ public final class GameRenderer {
 		// method takes ~450us
 		// TODO: try using loadPixels() for faster drawing
 		// background shadow
+		p.fill(32);
+		p.noStroke();
+		p.rect(0, BAR_HEIGHT, p.width, 1);
+		/*
 		p.strokeWeight(1);
 		int alpha = 255;
 		if (game.help) {
@@ -192,6 +255,7 @@ public final class GameRenderer {
 				alpha /= 1.5;
 			}
 		}
+		//*/
 	}
 	
 	static void drawTiles() {

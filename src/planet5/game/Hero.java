@@ -2,24 +2,21 @@ package planet5.game;
 
 import java.awt.event.KeyEvent;
 
-import planet5.Main;
-import planet5.config.BuildingStats;
-import planet5.config.Globals;
-import planet5.frames.GameFrame;
 import planet5.framework.Applet;
-import processing.core.PApplet;
 
 public class Hero {
 	// copied constants
-	public static final int TILE_SIZE = Globals.TILE_SIZE;
-	public static final int HERO_SIZE = 32;
+	public static final int TILE_SIZE = Game.TILE_SIZE;
 	
 	// constants
+	public static final int SIZE = 32;
 	public static final int SPEED = 100;
+	public static final int HP_BAR_HEIGHT = 8;
+	public static final int BASE_HP = 100;
 	
 	// hero variables
-	public int kiloX, kiloY;
 	public int x, y;
+	public int kiloX, kiloY;
 	public int curHp, maxHp;
 	
 	// reference variables
@@ -36,44 +33,33 @@ public class Hero {
 		this.y = y;
 		this.p = p;
 		this.map = map;
-		maxHp = 100;
+		maxHp = BASE_HP;
 		curHp = maxHp;
 	}
 	
-	private int sign(int num) {
-		if (num > 0)
-			return 1;
-		else if (num == 0)
-			return 0;
-		else
-			return -1;
-	}
-
 	// moves the hero, checking for wall and building collision
 	public void update(int elapsedMillis) {
-		if (curHp <= 0) {
+		if (curHp <= 0)
 			return;
-		}
+		
 		int speed = elapsedMillis * SPEED;
 		int xMove = 0;
 		int yMove = 0;
 		
 		// calculate total pixels to move
-		if (p.pressedKeys[KeyEvent.VK_W] && p.pressedKeys[KeyEvent.VK_S]) {
+		if (p.pressedKeys[KeyEvent.VK_W] && p.pressedKeys[KeyEvent.VK_S])
 			yMove = elapsedMillis * mostRecentWs;
-		} else if (p.pressedKeys[KeyEvent.VK_W]) {
+		else if (p.pressedKeys[KeyEvent.VK_W])
 			yMove = -speed;
-		} else if (p.pressedKeys[KeyEvent.VK_S]) {
+		else if (p.pressedKeys[KeyEvent.VK_S])
 			yMove = speed;
-		}
 		
-		if (p.pressedKeys[KeyEvent.VK_A] && p.pressedKeys[KeyEvent.VK_D]) {
+		if (p.pressedKeys[KeyEvent.VK_A] && p.pressedKeys[KeyEvent.VK_D])
 			xMove = elapsedMillis * mostRecentAd;
-		} else if (p.pressedKeys[KeyEvent.VK_A]) {
+		else if (p.pressedKeys[KeyEvent.VK_A])
 			xMove = -speed;
-		} else if (p.pressedKeys[KeyEvent.VK_D]) {
+		else if (p.pressedKeys[KeyEvent.VK_D])
 			xMove = speed;
-		}
 		
 		// find the sign of move
 		int move = SPEED;
@@ -115,17 +101,24 @@ public class Hero {
 		} while (moved);
 	}
 
+	private int sign(int num) {
+		if (num > 0)
+			return 1;
+		else if (num == 0)
+			return 0;
+		else
+			return -1;
+	}
+
 	private boolean checkCollision() {
 		int left = x / TILE_SIZE;
 		int up = y / TILE_SIZE;
-		int right = (x + HERO_SIZE - 1) / TILE_SIZE;
-		int down = (y + HERO_SIZE - 1) / TILE_SIZE;
+		int right = (x + SIZE - 1) / TILE_SIZE;
+		int down = (y + SIZE - 1) / TILE_SIZE;
 		
-		for (Enemy enemy : map.enemies) {
-			if (enemy.bounds.intersects(x, y, HERO_SIZE, HERO_SIZE)) {
+		for (Enemy enemy : map.enemies)
+			if (enemy.bounds.intersects(x, y, SIZE, SIZE))
 				return true;
-			}
-		}
 		
 		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
 			return true;
@@ -146,41 +139,40 @@ public class Hero {
 	
 	// draws the hero
 	public void draw() {
-		if (curHp <= 0) {
+		if (curHp <= 0)
 			return;
-		}
-		int x = this.x - map.mapX;
-		int y = this.y - map.mapY;
-		
-		final int hpHeight = 8;
 		
 		p.noStroke();
 		
-		// hero background
+		// draw the hero
 		p.fill(0xFF204080);
-		p.rect(x, y + hpHeight, HERO_SIZE, HERO_SIZE - hpHeight);
+		p.rect(x, y + HP_BAR_HEIGHT, SIZE, SIZE - HP_BAR_HEIGHT);
 		
-		// hp bar background
+		// draw health bar outline
+		int hpBarFill = (int) ((SIZE - 2) * curHp / maxHp);
 		p.fill(0);
-		p.rect(x, y, HERO_SIZE, hpHeight);
+		p.rect(x, y, 1, HP_BAR_HEIGHT);
+		p.rect(x + 1, y, hpBarFill, 1);
+		p.rect(x + 1, y + HP_BAR_HEIGHT - 1, hpBarFill, 1);
 		
-		// hp bar
-		int fill = (int) ((HERO_SIZE - 2) * curHp / maxHp);
+		// draw health bar blackness
+		p.rect(x + 1 + hpBarFill, y, SIZE - hpBarFill - 1, HP_BAR_HEIGHT);
+		
+		// draw health bar fill
 		p.fill(0xFFC00000);
-		p.rect(x + 1, y + 1, fill, hpHeight - 2);
+		p.rect(x + 1, y + 1, hpBarFill, HP_BAR_HEIGHT - 2);
 	}
 
-	// key event listener
-	// handles the user pressing opposite keys simultaneously
+	// if the user presses keys that go in opposite directions, the most recent
+	// key pressed takes priority
 	public void keyPressed() {
-		if (p.key == 'w') {
+		if (p.keyCode == KeyEvent.VK_W)
 			mostRecentWs = -SPEED;
-		} else if (p.key == 's') {
-			mostRecentWs = SPEED;
-		} else if (p.key == 'a') {
+		else if (p.keyCode == KeyEvent.VK_A)
 			mostRecentAd = -SPEED;
-		} else if (p.key == 'd') {
+		else if (p.keyCode == KeyEvent.VK_S)
+			mostRecentWs = SPEED;
+		else if (p.keyCode == KeyEvent.VK_D)
 			mostRecentAd = SPEED;
-		}
 	}
 }
