@@ -14,20 +14,27 @@ public final class EnemyStats {
 	private static int[] damage = {3, 6, 4};
 	// Speed per second.
 	private static int[] speed = {10, 5, 20};
+	private static int[] spawn = {3, 2, 1};
 	
 	public static float hp_delta = 0.001f;
 	public static float damage_delta = 0.001f;
 	public static float speed_delta = 0.0001f;
+	public static float spawn_delta = 0.0001f;
 	
 	public static int getHP(int i) {
-		return (int) (hp[i] + hp_delta * EnemyLevel.level);
+		return (int) (hp[i] + hp_delta * EnemyLevel.level());
 	}
 	
 	public static int getDamage(int i) {
-		return (int) (damage[i] + damage_delta * EnemyLevel.level);
+		return (int) (damage[i] + damage_delta * EnemyLevel.level());
 	}
 	
 	public static int getSpeed(int i) {
-		return (int) (speed[i] + speed_delta * EnemyLevel.level);
+		return (int) (speed[i] + speed_delta * EnemyLevel.level());
 	}
+	
+	public static int getSpawn(int i) {
+		return (int) (spawn[i] + spawn_delta * EnemyLevel.level());
+	}
+
 }

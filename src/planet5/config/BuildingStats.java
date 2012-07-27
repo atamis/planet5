@@ -13,15 +13,15 @@ public class BuildingStats {
 			"The Science Lab upgrades a variety of buildings and weapons you use.",
 			"The Laser Turret provides high damage short range defense. It fires continuously.",
 			"The Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots." };
-	private static float[] healths = { 1500, 100, 100, 100, 500, 500, 350 };
-	public static int[] costs = { 0, 20, 30, 100, 500, 350, 500 };
+	public static int[] costs = { 0, 20, 30, 100, 500, 200, 500 };
 	public static int[] rows = { 3, 1, 1, 1, 2, 1, 2 };
 	public static int[] cols = { 3, 1, 1, 1, 2, 1, 2 };
 	public static int[] light = { 256, 64, 64, 64, 256, 96, 64 };
-	private static float[] cap = { 4800, 0, 0, 500, 0, 0, 0 };
-	private static float[] gen = { 1, 0, 5, 0, 0, 0, 0 };
-	private static float[] draw = { 0, 0, 0, 0, 10, 10, 4 };
-	private static float[] damage = { 0, 0, 0, 0, 0, 4, 20, 100 };
+	private static float[] healths = { 1500, 100, 100, 100, 500, 1000, 350 };
+	private static float[] cap = { 4800, 0, 0, 1000, 0, 0, 0 };
+	private static float[] gen = { 0.1f, 0, 0.1f, 0, 0, 0, 0 };
+	private static float[] draw = { 0, 0, 0, 0, 10, 0.5f, 3 };
+	private static float[] damage = { 0, 0, 0, 0, 0, 0, 60, 200 };
 
 	public static float health_delta = 0.1f;
 	public static float cap_delta = 0.01f;
@@ -57,8 +57,7 @@ public class BuildingStats {
 
 	public static float getDraw(int i) {
 		if (i == 4 || i == 5 || i == 6)
-			return draw[i] + draw_delta
-					* UpgradeStats.level[Upgrades.draw];
+			return draw[i] + draw_delta * UpgradeStats.level[Upgrades.draw];
 		else
 			return 0;
 

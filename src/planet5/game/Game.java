@@ -1,29 +1,20 @@
 package planet5.game;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.EnemyLevel;
 import planet5.config.EnemyStats;
 import planet5.config.Fonts;
-import planet5.config.Globals;
 import planet5.config.UpgradeStats;
-import planet5.frames.GameFrame;
 import planet5.framework.Applet;
-import planet5.framework.Button;
 import planet5.game.gen.CaveGenerator;
-import processing.core.PApplet;
-import processing.core.PGraphics;
-import processing.core.PVector;
 
 public class Game {
 	// graphical constants
@@ -34,7 +25,7 @@ public class Game {
 	private static final int MILLIS_PER_DAY = 10 * 60 * 1000;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_DAY / 24;
 	private static final int MILLIS_PER_MINUTE = MILLIS_PER_HOUR / 60;
-	private static final int GAME_START_TIME = 0 * MILLIS_PER_HOUR;
+	private static final int GAME_START_TIME = 12 * MILLIS_PER_HOUR;
 
 	public boolean paused = false, help = false;
 	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
@@ -264,7 +255,7 @@ public class Game {
 			spawnEnemies(elapsedMillis); // 9351930 => 2234
 			updateEnemies(elapsedMillis); // 12836684 => 200099
 			checkGameEvents(); // 1787
-			EnemyLevel.level += elapsedMillis;
+			EnemyLevel.add(elapsedMillis);
 		}
 
 		// remove building buy if not enough energy

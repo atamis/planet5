@@ -1,7 +1,19 @@
 package planet5.config;
 
 public class EnemyLevel {
-	public static float level = 0;
+	private static float level = 0;
+	
+	public static float level() {
+		// TODO: reset
+		// return level;
+		return 0;
+	}
+	
+	public static float add(float x) {
+		level += x;
+		
+		return level;
+	}
 	
 	public static void reset() {
 		level = 0;
