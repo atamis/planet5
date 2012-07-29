@@ -22,6 +22,7 @@ public class Game {
 	static final int BAR_HEIGHT = 45;
 
 	// time constants
+	// 10 mintues for 25 hours
 	private static final int MILLIS_PER_DAY = 10 * 60 * 1000;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_DAY / 24;
 	private static final int MILLIS_PER_MINUTE = MILLIS_PER_HOUR / 60;
@@ -914,5 +915,15 @@ public class Game {
 		} else if (command.equals("Play Again")) {
 			restartGame();
 		}
+	}
+
+	public float getTotalGen() {
+		float x = 0;
+		
+		for(Building b : buildings) {
+			x += BuildingStats.getGen(b.type);
+		}
+
+		return x;
 	}
 }

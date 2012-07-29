@@ -108,8 +108,8 @@ public final class GameRenderer {
 		p.textAlign(p.LEFT, p.TOP);
 		p.textSize(12);
 
-		String[] strings = {"Health: " + UpgradeStats.level[0],
-				"Gen: " + UpgradeStats.level[1],
+		String[] strings = {"MortarH: " + BuildingStats.getHealth(6),
+				"Gen: " + game.getTotalGen(),
 				"MHealth: " + EnemyStats.getHP(0),
 				"MDamage: " + EnemyStats.getDamage(0),
 				"MSpeed: " + EnemyStats.getSpeed(0),

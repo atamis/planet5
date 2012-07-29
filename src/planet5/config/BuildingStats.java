@@ -19,14 +19,14 @@ public class BuildingStats {
 	public static int[] light = { 256, 64, 64, 64, 256, 96, 64 };
 	private static float[] healths = { 1500, 100, 100, 100, 500, 1000, 350 };
 	private static float[] cap = { 4800, 0, 0, 1000, 0, 0, 0 };
-	private static float[] gen = { 0.1f, 0, 0.1f, 0, 0, 0, 0 };
-	private static float[] draw = { 0, 0, 0, 0, 10, 0.5f, 3 };
-	private static float[] damage = { 0, 0, 0, 0, 0, 0, 60, 200 };
+	private static float[] gen = { 0.08f, 0, 0.08f, 0, 0, 0, 0 };
+	private static float[] draw = { 0, 0, 0, 0, 10, 0.5f, 0 };
+	private static float[] damage = { 0, 0, 0, 0, 0, 0, 30, 200 };
 
-	public static float health_delta = 0.1f;
-	public static float cap_delta = 0.01f;
-	public static float gen_delta = 0.01f;
-	public static float damage_delta = 0.01f;
+	public static float health_delta = 0.0001f;
+	public static float cap_delta = 0.0001f;
+	public static float gen_delta = 0.000001f;
+	public static float damage_delta = 0.001f;
 	public static float draw_delta = 0.01f;
 
 	public static float getHealth(int i) {
