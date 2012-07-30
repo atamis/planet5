@@ -13,8 +13,7 @@ public class Projectile {
 	private static final int PROJECTILE_SIZE = 16;
 	private static final int DETONATE_RADIUS_SQ = 4 * 4;
 	private static final int EXPLOSION_RADIUS_SQ = 32 * 32;
-	private static final float SPEED = 0.2f;
-	public static final int DAMAGE = 50;
+	private static final float SPEED = 0.8f;
 	
 	private float floatX, floatY;
 	public Rectangle bounds;
@@ -57,11 +56,13 @@ public class Projectile {
 		rotation = Math.atan2(dx, dy);
 		
 		// explode if target is close enough
+		int damage = (int) BuildingStats.getDamage(6);
 		if (target.center.distanceSq(center) < DETONATE_RADIUS_SQ) {
 			// kill nearby enemies
-			for (Enemy e : map.enemies) {
+			for (Enemy e : map.enemies) { // TODO: enemyArray
 				if (e.center.distanceSq(center) < EXPLOSION_RADIUS_SQ) {
-					e.processFutureDamage(DAMAGE);
+					e.processFutureDamage(damage);
+					e.takeDamage(damage);
 					if (e.isDead()) {
 						
 					}

@@ -24,74 +24,40 @@ public final class GameRenderer {
 		p = parent;
 	}
 
-	int t = 0;
-	static long[] avg = new long[13];
-	static long[] min = new long[13];
-	static long[] max = new long[13];
-	static void stat(int idx, long num) {
-		
-	}
-	
 	public static void draw(Game game) {
 		long start = System.nanoTime();
-		long t = System.nanoTime();
 		
-		p.pushMatrix();
 		p.translate(0, BAR_HEIGHT);
 		GameRenderer.game = game;
-		
+
+		p.translate(-game.mapX, -game.mapY);
 		drawTiles();
+		p.translate(game.mapX, game.mapY);
 		
-		stat(0, (System.nanoTime()-t));t=System.nanoTime();
-		
-		drawBuildings(); t=System.nanoTime();
+		drawBuildings();
 		
 		p.translate(-game.mapX, -game.mapY);
-		game.hero.draw(); t=System.nanoTime();
-		
+		game.hero.draw();
 		p.translate(game.mapX, game.mapY);
-		drawEnemies(); t=System.nanoTime();
 		
-		drawProjectiles();t=System.nanoTime();
+		drawEnemies();
 		
-		if (!game.help) {
-			drawBuildingPlaceover(); t=System.nanoTime();
+		drawProjectiles();
+
+		p.translate(-game.mapX, -game.mapY);
+		drawBuildingPlaceover();
+		p.translate(game.mapX, game.mapY);
 			
-			drawField();t=System.nanoTime();
-			
-		}
-		drawLoseWin();t=System.nanoTime();
-		
-		
-		p.popMatrix();
+		drawLoseWin();
+
+		p.translate(0, -BAR_HEIGHT);
 		
 		// draw bar
-		drawBarBackground();	// ~45ust=System.nanoTime();
+		drawBarBackground();
 		
-		drawBarBuildings();		// ~80ust=System.nanoTime();
+		drawBarBuildings();
 		
-		drawBarUi(); t=System.nanoTime();
-		
-		drawShadows();t=System.nanoTime();
-		
-
-		
-		if(++t % 10 == 0 && t % 2 == 1 && t % 2 == 0){
-			p.println();
-			p.println("drawTiles: " + (System.nanoTime() - t) + "ns"); 
-			p.println("drawBuildings: " + (System.nanoTime() - t) + "ns");
-			p.println("hero.draw: " + (System.nanoTime() - t) + "ns");
-			p.println("drawEnemies: " + (System.nanoTime() - t) + "ns");
-			p.println("drawProjectiles: " + (System.nanoTime() - t) + "ns"); 
-			p.println("drawBuildingPlaceover: " + (System.nanoTime() - t) + "ns");
-			p.println("drawField: " + (System.nanoTime() - t) + "ns"); 
-			p.println("drawLoseWin: " + (System.nanoTime() - t) + "ns"); 
-			p.println("drawBarBackground: " + (System.nanoTime() - t) + "ns"); 
-			p.println("drawBarBuildings: " + (System.nanoTime() - t) + "ns"); 
-			p.println("drawBarUi: " + (System.nanoTime() - t) + "ns");
-			p.println("drawShadows: " + (System.nanoTime() - t) + "ns"); 
-			p.println("total: " + (System.nanoTime() - start) + "ns");
-		}
+		drawBarUi();
 		
 		if(Globals.DEBUG)
 			drawDebug();
@@ -142,10 +108,9 @@ public final class GameRenderer {
 
 	// drawing methods
 	static void drawBarBackground() {
-		// TODO: can optimize by drawing lines for left, rectangle for middle top, lines for right
 		p.noStroke();
 		p.fill(0xFF202020);
-		p.rect(0, 0, p.width, BAR_HEIGHT);
+		p.rect(0, 0, p.width, BAR_HEIGHT + 1);
 		p.fill(0);
 		p.rect(p.width - 3 * 64, 0, 3 * 64, 23);
 	}
@@ -158,11 +123,11 @@ public final class GameRenderer {
 			int boxX = i * (BAR_HEIGHT - 1) + 1;
 			boolean buyable = (game.curEnergy >= BuildingStats.costs[i + 1]);
 			
-			if (buyable) {
+			if (buyable)
 				p.fill(128);
-			} else {
+			else
 				p.fill(64);
-			}
+			
 			if (game.help) {
 				
 			} else if (game.selectedBuilding != null && game.selectedBuilding.type == 4 && i == game.selectedBuilding.current_upgrade) {
@@ -200,7 +165,6 @@ public final class GameRenderer {
 		int energy_bar_fill = (int) p.map(game.curEnergy, 0, game.maxEnergy, 0, energy_bar_width);
 		
 		// maximum energy bar
-		// ~17us
 		p.fill(64, 64, 0);
 		p.rect(energy_bar_start + energy_bar_fill, BAR_HEIGHT / 2 + 2, energy_bar_width - energy_bar_fill, BAR_HEIGHT / 2 - 1);
 		
@@ -223,53 +187,25 @@ public final class GameRenderer {
 			hour -= 12;
 			part = "PM";
 		}
-		if (hour == 0) {
+		
+		if (hour == 0)
 			hour = 12;
-		}
+		
 		String time = String.format("Day %d, %d:%02d %s", game.day + 1, hour, game.minute, part);
 		p.text(time, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16, BAR_HEIGHT / 2 - 1);
 		
 		p.textAlign(p.RIGHT, p.CENTER);
-		p.text("fps: " + game.lastFrameRate, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16, BAR_HEIGHT / 2 - 1);
+		String text = "fps: " + game.lastFrameRate;
+			text = Game.DOUBLE_ASDF + "x! " + text;
+		p.text(text, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16, BAR_HEIGHT / 2 - 1);
 		if (p.millis() - game.lastFrameRateUpdate >= 1000) {
 			game.lastFrameRate = (int) p.frameRate;
 			game.lastFrameRateUpdate = p.millis(); // DOESNT BELONG HERE.
 		}
 	}
-	static void drawShadows() {
-		// method takes ~450us
-		// TODO: try using loadPixels() for faster drawing
-		// background shadow
-		p.fill(32);
-		p.noStroke();
-		p.rect(0, BAR_HEIGHT, p.width, 1);
-		/*
-		p.strokeWeight(1);
-		int alpha = 255;
-		if (game.help) {
-			p.fill(0, 0, 0, 192);
-			p.rect(0, BAR_HEIGHT, p.width, p.height - BAR_HEIGHT);
-		}
-		for (int i = 0; alpha >= 2; i++) {
-			if (game.help) {
-				p.stroke(0, 0, 0, alpha);
-				p.line(0, BAR_HEIGHT + i, p.width, BAR_HEIGHT + i);
-				p.line(i, BAR_HEIGHT, i, p.height);
-				p.line(p.width - i - 1, BAR_HEIGHT, p.width - i - 1, p.height);
-				p.line(0, p.height - i - 1, p.width, p.height - i - 1);
-				alpha /= 1.5;
-			} else {
-				p.stroke(32, 32, 32, alpha);
-				p.line(0, BAR_HEIGHT + i - 1, p.width, BAR_HEIGHT + i - 1);
-				alpha /= 1.5;
-			}
-		}
-		//*/
-	}
 	
 	static void drawTiles() {
-		// method takes ~2.1ms
-		p.translate(-game.mapX, -game.mapY);
+		boolean drawField = (game.placingBuilding != -1 && game.isPlaying());
 		p.noStroke();
 
 		// calculate bounding x and y values
@@ -281,35 +217,28 @@ public final class GameRenderer {
 		// draw the tiles
 		for (int x = xMin; x < xMax; x++) {
 			for (int y = yMin; y < yMax; y++) {
-				// use lighting
-				int alpha = game.lighting[y][x];
+				// get original tile color
+				Color c = new Color(game.tiles[y][x].color);
+				int r = c.getRed(), g = c.getGreen(), b = c.getBlue();
 				
-				// use a different color for walls
-				/*if (tiles[y][x].wall) {
-					int mono = alpha * 128 / 255;
-					p.fill(p.color(mono, mono, mono));
-				} else {*/
-					Color c = new Color(game.tiles[y][x].color);
-					int r = c.getRed() * alpha / 255;
-					int g = c.getGreen() * alpha / 255;
-					int b = c.getBlue() * alpha / 255;
-					p.fill(p.color(r, g, b));
-				//}
+				// apply field
+				if (drawField && game.field[y][x]) {
+					r = (192 * r + 64 * 64) / 256;
+					g = (192 * g + 64 * 128) / 256;
+					b = (192 * b + 64 * 255) / 256;
+				}
+				
+				// apply lighting
+				int alpha = game.lighting[y][x];
+				r = r * alpha / 255;
+				g = g * alpha / 255;
+				b = b * alpha / 255;
 
 				// draw the tile
-				p.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-				if (game.field[y][x]) {
-					p.fill(0);
-					//p.rect(x * TILE_SIZE, y * TILE_SIZE, 4, 4);
-				}
-				if (!game.tiles[y][x].wall) {
-					p.fill(0);
-				//	p.text(path[y][x], x * TILE_SIZE + 8, y * TILE_SIZE + 8);
-				}
+				p.fill(p.color(r, g, b));
+				p.rect(x * TILE_SIZE , y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 			}
 		}
-
-		p.translate(game.mapX, game.mapY);
 	}
 	static void drawBuildings() {
 		// TODO: use this?
@@ -370,61 +299,30 @@ public final class GameRenderer {
 		}
 		p.noStroke();
 		
-		// TODO: only draw if can
 		for (Projectile pr : game.projectiles)
 			pr.draw();
 	}
 	static void drawBuildingPlaceover() {
-		if (!game.isPlacingBuilding()) {
+		if (!game.isPlacingBuilding() || !game.isPlaying())
 			return;
-		}
 		
-		p.translate(-game.mapX, -game.mapY);
-
 		int x = (p.mouseX + game.mapX) / 32;
 		int y = (p.mouseY + game.mapY - BAR_HEIGHT) / 32;
 		int w = BuildingStats.cols[game.placingBuilding];
 		int h = BuildingStats.rows[game.placingBuilding];
 
 		// draw a transparency showing where the building will be placed
-		if (game.canPlaceBuilding(x, y, w, h)) {
+		if (game.canPlaceBuilding(x, y, w, h))
 			p.fill(0x80208000);
-		} else {
+		else
 			p.fill(0x80FF0000);
-		}
+		
 		p.noStroke();
 		p.rect(x * TILE_SIZE, y * TILE_SIZE, w * TILE_SIZE, h * TILE_SIZE);
-
-		p.translate(game.mapX, game.mapY);
-	}
-	static void drawField() {
-		// TODO: improve performance
-		if (game.placingBuilding != -1) {
-			p.translate(-game.mapX, -game.mapY);
-
-			// calculate bounding x and y values
-			int xMin = game.mapX / TILE_SIZE;
-			int yMin = game.mapY / TILE_SIZE;
-			int xMax = (p.width + game.mapX - 1) / TILE_SIZE + 1;
-			int yMax = (p.height + game.mapY - BAR_HEIGHT - 1) / TILE_SIZE + 1;
-
-			// draw the tiles
-			p.fill(p.color(64, 128, 255, 64));
-			for (int i = xMin; i < xMax; i++) {
-				for (int j = yMin; j < yMax; j++) {
-					if (game.field[j][i]) {
-						p.rect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-					}
-				}
-			}
-
-			p.translate(game.mapX, game.mapY);
-		}
 	}
 	static void drawLoseWin() {
-		if (game.win == -1 && game.lose == -1) {
+		if (game.win == -1 && game.lose == -1)
 			return;
-		}
 		
 		p.fill(0xFF202020);
 		p.rect((p.width - 300) / 2, 290, 300, 89);

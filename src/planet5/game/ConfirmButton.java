@@ -97,9 +97,9 @@ public class ConfirmButton {
 					this.y = y;
 					confirm = true;
 				}
-				pressedAnywhere = false;
-				pressedInside = false;
 			}
+			pressedAnywhere = false;
+			pressedInside = false;
 		}
 	}
 }

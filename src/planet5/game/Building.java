@@ -40,7 +40,7 @@ public class Building {
 		this.width = BuildingStats.cols[type];
 		this.height = BuildingStats.rows[type];
 		maxHp = BuildingStats.getHealth(type);
-		hp = maxHp; // = 1 ? or another bar?
+		hp = maxHp;
 	}
 	
 	public boolean update(int elapsedMillis) {
@@ -55,7 +55,7 @@ public class Building {
 			}
 		}
 		
-		if(type == 4) {
+		if(type == 4 && buildTime == -1) {
 			UpgradeStats.level[current_upgrade] += elapsedMillis;
 		}
 
@@ -77,7 +77,6 @@ public class Building {
 			PVector e = target.screenLoc();
 			e.add(Enemy.ENEMY_SIZE / 2, Enemy.ENEMY_SIZE / 2, 0);
 			p.line(c.x, c.y, e.x, e.y);
-			//System.out.println(c);
 			rad = p.HALF_PI + (float) p.atan2((e.y - c.y), (e.x - c.x));
 		}
 	}

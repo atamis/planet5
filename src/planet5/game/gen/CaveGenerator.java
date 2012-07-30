@@ -9,6 +9,7 @@ import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import planet5.game.Building;
 import planet5.game.Game;
+import planet5.game.Hero;
 import planet5.game.Tile;
 import processing.core.PConstants;
 import processing.core.PGraphics;
@@ -85,6 +86,7 @@ public class CaveGenerator implements Generator {
 		int y = (int) (height/2.0);
 		
 		// Put the hero in the center.
+		game.hero = new Hero(p, game, 0, 0);
 		game.hero.x = x * Globals.TILE_SIZE;
 		game.hero.y = y * Globals.TILE_SIZE;
 		game.hero.kiloX = 1000 * game.hero.x;

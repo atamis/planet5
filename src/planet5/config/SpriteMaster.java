@@ -23,7 +23,6 @@ public class SpriteMaster {
 	public PImage enemy;
 
 	public SpriteMaster(PApplet p) {
-		System.out.println("Loading sprites.");
 		int width, height;
 		raw_building_sprite = p.loadImage(Globals.SPRITE_IMAGE);
 		building_sprites = new PImage[BuildingStats.names.length];

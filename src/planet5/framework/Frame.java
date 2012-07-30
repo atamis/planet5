@@ -1,10 +1,3 @@
-/*
- * Frame.java
- * James Zhang
- * July 17 2012
- * 
- */
-
 package planet5.framework;
 
 import java.awt.event.MouseWheelEvent;

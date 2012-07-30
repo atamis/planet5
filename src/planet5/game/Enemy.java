@@ -2,9 +2,7 @@ package planet5.game;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 
-import planet5.Main;
 import planet5.config.EnemyStats;
 import planet5.config.Globals;
 import planet5.frames.GameFrame;
@@ -77,57 +75,50 @@ public class Enemy {
 		int speed = elapsedMillis * this.speed;
 		int xMove = 0;
 		int yMove = 0;
+		map.enemyArray[center.y / TILE_SIZE][center.x / TILE_SIZE].remove(this);
 
 		// calculate total pixels to move
-		int x = bounds.x / TILE_SIZE;
-		int y = bounds.y / TILE_SIZE;
+		int left = bounds.x / TILE_SIZE;
+		int up = bounds.y / TILE_SIZE;
 		int right = (bounds.x + ENEMY_SIZE) / TILE_SIZE;
-		int bot = (bounds.y + ENEMY_SIZE) / TILE_SIZE;
-		int targetX = x;
-		int targetY = y;
+		int down = (bounds.y + ENEMY_SIZE) / TILE_SIZE;
+		int targetX = left;
+		int targetY = up;
 
-		int currentDistance = map.path[y][x];
-		if (x != 0 && map.path[y][x - 1] < currentDistance) {
-			targetX = x - 1;
-		} else if (x != map.tileWidth - 1
-				&& map.path[y][x + 1] < currentDistance) {
-			targetX = x + 1;
+		int currentDistance = map.path[up][left];
+		if (left != 0 && map.path[up][left - 1] < currentDistance) {
+			targetX = left - 1;
+		} else if (left != map.tileWidth - 1
+				&& map.path[up][left + 1] < currentDistance) {
+			targetX = left + 1;
 		}
 
-		if (y != 0 && map.path[y - 1][x] < currentDistance) {
-			targetY = y - 1;
-		} else if (y != map.tileHeight - 1
-				&& map.path[y + 1][x] < currentDistance) {
-			targetY = y + 1;
+		if (up != 0 && map.path[up - 1][left] < currentDistance) {
+			targetY = up - 1;
+		} else if (up != map.tileHeight - 1
+				&& map.path[up + 1][left] < currentDistance) {
+			targetY = up + 1;
 		}
 
-		if (x != right) {
-			if (targetX == right) {
+		if (left != right)
+			if (targetX == right)
 				xMove = speed;
-			} else {
+			else
 				xMove = -speed;
-			}
-		} else {
-			if (targetX == x + 1) {
-				xMove = speed;
-			} else if (targetX == x - 1) {
-				xMove = -speed;
-			}
-		}
+		else if (targetX == left + 1)
+			xMove = speed;
+		else if (targetX == left - 1)
+			xMove = -speed;
 
-		if (y != bot) {
-			if (targetY == bot) {
+		if (up != down)
+			if (targetY == down)
 				yMove = speed;
-			} else {
+			else
 				yMove = -speed;
-			}
-		} else {
-			if (targetY == y + 1) {
-				yMove = speed;
-			} else if (targetY == y - 1) {
-				yMove = -speed;
-			}
-		}
+		else if (targetY == up + 1)
+			yMove = speed;
+		else if (targetY == up - 1)
+			yMove = -speed;
 
 		// find the sign of move
 		int move = this.speed;
@@ -140,52 +131,76 @@ public class Enemy {
 
 		// move pixel by pixel
 		boolean moved;
-		do {
+		int newLeft, newRight, newUp, newDown, oldX, oldY;
+		while (true) {
 			moved = false;
+
+			oldX = bounds.x;
+			oldY = bounds.y;
+			newLeft = left;
+			newRight = right;
+			newUp = up;
+			newDown = down;
 
 			if (xMove > 0) {
 				xMove -= move;
-				this.kiloX += xSign;
-				this.bounds.x = this.kiloX / 1000;
+				kiloX += xSign;
+				bounds.x = kiloX / 1000;
 
-				if (checkCollision()) {
-					this.kiloX -= xSign;
-					this.bounds.x = this.kiloX / 1000;
+				newLeft = bounds.x / TILE_SIZE;
+				newRight = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
+
+				if ((left != newLeft || right != newRight)
+						&& checkTileCollision(newLeft, up, newRight, down)) {
+					kiloX -= xSign;
+					bounds.x = oldX;
+					newLeft = left;
+					newRight = right;
+				} else if (oldX != bounds.x && checkHeroCollision()) {
+					kiloX -= xSign;
+					bounds.x = oldX;
+					newLeft = left;
+					newRight = right;
 				} else {
 					moved = true;
 				}
 			}
 
 			if (yMove > 0) {
-				this.kiloY += ySign;
+				kiloY += ySign;
 				yMove -= move;
-				this.bounds.y = this.kiloY / 1000;
+				bounds.y = kiloY / 1000;
 
-				if (checkCollision()) {
-					this.kiloY -= ySign;
-					this.bounds.y = this.kiloY / 1000;
+				newUp = bounds.y / TILE_SIZE;
+				newDown = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
+
+				if ((up != newUp || down != newDown)
+						&& checkTileCollision(newLeft, newUp, newRight, newDown)) {
+					kiloY -= ySign;
+					bounds.y = oldY;
+				} else if (oldY != bounds.y && checkHeroCollision()) {
+					kiloY -= ySign;
+					bounds.y = oldY;
 				} else {
 					moved = true;
 				}
 			}
-		} while (moved);
+
+			if (!moved)
+				break;
+
+			left = bounds.x / TILE_SIZE;
+			right = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
+			up = bounds.y / TILE_SIZE;
+			down = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
+		}
 
 		center.setLocation(this.bounds.x + ENEMY_SIZE / 2, this.bounds.y
 				+ ENEMY_SIZE / 2);
+		map.enemyArray[center.y / TILE_SIZE][center.x / TILE_SIZE].add(this);
 	}
 
-	private boolean checkCollision() {
-		int left = bounds.x / TILE_SIZE;
-		int up = bounds.y / TILE_SIZE;
-		int right = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
-		int down = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
-
-
-		if (bounds.intersects(map.hero.x, map.hero.y, Hero.SIZE,
-				Hero.SIZE)) {
-			return true;
-		}
-
+	private boolean checkTileCollision(int left, int up, int right, int down) {
 		if (bounds.x < 0 || bounds.y < 0 || right >= map.tileWidth
 				|| down >= map.tileHeight) {
 			return true;
@@ -204,6 +219,10 @@ public class Enemy {
 		}
 
 		return false;
+	}
+
+	private boolean checkHeroCollision() {
+		return bounds.intersects(map.hero.x, map.hero.y, Hero.SIZE, Hero.SIZE);
 	}
 
 	public PVector screenLoc() {

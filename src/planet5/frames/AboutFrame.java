@@ -1,10 +1,3 @@
-/*
- * AboutFrame.java
- * James Zhang
- * July 19 2012
- * Shows information about the game.
- */
-
 package planet5.frames;
 
 import java.awt.Rectangle;
@@ -38,12 +31,11 @@ public class AboutFrame extends Frame {
 		p.textFont(Fonts.consolas32);
 		p.text("About", 32, 32 + (63 - p.textDescent() - p.textAscent()) / 2, p.width-32-32, 63);
 		
-		// TODO: text in the about frame
 		p.fill(255);
 		p.textFont(Fonts.consolas32);
-		p.textAlign(p.LEFT, p.TOP);
+		p.textAlign(p.CENTER, p.CENTER);
 		p.textLeading(p.textAscent() + p.textDescent());
-		p.text("", 32+16, 96+16, p.width-32-32-32, p.height-32-32-32);
+		p.text("Made by Crushing Panic Games\nAndrew Amis\nJames Zhang", 32+16, 96+16, p.width-32-32-32, p.height-32-32-32-96);
 	}
 
 	@Override

@@ -1,10 +1,3 @@
-/*
- * TextButton.java
- * James Zhang
- * July 19 2012
- * A button with only text, no background.
- */
-
 package planet5.frames;
 
 import java.awt.Rectangle;

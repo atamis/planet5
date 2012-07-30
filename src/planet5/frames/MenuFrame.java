@@ -1,10 +1,3 @@
-/*
- * MenuFrame.java
- * James Zhang
- * July 19 2012
- * The menu screen.
- */
-
 package planet5.frames;
 
 import java.awt.Rectangle;
@@ -57,17 +50,15 @@ public class MenuFrame extends Frame {
 	public void buttonClicked(String command) {
 		if (command.equals("Play Campaign")) {
 			Main.campaignFrame.game.restartGame();
-			//Main.campaignFrame.draw();
 			Main.campaignFrame.update();
 			p.transitionFrame(Main.campaignFrame, Main.fullFadeTransition);
-			// TODO: restart level? (for survival)
 		}
 		else if (command.equals("Play Survival")) {
 			
 		}
 		else if (command.equals("Settings")) {
-			Main.settingsFrame.phase = 0;
-			p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
+			//Main.settingsFrame.phase = 0;
+			//p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("About")) {
 			p.transitionFrame(Main.aboutFrame, Main.fullFadeTransition);

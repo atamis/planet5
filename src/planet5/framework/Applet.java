@@ -1,12 +1,3 @@
-/*
- * Applet.java
- * James Zhang
- * July 17 2012
- * The Applet class extends a PApplet and manages multiple Frames classes. Each
- * Frame acts like a PApplet when it is focused. This class keeps track of the
- * pressed keys and supports changing frames, optionally with transitions.
- */
-
 package planet5.framework;
 
 import java.awt.event.KeyEvent;

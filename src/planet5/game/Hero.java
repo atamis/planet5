@@ -118,7 +118,7 @@ public class Hero {
 		int right = (x + SIZE - 1) / TILE_SIZE;
 		int down = (y + SIZE - 1) / TILE_SIZE;
 		
-		for (Enemy enemy : map.enemies)
+		for (Enemy enemy : map.enemies) // TODO: enemyArray
 			if (enemy.bounds.intersects(x, y, SIZE, SIZE))
 				return true;
 		

@@ -1,10 +1,3 @@
-/*
- * Transition.java
- * James Zhang
- * July 17 2012
- * The Transition class is used by the Applet to transition between two Frames.
- */
-
 package planet5.framework;
 
 public abstract class Transition {

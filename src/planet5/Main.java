@@ -42,7 +42,7 @@ public class Main extends Applet {
 		fullFadeTransition = new FullFadeTransition(this);
 		
 		// TODO: change back to menuFrame
-		setFrame(campaignFrame);
+		setFrame(menuFrame);
 	}
 
 	public static void main(String[] args) {
@@ -50,6 +50,6 @@ public class Main extends Applet {
 		PApplet.main(new String[] { "planet5.Main" });
 		
 		// presentation mode
-		// PApplet.main(new String[] { "--present", "planet5.Main" });
+		//PApplet.main(new String[] { "--present", "planet5.Main" });
 	}
 }

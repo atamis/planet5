@@ -25,8 +25,7 @@ public class Game {
 	private static final int MILLIS_PER_DAY = 10 * 60 * 1000;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_DAY / 24;
 	private static final int MILLIS_PER_MINUTE = MILLIS_PER_HOUR / 60;
-	private static final int GAME_START_TIME = 9 * MILLIS_PER_HOUR;
-
+	private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
 
 	public boolean paused = false, help = false;
 	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
@@ -34,7 +33,6 @@ public class Game {
 
 	// game time
 	public int gameMillis;
-	private long lastUpdateTime;
 	public int day, hour, minute;
 
 	// building variables
@@ -64,6 +62,7 @@ public class Game {
 	// building and variables
 	public ArrayList<Building> buildings = new ArrayList<Building>();
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public ArrayList<Enemy>[][] enemyArray;
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	public Hero hero;
 	public Building base;
@@ -76,6 +75,7 @@ public class Game {
 
 	// special variables
 	private Applet p;
+	private long lastUpdateTime;
 
 	// constructors
 	public Game(GameListener listener, Applet p) {
@@ -117,38 +117,47 @@ public class Game {
 	}
 
 	public void restartGame() {
-		lastUpdateTime = System.currentTimeMillis();
-		
-		UpgradeStats.reset();
-		EnemyLevel.reset();
+		int width = 200, height = 200;
 
-		// TODO
-		hero = new Hero(p, this, 0, 0);
+		// map
+		tileWidth = width;
+		tileHeight = height;
+
+		// units
 		buildings.clear();
 		enemies.clear();
 		projectiles.clear();
-		(new CaveGenerator()).gen(p, this, 200, 200);
-
-		tileWidth = tiles[0].length;
-		tileHeight = tiles.length;
+		enemyArray = new ArrayList[tileHeight][tileWidth];
+		for (int x = 0; x < tileWidth; x++)
+			for (int y = 0; y < tileHeight; y++)
+				enemyArray[y][x] = new ArrayList<Enemy>();
+		
 		lighting = new int[tileHeight][tileWidth];
 		field = new boolean[tileHeight][tileWidth];
-
-		// calculate path array
+		(new CaveGenerator()).gen(p, this, width, height);
 		calculatePathing();
 		recalculateField();
-		gameMillis = GAME_START_TIME;
+		
+		// upgrades
+		UpgradeStats.reset();
+		EnemyLevel.reset();
 
-		// TODO:... refactor
+
+		// game events
 		win = -1;
 		lose = -1;
-		pauseButton.enabled = true;
 		playAgainButton.visible = false;
-
+		
+		// bar
+		pauseButton.enabled = true;
 		pauseButton.text = "Pause";
 		curEnergy = 0;
 		paused = false;
 		help = false;
+
+		// game time
+		gameMillis = GAME_START_TIME;
+		lastUpdateTime = System.currentTimeMillis();
 	}
 
 	public void calculatePathing() {
@@ -237,6 +246,7 @@ public class Game {
 		// calculate elapsed time
 		int elapsedMillis = (int) (System.currentTimeMillis() - lastUpdateTime);
 		lastUpdateTime = System.currentTimeMillis();
+		elapsedMillis *= DOUBLE_ASDF;
 
 		// recalculate game time
 		if (!paused()) {
@@ -246,34 +256,24 @@ public class Game {
 			minute = (gameMillis % MILLIS_PER_HOUR) / MILLIS_PER_MINUTE;
 		}
 
-		recalculateLighting(); // 1629374 => 862032
+		recalculateLighting();
 		if (!paused()) {
-			calculateVariables(); // 3126 ... not even used
-			updateMap(); // 8486 ... not even used
-			updateHero(elapsedMillis); // 117468 if moving, 3573 if not
-			updateBuildings(elapsedMillis); // 5360-12059 with a lot of
-											// buildings
+			updateHero(elapsedMillis);
+			updateBuildings(elapsedMillis);
 			updateProjectiles(elapsedMillis);
-			spawnEnemies(elapsedMillis); // 9351930 => 2234
-			updateEnemies(elapsedMillis); // 12836684 => 200099
-			checkGameEvents(); // 1787
+			spawnEnemies(elapsedMillis);
+			updateEnemies(elapsedMillis);
+			checkGameEvents();
+			
 			EnemyLevel.add(elapsedMillis);
+			recalculateEnergyValues();
 		}
 
 		// remove building buy if not enough energy
-		// TODO: change to yellow or something
 		if (placingBuilding != -1
 				&& curEnergy < BuildingStats.costs[placingBuilding]) {
 			placingBuilding = -1;
 		}
-	}
-
-	public void calculateVariables() {
-
-	}
-
-	private void updateMap() {
-		// TODO
 	}
 
 	private void updateHero(int elapsedMillis) {
@@ -289,8 +289,9 @@ public class Game {
 				+ BAR_HEIGHT);
 	}
 
+	// updating buildings
 	private void updateBuildings(int elapsedMillis) {
-		// update energy, kill enemies
+		// update buildings and energy values
 		boolean recalc = false;
 		for (int i = 0; i < buildings.size(); i++) {
 			Building building = buildings.get(i);
@@ -301,23 +302,32 @@ public class Game {
 				if (building.buildTime != -1)
 					continue;
 				
-				if (building == base) {
+				if (building == base)
 					curEnergy += elapsedMillis * BuildingStats.getGen(base.type);
-				} else if (hour >= 8 && hour < 20) {
+				else if (hour >= 8 && hour < 20)
 					curEnergy += elapsedMillis * BuildingStats.getGen(building.type);
-				}
+			}
+		}
+		
+		// use energy to kill enemies
+		for (int i = 0; i < buildings.size(); i++) {
+			Building building = buildings.get(i);
+			if (building.powered && building.buildTime == -1) {
+				if (building.type != 5 && building.type != 6)
+					continue;
 				
 				// reset variables
 				building.target = null;
 				
+				// check for reload time
 				int range = 0;
-				// check for reload time, assign range
-
 				if (curEnergy < elapsedMillis * BuildingStats.getDraw(building.type)) {
 					continue;
 				}
+				
+				// assign range
 				if (building.type == 5) {
-					range = 32 * 4; // TODO: put constants elsewhere
+					range = 32 * 4;
 				} else if (building.type == 6) {
 					if (gameMillis - building.lastFireTime < 25) {
 						continue;
@@ -328,10 +338,14 @@ public class Game {
 				}
 				
 				// find the closest enemy
-				int min = Integer.MAX_VALUE;
-				for (Enemy enemy : enemies) {
+				int maxRadius = range / 32;
+				int min = range;
+				for (int radius = 1; radius <= maxRadius; i++) {
+					
+				}
+				for (Enemy enemy : enemies) { // TODO: enemyArray
 					int dist = dist(building, enemy);
-					if (dist < range && dist < min) {//TODO: can change to only <min if min=range init
+					if (dist < min) {
 						min = dist;
 						building.target = enemy;
 					}
@@ -340,22 +354,20 @@ public class Game {
 				if (building.target == null || building.target.isDead() || building.target.willBeDead())
 					continue;
 				
-				// deal damage, remove dead enemies
+				// deal damage, remove dead enemies, consume energy
 				if (building.type == 5) {
-					// TODO: constant
-					building.target.takeDamage(10);
+					// TODO don't overkill the enemy
+					
+					building.target.takeDamage((int) (elapsedMillis * BuildingStats.getDamage(5)));
+					curEnergy -= elapsedMillis * BuildingStats.getDraw(building.type);
 				} else if (building.type == 6) {
 					Projectile pr = new Projectile(this, p, building.col * TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE + TILE_SIZE);
 					pr.target = building.target;
-					pr.target.takeFutureDamage(Projectile.DAMAGE);
+					pr.target.takeFutureDamage((int) BuildingStats.getDamage(6));
 					projectiles.add(pr);
+					curEnergy -= BuildingStats.getDraw(building.type);
 					//building.target = null;
 				}
-				
-				// consume energy
-				// TODO: lasers consume elapsedMillis*
-				// TODO: mortars don't consume elapsedMillis*
-				curEnergy -= elapsedMillis * BuildingStats.getDraw(building.type);
 				
 				// set reload time
 				building.lastFireTime = gameMillis;
@@ -363,13 +375,13 @@ public class Game {
 		}
 		
 		if (recalc)
-			recalculateField();
+			recalculateField();	// TODO: only recalculate once per draw() ?
 		
 		// limit max energy
 		if (curEnergy > maxEnergy)
 			curEnergy = maxEnergy;
 	}
-
+	
 	private void updateProjectiles(int elapsedMillis) {
 		Iterator<Projectile> iterator = projectiles.iterator();
 		while (iterator.hasNext()) {
@@ -392,23 +404,24 @@ public class Game {
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
 		maxEnemyCount = 100000;
-		double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
-
-		for (int i = 0; i < tileHeight; i++) {
-			for (int j = 0; j < tileWidth; j++) {
-				if (enemies.size() >= maxEnemyCount) {
-					return;
-				}
-
-				if (!tiles[i][j].wall && tiles[i][j].building == null
-						&& lighting[i][j] < 128 && Math.random() < chance) {
-					int type = (int) (3 * Math.random());
-					Enemy enemy = new Enemy(j * TILE_SIZE, i * TILE_SIZE, type,
-							this, p);
-					enemies.add(enemy);
-				}
+		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
+		
+		int trials = 10;
+		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
+			int x = (int) (tileWidth * Math.random());
+			int y = (int) (tileHeight * Math.random());
+			if (!tiles[y][x].wall && tiles[y][x].building == null
+						&& lighting[y][x] <= 128) {
+				int type = (int) (3 * Math.random());
+				Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
+						this, p);
+				enemies.add(enemy);
+				enemyArray[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].add(enemy);
 			}
 		}
+		
+		if (day != 0 && hour == 0 && enemies.size() == 0)
+			win();
 	}
 
 	private void updateEnemies(int elapsedMillis) {
@@ -478,6 +491,7 @@ public class Game {
 			}
 		}
 
+		// remove dead enemies
 		Iterator<Enemy> iterator = enemies.iterator();
 		while (iterator.hasNext()) {
 			Enemy enemy = iterator.next();
@@ -487,7 +501,6 @@ public class Game {
 	}
 
 	private void recalculateLighting() {
-		// method takes ~30us to 0.1ms
 		// TODO: walls block light?
 
 		// global lighting based on time of day
@@ -567,14 +580,16 @@ public class Game {
 		}
 	}
 
+	public boolean isPlaying() {
+		return (!help && win == -1 && lose == -1);
+	}
+	
 	// building related methods
 	public boolean isPlacingBuilding() {
 		return (placingBuilding != -1 && p.mouseY > BAR_HEIGHT);
 	}
 
 	public boolean canPlaceBuilding(int x, int y, int w, int h) {
-		// TODO: only allow building on places with light or something
-		// TODO: also energy fields u no
 		int left = hero.x / TILE_SIZE;
 		int up = hero.y / TILE_SIZE;
 		int right = (hero.x + hero.SIZE - 1) / TILE_SIZE;
@@ -611,7 +626,7 @@ public class Game {
 		// check for placing over enemies
 		Rectangle building = new Rectangle(x * TILE_SIZE, y * TILE_SIZE, w
 				* TILE_SIZE, h * TILE_SIZE);
-		for (Enemy enemy : enemies) {
+		for (Enemy enemy : enemies) { // TODO: enemyArray
 			if (building.intersects(enemy.bounds)) {
 				return false;
 			}
@@ -636,7 +651,6 @@ public class Game {
 	}
 
 	public void setBase(Building base) {
-		// TODO: use these 3 methods and refactor?
 		this.base = base;
 		base.buildTime = -1;
 		if (buildings.size() == 0) {
@@ -664,10 +678,9 @@ public class Game {
 	}
 
 	public void sellBuilding(Building building) {
-		curEnergy += BuildingStats.costs[building.type];
+		curEnergy += BuildingStats.costs[building.type] / 2;
 		if (curEnergy > maxEnergy) {
 			curEnergy = maxEnergy;
-			// TODO: only do this once?
 		}
 		removeBuilding(building);
 	}
@@ -683,19 +696,17 @@ public class Game {
 	}
 
 	public void recalculateField() {
-		for (int i = 0; i < tileHeight; i++) {
+		for (int i = 0; i < tileHeight; i++)
 			Arrays.fill(field[i], false);
-		}
 
-		// TODO: can optimize this but probably unnecessary
 		calculatePoweredBuildings();
 
 		for (Building building : buildings) {
 			if (building.type <= 1 && building.powered
 					&& building.buildTime == -1) { // or <= 2
-				int x = building.col * TILE_SIZE + (building.width - 1)
+				int x = building.col * TILE_SIZE + building.width
 						* TILE_SIZE / 2;
-				int y = building.row * TILE_SIZE + (building.height - 1)
+				int y = building.row * TILE_SIZE + building.height
 						* TILE_SIZE / 2;
 				int left = Math.max(0, building.col - FIELD_RADIUS);
 				int right = Math.min(tileWidth - 1, building.col
@@ -717,6 +728,21 @@ public class Game {
 		}
 	}
 
+	public void recalculateEnergyValues() {
+		// calculate energy values
+		int energy = this.curEnergy;
+		int maxEnergy = 0;
+		for (Building building : buildings) {
+			if (building.powered && building.buildTime == -1) {
+				maxEnergy += BuildingStats.getCap(building.type);
+			}
+		}
+		if (energy > maxEnergy) {
+			energy = maxEnergy;
+		}
+		this.maxEnergy = maxEnergy;
+		this.curEnergy = energy;
+	}
 	public void calculatePoweredBuildings() {
 		// clear everything
 		for (Building building : buildings) {
@@ -737,7 +763,7 @@ public class Game {
 				if (!building.powered) {
 					if (willPower(source, building)) {
 						building.powered = true;
-						if (building.type == 1) {
+						if (building.type == 1 && building.buildTime == -1) {
 							nextStack.add(building);
 						}
 					}
@@ -749,20 +775,6 @@ public class Game {
 				nextStack = new ArrayList<Building>();
 			}
 		}
-
-		// calculate energy values
-		int energy = this.curEnergy;
-		int maxEnergy = 0;
-		for (Building building : buildings) {
-			if (building.powered && building.buildTime == -1) {
-				maxEnergy += BuildingStats.getCap(building.type);
-			}
-		}
-		if (energy > maxEnergy) {
-			energy = maxEnergy;
-		}
-		this.maxEnergy = maxEnergy;
-		this.curEnergy = energy;
 
 		// calculate connections
 		// TODO: power sources must lead to base AND if multiple, connect to
@@ -779,10 +791,8 @@ public class Game {
 
 		for (int i = 0; i < building.width; i++) {
 			for (int j = 0; j < building.height; j++) {
-				int x2 = (building.col + i) * TILE_SIZE + building.width
-						* TILE_SIZE / 2;
-				int y2 = (building.row + j) * TILE_SIZE + building.height
-						* TILE_SIZE / 2;
+				int x2 = (building.col + i) * TILE_SIZE;
+				int y2 = (building.row + j) * TILE_SIZE;
 
 				int dx = x1 - x2;
 				int dy = y1 - y2;
@@ -824,14 +834,16 @@ public class Game {
 		} else if (keyCode == KeyEvent.VK_Q) {
 			if (selectedBuilding != null) {
 				sellBuilding(selectedBuilding);
+				selectedBuilding = null;
 			}
+		} else if (keyCode == KeyEvent.VK_ENTER) {
+			DOUBLE_ASDF*=2;
+			if (DOUBLE_ASDF == 32)
+				DOUBLE_ASDF = 1;
 		}
 	}
 
-	public void keyReleased(int keyCode) {
-		// TODO Auto-generated method stub
-
-	}
+	public void keyReleased(int keyCode) {}
 
 	// mouse event handlers
 	public void mousePressed(int x, int y, int mouseButton) {
@@ -839,6 +851,9 @@ public class Game {
 		pauseButton.mousePressed(x, y, mouseButton);
 		quitButton.mousePressed(x, y, mouseButton);
 		playAgainButton.mousePressed(x, y, mouseButton);
+		
+		if (mouseButton != MouseEvent.BUTTON1)
+			return;
 
 		for (int i = 0; i < 6; i++) {
 			int boxX = i * (BAR_HEIGHT - 1) + 1;
@@ -865,18 +880,14 @@ public class Game {
 		// do building related options
 		if (y >= BAR_HEIGHT) {
 			int col = (x + mapX) / TILE_SIZE;
-			int row = (y + mapY - BAR_HEIGHT) / TILE_SIZE; // TODO: refactor,
-															// update every
-															// tick?
+			int row = (y + mapY - BAR_HEIGHT) / TILE_SIZE;
 			Building building = tiles[row][col].building;
 
-			// check if a building can be sold
+			// if there's a building, sell or select; otherwise do nothing
 			if (building != null && selectedBuilding == building) {
 				sellBuilding(building);
-			}
-
-			// check if a building can be selected
-			if (building != null && building != base) {
+				selectedBuilding = null;
+			} else if (building != null && building != base) {
 				selectedBuilding = building;
 				placingBuilding = -1;
 			} else {
@@ -892,7 +903,6 @@ public class Game {
 	}
 
 	public void mouseReleased(int x, int y, int mouseButton) {
-		// TODO (+mousePressed)
 		helpButton.mouseReleased(x, y, mouseButton);
 		pauseButton.mouseReleased(x, y, mouseButton);
 		quitButton.mouseReleased(x, y, mouseButton);

@@ -1,11 +1,3 @@
-/*
- * FullFadeTransition.java
- * James Zhang
- * July 19 2012
- * Displays a 255 millisecond fade to a black screen, then a 255 millisecond
- * fade to the next screen.
- */
-
 package planet5.framework;
 
 
