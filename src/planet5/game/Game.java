@@ -26,7 +26,8 @@ public class Game {
 	private static final int MILLIS_PER_DAY = 10 * 60 * 1000;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_DAY / 24;
 	private static final int MILLIS_PER_MINUTE = MILLIS_PER_HOUR / 60;
-	private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
+	private static final int GAME_START_TIME = 16 * MILLIS_PER_HOUR;
+	public static int DOUBLE_ASDF = 1;
 
 	public boolean paused = false, help = false;
 	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
@@ -63,7 +64,7 @@ public class Game {
 	// building and variables
 	public ArrayList<Building> buildings = new ArrayList<Building>();
 	public ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-	public ArrayList<Enemy>[][] enemyArray;
+	public ArrayList<Enemy>[][] enemyArrayCenter, enemyArrayCorner;
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	public Hero hero;
 	public Building base;
@@ -128,10 +129,13 @@ public class Game {
 		buildings.clear();
 		enemies.clear();
 		projectiles.clear();
-		enemyArray = new ArrayList[tileHeight][tileWidth];
+		enemyArrayCenter = new ArrayList[tileHeight][tileWidth];
+		enemyArrayCorner = new ArrayList[tileHeight][tileWidth];
 		for (int x = 0; x < tileWidth; x++)
-			for (int y = 0; y < tileHeight; y++)
-				enemyArray[y][x] = new ArrayList<Enemy>();
+			for (int y = 0; y < tileHeight; y++) {
+				enemyArrayCenter[y][x] = new ArrayList<Enemy>();
+				enemyArrayCorner[y][x] = new ArrayList<Enemy>();
+			}
 		
 		lighting = new int[tileHeight][tileWidth];
 		field = new boolean[tileHeight][tileWidth];
@@ -281,8 +285,8 @@ public class Game {
 		hero.update(elapsedMillis);
 
 		// update map position
-		mapX = (int) hero.x - p.width / 2;
-		mapY = (int) hero.y - (p.height - BAR_HEIGHT) / 2;
+		mapX = hero.x - p.width / 2;
+		mapY = hero.y - (p.height - BAR_HEIGHT) / 2;
 
 		// constrain map position
 		mapX = p.constrain(mapX, 0, tileWidth * TILE_SIZE - p.width);
@@ -321,12 +325,12 @@ public class Game {
 				building.target = null;
 				
 				// check for reload time
-				int range = 0;
 				if (curEnergy < elapsedMillis * BuildingStats.getDraw(building.type)) {
 					continue;
 				}
 				
 				// assign range
+				int range = 0;
 				if (building.type == 5) {
 					range = 32 * 4;
 				} else if (building.type == 6) {
@@ -339,18 +343,7 @@ public class Game {
 				}
 				
 				// find the closest enemy
-				int maxRadius = range / 32;
-				int min = range;
-				for (int radius = 1; radius <= maxRadius; i++) {
-					
-				}
-				for (Enemy enemy : enemies) { // TODO: enemyArray
-					int dist = dist(building, enemy);
-					if (dist < min) {
-						min = dist;
-						building.target = enemy;
-					}
-				}
+				building.target = building.findClosestEnemy(this, range / 32);
 				
 				if (building.target == null || building.target.isDead() || building.target.willBeDead())
 					continue;
@@ -394,17 +387,10 @@ public class Game {
 		}
 	}
 
-	private int dist(Building turret, Enemy enemy) {
-		int x1 = turret.col * TILE_SIZE + turret.width * TILE_SIZE / 2;
-		int y1 = turret.row * TILE_SIZE + turret.height * TILE_SIZE / 2;
-		int x2 = (int) enemy.bounds.x + enemy.ENEMY_SIZE / 2;
-		int y2 = (int) enemy.bounds.y + enemy.ENEMY_SIZE / 2;
-		return (int) Math.hypot(x1 - x2, y1 - y2);
-	}
-
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		maxEnemyCount = 100000;
+		//maxEnemyCount = 1000;
+		maxEnemyCount = 20;
 		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 		
 		int trials = 10;
@@ -417,7 +403,8 @@ public class Game {
 				Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
 						this, p);
 				enemies.add(enemy);
-				enemyArray[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].add(enemy);
+				enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].add(enemy);
+				enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x / TILE_SIZE].add(enemy);
 			}
 		}
 		
@@ -627,11 +614,14 @@ public class Game {
 		// check for placing over enemies
 		Rectangle building = new Rectangle(x * TILE_SIZE, y * TILE_SIZE, w
 				* TILE_SIZE, h * TILE_SIZE);
-		for (Enemy enemy : enemies) { // TODO: enemyArray
-			if (building.intersects(enemy.bounds)) {
-				return false;
-			}
-		}
+
+		int loopTop = Math.max(0, up - 1);
+		int loopLeft = Math.max(0, left - 1);
+		for (int i = loopLeft; i <= right; i++)
+			for (int j = loopTop; j <= down; j++)
+				for (Enemy enemy : enemyArrayCorner[j][i])
+					if (building.intersects(enemy.bounds))
+						return false;
 
 		return true;
 	}

@@ -1,5 +1,8 @@
 package planet5.game;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import planet5.config.BuildingStats;
 import planet5.config.Fonts;
 import planet5.config.Globals;
@@ -29,6 +32,10 @@ public class Building {
 	boolean powered = false;
 	Building powerSource = null;
 	int current_upgrade = Upgrades.gen;
+	
+	// enemy search variables
+	private int searchMin;
+	private Enemy searchResult;
 	
 	public Building(int type, int x, int y, int gameTime) {
 		rad = 0;
@@ -169,5 +176,69 @@ public class Building {
 		} else if (powerSource != null) {
 
 		}
+	}
+
+	public Enemy findClosestEnemy(Game game, int range) {
+		searchMin = 32 * 32 * range * range;
+		searchResult = null;
+		
+		// this is a close imitation of breadth-first search
+		// TODO: can always optimize more (with a more full breadth search, or larger enemy array)
+		for (int i = 1; i <= range; i++) {
+			// values
+			int top = row - i;
+			int left = col - i;
+			int bottom = row + i + height - 1;
+			int right = col + i + width - 1;
+			
+			// looping values
+			int loopTop = Math.max(0, top);
+			int loopLeft = Math.max(0, left);
+			int loopBottom = Math.min(bottom, game.tileHeight - 1);
+			int loopRight = Math.min(right, game.tileWidth - 1);
+			
+			// add enemies on the left and right sides
+			for (int j = loopTop; j <= loopBottom; j++) {
+				if (left == loopLeft)
+					findClosestEnemy(game.enemyArrayCenter[j][left]);
+				if (right == loopRight)
+					findClosestEnemy(game.enemyArrayCenter[j][right]);
+			}
+			
+			// add enemies top and bottom sides
+			for (int j = loopLeft; j <= loopRight; j++) {
+				if (top == loopTop)
+					findClosestEnemy(game.enemyArrayCenter[top][j]);
+				if (bottom == loopBottom)
+					findClosestEnemy(game.enemyArrayCenter[bottom][j]);
+			}
+			
+			// return the closest enemy
+			if (searchResult != null)
+				return searchResult;
+		}
+		
+		return null;
+	}
+	
+	private void findClosestEnemy(ArrayList<Enemy> enemies) {
+		for (Enemy enemy : enemies) {
+			int dist = distToEnemy(enemy);
+			if (dist < searchMin) {
+				searchMin = dist;
+				searchResult = enemy;
+			}
+		}
+	}
+
+	private int distToEnemy(Enemy enemy) {
+		// TODO: use all four squares if needed
+		int x1 = col * TILE_SIZE + width * TILE_SIZE / 2;
+		int y1 = row * TILE_SIZE + height * TILE_SIZE / 2;
+		int x2 = enemy.bounds.x + enemy.ENEMY_SIZE / 2;
+		int y2 = enemy.bounds.y + enemy.ENEMY_SIZE / 2;
+		int dx = x1 - x2;
+		int dy = y1 - y2;
+		return (dx * dx + dy * dy);
 	}
 }

@@ -12,7 +12,8 @@ public class Projectile {
 	private static final int TILE_SIZE = Game.TILE_SIZE;
 	private static final int PROJECTILE_SIZE = 16;
 	private static final int DETONATE_RADIUS_SQ = 4 * 4;
-	private static final int EXPLOSION_RADIUS_SQ = 32 * 32;
+	private static final int EXPLOSION_RADIUS = 32;
+	private static final int EXPLOSION_RADIUS_SQ = EXPLOSION_RADIUS * EXPLOSION_RADIUS;
 	private static final float SPEED = 0.8f;
 	
 	private float floatX, floatY;
@@ -58,16 +59,21 @@ public class Projectile {
 		// explode if target is close enough
 		int damage = (int) BuildingStats.getDamage(6);
 		if (target.center.distanceSq(center) < DETONATE_RADIUS_SQ) {
-			// kill nearby enemies
-			for (Enemy e : map.enemies) { // TODO: enemyArray
-				if (e.center.distanceSq(center) < EXPLOSION_RADIUS_SQ) {
-					e.processFutureDamage(damage);
-					e.takeDamage(damage);
-					if (e.isDead()) {
-						
-					}
-				}
-			}
+			int loopTop = Math.max(0, target.center.y / TILE_SIZE - EXPLOSION_RADIUS);
+			int loopLeft = Math.max(0, target.center.x / TILE_SIZE - EXPLOSION_RADIUS);
+			int loopBottom = Math.min(target.center.y / TILE_SIZE + 1 + EXPLOSION_RADIUS, map.tileHeight - 1);
+			int loopRight = Math.min(target.center.x / TILE_SIZE + 1 + EXPLOSION_RADIUS, map.tileWidth - 1);
+			
+			for (int i = loopLeft; i <= loopRight; i++)
+				for (int j = loopTop; j <= loopBottom; j++)
+					for (Enemy enemy : map.enemyArrayCenter[j][i])
+						if (enemy.center.distanceSq(center) < EXPLOSION_RADIUS_SQ) {
+							enemy.processFutureDamage(damage);
+							enemy.takeDamage(damage);
+							if (enemy.isDead()) {
+								
+							}
+						}
 			
 			// TODO: explosion effect?
 			remove = true;

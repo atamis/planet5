@@ -118,9 +118,14 @@ public class Hero {
 		int right = (x + SIZE - 1) / TILE_SIZE;
 		int down = (y + SIZE - 1) / TILE_SIZE;
 		
-		for (Enemy enemy : map.enemies) // TODO: enemyArray
-			if (enemy.bounds.intersects(x, y, SIZE, SIZE))
-				return true;
+		// TODO: can optimize more b/c max 9 squares have to be checked, not 16
+		int loopTop = Math.max(0, up - 1);
+		int loopLeft = Math.max(0, left - 1);
+		for (int i = loopLeft; i <= right; i++)
+			for (int j = loopTop; j <= down; j++)
+				for (Enemy enemy : map.enemyArrayCorner[j][i])
+					if (enemy.bounds.intersects(x, y, SIZE, SIZE))
+						return true;
 		
 		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
 			return true;

@@ -75,7 +75,8 @@ public class Enemy {
 		int speed = elapsedMillis * this.speed;
 		int xMove = 0;
 		int yMove = 0;
-		map.enemyArray[center.y / TILE_SIZE][center.x / TILE_SIZE].remove(this);
+		map.enemyArrayCenter[center.y / TILE_SIZE][center.x / TILE_SIZE].remove(this);
+		map.enemyArrayCorner[bounds.y / TILE_SIZE][bounds.x / TILE_SIZE].remove(this);
 
 		// calculate total pixels to move
 		int left = bounds.x / TILE_SIZE;
@@ -197,7 +198,8 @@ public class Enemy {
 
 		center.setLocation(this.bounds.x + ENEMY_SIZE / 2, this.bounds.y
 				+ ENEMY_SIZE / 2);
-		map.enemyArray[center.y / TILE_SIZE][center.x / TILE_SIZE].add(this);
+		map.enemyArrayCenter[center.y / TILE_SIZE][center.x / TILE_SIZE].add(this);
+		map.enemyArrayCorner[bounds.y / TILE_SIZE][bounds.x / TILE_SIZE].add(this);
 	}
 
 	private boolean checkTileCollision(int left, int up, int right, int down) {

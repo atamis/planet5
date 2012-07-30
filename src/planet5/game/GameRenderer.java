@@ -295,6 +295,9 @@ public final class GameRenderer {
 			
 			if (e != null && e.isDead()) {
 				game.enemies.remove(e); // shouldn't be here
+				game.enemyArrayCenter[e.center.y / TILE_SIZE][e.center.x / TILE_SIZE].remove(e);
+				game.enemyArrayCorner[e.bounds.y / TILE_SIZE][e.bounds.x / TILE_SIZE].remove(e);
+				building.target = null;
 			}
 		}
 		p.noStroke();
