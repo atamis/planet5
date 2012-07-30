@@ -12,6 +12,7 @@ import planet5.framework.Applet;
 import planet5.framework.Frame;
 import planet5.framework.FullFadeTransition;
 import planet5.framework.Transition;
+import planet5.gfx.ParticleTestFrame;
 import processing.core.PApplet;
 
 public class Main extends Applet {
@@ -23,6 +24,7 @@ public class Main extends Applet {
 	public static SettingsFrame settingsFrame;
 	public static AboutFrame aboutFrame;
 	public static FullFadeTransition fullFadeTransition;
+	public static ParticleTestFrame test_frame;
 	
 	@Override
 	public void setup() {
@@ -40,6 +42,7 @@ public class Main extends Applet {
 		settingsFrame = new SettingsFrame(this);
 		aboutFrame = new AboutFrame(this);
 		fullFadeTransition = new FullFadeTransition(this);
+		test_frame = new ParticleTestFrame(this);
 		
 		// TODO: change back to menuFrame
 		setFrame(menuFrame);

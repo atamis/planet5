@@ -43,6 +43,8 @@ public final class GameRenderer {
 		drawEnemies();
 		
 		drawProjectiles();
+		
+		game.ps.draw(p);
 
 		p.translate(-game.mapX, -game.mapY);
 		drawBuildingPlaceover();
@@ -79,7 +81,8 @@ public final class GameRenderer {
 				"MHealth: " + EnemyStats.getHP(0),
 				"MDamage: " + EnemyStats.getDamage(0),
 				"MSpeed: " + EnemyStats.getSpeed(0),
-				"#Monsters" + game.enemies.size()};
+				"#Monsters: " + game.enemies.size(),
+				"Particles: " + game.ps.particles.size()};
 
 		
 		int width = 100, height = (int) ((strings.length + 3) * (p.textAscent() + 4));

@@ -15,6 +15,8 @@ import planet5.config.Fonts;
 import planet5.config.UpgradeStats;
 import planet5.framework.Applet;
 import planet5.game.gen.CaveGenerator;
+import planet5.gfx.ParticleSystem;
+import processing.core.PVector;
 
 public class Game {
 	// graphical constants
@@ -71,6 +73,7 @@ public class Game {
 
 	private GameButton helpButton, pauseButton, playAgainButton;
 	private ConfirmButton quitButton;
+	public ParticleSystem ps;
 
 	//
 	private GameListener listener;
@@ -83,6 +86,7 @@ public class Game {
 	public Game(GameListener listener, Applet p) {
 		this.listener = listener;
 		this.p = p;
+		ps = new ParticleSystem();
 
 		// add buttons
 		int w = p.width;
@@ -247,6 +251,7 @@ public class Game {
 		pauseButton.update(p.focused);
 		quitButton.update(p.focused);
 		playAgainButton.update(p.focused);
+		
 
 		// calculate elapsed time
 		int elapsedMillis = (int) (System.currentTimeMillis() - lastUpdateTime);
@@ -263,6 +268,7 @@ public class Game {
 
 		recalculateLighting();
 		if (!paused()) {
+			ps.update(elapsedMillis);
 			updateHero(elapsedMillis);
 			updateBuildings(elapsedMillis);
 			updateProjectiles(elapsedMillis);
@@ -428,7 +434,7 @@ public class Game {
 				base.hp -= damage;
 				if (base.hp <= 0) {
 					base.hp = 0;
-					// TODO: explosion
+					ps.explosion(base.col * TILE_SIZE - mapX, base.row * TILE_SIZE - mapY);
 				}
 				// TODO: static screen
 			}
@@ -449,6 +455,7 @@ public class Game {
 
 							// o_o
 							iterator.remove();
+							ps.explosion(building.col * TILE_SIZE - mapX, building.row * TILE_SIZE - mapY);
 							for (int i = 0; i < building.height; i++) {
 								for (int j = 0; j < building.width; j++) {
 									tiles[building.row + i][building.col + j].building = null;
@@ -483,8 +490,11 @@ public class Game {
 		Iterator<Enemy> iterator = enemies.iterator();
 		while (iterator.hasNext()) {
 			Enemy enemy = iterator.next();
-			if (enemy.isDead())
+			if (enemy.isDead()) {
+				PVector loc = enemy.screenLoc();
+				ps.bloodBang(loc.x, loc.y);
 				iterator.remove();
+			}
 		}
 	}
 
