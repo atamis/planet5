@@ -1,5 +1,6 @@
 package planet5.gfx;
 
+import planet5.Main;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
 
@@ -11,6 +12,7 @@ public class ParticleTestFrame extends Frame {
 		super(p);
 		ps = new ParticleSystem();
 		last_updated = 0;
+		
 		// TODO Auto-generated constructor stub
 	}
 

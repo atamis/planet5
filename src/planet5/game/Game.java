@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
+
+import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.EnemyLevel;
 import planet5.config.EnemyStats;
@@ -28,7 +32,7 @@ public class Game {
 	private static final int MILLIS_PER_DAY = 10 * 60 * 1000;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_DAY / 24;
 	private static final int MILLIS_PER_MINUTE = MILLIS_PER_HOUR / 60;
-	private static final int GAME_START_TIME = 16 * MILLIS_PER_HOUR;
+	private static final int GAME_START_TIME = 9 * MILLIS_PER_HOUR;
 	public static int DOUBLE_ASDF = 1;
 
 	public boolean paused = false, help = false;
@@ -81,12 +85,16 @@ public class Game {
 	// special variables
 	private Applet p;
 	private long lastUpdateTime;
+	AudioPlayer song;
 
 	// constructors
 	public Game(GameListener listener, Applet p) {
 		this.listener = listener;
 		this.p = p;
 		ps = new ParticleSystem();
+		
+		song = Main.minim.loadFile("Eric_Skiff_-_01_-_A_Night_Of_Dizzy_Spells.mp3");
+		song.loop();
 
 		// add buttons
 		int w = p.width;

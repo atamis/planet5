@@ -1,5 +1,6 @@
 package planet5;
 
+import ddf.minim.Minim;
 import planet5.config.BaseBuildingStats;
 import planet5.config.BuildingStats;
 import planet5.config.Fonts;
@@ -17,7 +18,8 @@ import processing.core.PApplet;
 
 public class Main extends Applet {
 	public static Main instance;
-	
+	public static Minim minim;
+
 	// frames and transitions
 	public static MenuFrame menuFrame;
 	public static CampaignFrame campaignFrame;
@@ -25,17 +27,18 @@ public class Main extends Applet {
 	public static AboutFrame aboutFrame;
 	public static FullFadeTransition fullFadeTransition;
 	public static ParticleTestFrame test_frame;
-	
+
 	@Override
 	public void setup() {
 		// set defaults
 		smooth();
 		size(1024, 768);
 		instance = this;
-		
+		minim = new Minim(this);
+
 		// load configuration
 		Fonts.load(this);
-		
+
 		// load frames and transitions
 		menuFrame = new MenuFrame(this);
 		campaignFrame = new CampaignFrame(this);
@@ -43,7 +46,7 @@ public class Main extends Applet {
 		aboutFrame = new AboutFrame(this);
 		fullFadeTransition = new FullFadeTransition(this);
 		test_frame = new ParticleTestFrame(this);
-		
+
 		// TODO: change back to menuFrame
 		setFrame(menuFrame);
 	}
@@ -51,8 +54,8 @@ public class Main extends Applet {
 	public static void main(String[] args) {
 		// windowed mode
 		PApplet.main(new String[] { "planet5.Main" });
-		
+
 		// presentation mode
-		//PApplet.main(new String[] { "--present", "planet5.Main" });
+		// PApplet.main(new String[] { "--present", "planet5.Main" });
 	}
 }
