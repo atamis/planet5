@@ -29,11 +29,12 @@ public class Game {
 
 	// time constants
 	// 10 mintues for 25 hours
-	private static final int MILLIS_PER_DAY = 10 * 60 * 1000;
-	private static final int MILLIS_PER_HOUR = MILLIS_PER_DAY / 24;
-	private static final int MILLIS_PER_MINUTE = MILLIS_PER_HOUR / 60;
-	private static final int GAME_START_TIME = 9 * MILLIS_PER_HOUR;
-	public static int DOUBLE_ASDF = 1;
+	private static final int MILLIS_PER_MINUTE = 416;
+	private static final int MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
+	private static final int MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
+	//private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
+	private static final int GAME_START_TIME = 39 * MILLIS_PER_HOUR/2;
+	public static int gameSpeedMultiplier = 1;
 
 	public boolean paused = false, help = false;
 	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
@@ -56,6 +57,7 @@ public class Game {
 	public Tile[][] tiles;
 	public int[][] lighting;
 	public boolean[][] field;
+	public boolean[][] covered;
 	public final int[] hourToLighting = { 0, 0, 0, 0, 32, 64, 96, 128, 160,
 			192, 224, 255, 255, 255, 255, 255, 255, 224, 192, 160, 128, 96, 64,
 			32 };
@@ -75,7 +77,9 @@ public class Game {
 	public Hero hero;
 	public Building base;
 
-	private GameButton helpButton, pauseButton, playAgainButton;
+	private GameButton helpButton, playAgainButton;
+	private RadioButton[] speedButtons = new RadioButton[5];
+	private RadioButton pauseButton;
 	private ConfirmButton quitButton;
 	public ParticleSystem ps;
 
@@ -99,10 +103,17 @@ public class Game {
 		// add buttons
 		int w = p.width;
 
-		helpButton = new GameButton(this, p, new Rectangle(w - 63 - 64 - 64, 0,
+		int speed = 16;
+		for (int i = 0; i < speedButtons.length; i++) {
+			speedButtons[i] = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64 - 32*speedButtons.length + 32*i, 0, 31,
+					23), speed + "x");
+			speed /= 2;
+		}
+		
+		pauseButton = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64, 0, 63,
+				23), "Pause");
+		helpButton = new GameButton(this, p, new Rectangle(w - 63 - 64, 0,
 				63, 23), "Help", Fonts.consolas16);
-		pauseButton = new GameButton(this, p, new Rectangle(w - 63 - 64, 0, 63,
-				23), "Pause", Fonts.consolas16);
 		quitButton = new ConfirmButton(this, p,
 				new Rectangle(w - 63, 0, 63, 23), "Quit");
 		playAgainButton = new GameButton(this, p, new Rectangle((w - 300) / 2,
@@ -151,7 +162,17 @@ public class Game {
 		
 		lighting = new int[tileHeight][tileWidth];
 		field = new boolean[tileHeight][tileWidth];
+		covered = new boolean[tileHeight][tileWidth];
 		(new CaveGenerator()).gen(p, this, width, height);
+		
+		// update covered array
+		for (int i = 0; i < tileHeight; i++)
+			for (int j = 0; j < tileWidth; j++)
+				covered[i][j] = tiles[i][j].wall;
+		for (int i = 0; i < base.height; i++)
+			for (int j = 0; j < base.width; j++)
+				covered[base.row + i][base.col + j] = true;
+		
 		calculatePathing();
 		recalculateField();
 		
@@ -159,22 +180,25 @@ public class Game {
 		UpgradeStats.reset();
 		EnemyLevel.reset();
 
-
 		// game events
 		win = -1;
 		lose = -1;
 		playAgainButton.visible = false;
 		
 		// bar
-		pauseButton.enabled = true;
 		pauseButton.text = "Pause";
 		curEnergy = 0;
 		paused = false;
 		help = false;
+		
+		unselectButtons();
+		gameSpeedMultiplier = 1;
+		speedButtons[4].selected = true;
 
 		// game time
 		gameMillis = GAME_START_TIME;
 		lastUpdateTime = System.currentTimeMillis();
+		ps.particles.clear();
 	}
 
 	public void calculatePathing() {
@@ -229,13 +253,11 @@ public class Game {
 	// game ending methods
 	public void lose() {
 		lose = 0;
-		pauseButton.enabled = false;
 		playAgainButton.visible = true;
 	}
 
 	public void win() {
 		win = 0;
-		pauseButton.enabled = false;
 		playAgainButton.visible = true;
 	}
 
@@ -251,6 +273,8 @@ public class Game {
 		pauseButton.draw(p.mouseX, p.mouseY, p.focused);
 		quitButton.draw(p.mouseX, p.mouseY, p.focused);
 		playAgainButton.draw(p.mouseX, p.mouseY, p.focused);
+		for (int i = 0; i < speedButtons.length; i++)
+			speedButtons[i].draw(p.mouseX, p.mouseY, p.focused);
 	}
 
 	public void update() {
@@ -259,12 +283,13 @@ public class Game {
 		pauseButton.update(p.focused);
 		quitButton.update(p.focused);
 		playAgainButton.update(p.focused);
-		
+		for (int i = 0; i < speedButtons.length; i++)
+			speedButtons[i].update(p.focused);
 
 		// calculate elapsed time
 		int elapsedMillis = (int) (System.currentTimeMillis() - lastUpdateTime);
 		lastUpdateTime = System.currentTimeMillis();
-		elapsedMillis *= DOUBLE_ASDF;
+		elapsedMillis *= gameSpeedMultiplier;
 
 		// recalculate game time
 		if (!paused()) {
@@ -273,6 +298,7 @@ public class Game {
 			hour = (gameMillis % MILLIS_PER_DAY) / MILLIS_PER_HOUR;
 			minute = (gameMillis % MILLIS_PER_HOUR) / MILLIS_PER_MINUTE;
 		}
+		
 
 		recalculateLighting();
 		if (!paused()) {
@@ -281,7 +307,20 @@ public class Game {
 			updateBuildings(elapsedMillis);
 			updateProjectiles(elapsedMillis);
 			spawnEnemies(elapsedMillis);
-			updateEnemies(elapsedMillis);
+
+			// if there are monsters on the map set game to 1x
+			if (enemies.size() != 0) {
+				for (int i = 0; i < 4; i++)
+					speedButtons[i].enabled = false;
+				unselectButtons();
+				gameSpeedMultiplier = 1;
+				speedButtons[4].selected = true;
+			} else {
+				for (int i = 0; i < 4; i++)
+					speedButtons[i].enabled = true;
+			}
+			
+			updateEnemies(elapsedMillis); // MAKE THIS FASTER.
 			checkGameEvents();
 			
 			EnemyLevel.add(elapsedMillis);
@@ -403,11 +442,12 @@ public class Game {
 
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		//maxEnemyCount = 1000;
-		maxEnemyCount = 20;
+		maxEnemyCount = 10000;
+		//maxEnemyCount = 20;
 		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
-		
-		int trials = 10;
+
+		int trials = 10000-enemies.size();
+		//int trials = 10;
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
 			int x = (int) (tileWidth * Math.random());
 			int y = (int) (tileHeight * Math.random());
@@ -427,17 +467,36 @@ public class Game {
 	}
 
 	private void updateEnemies(int elapsedMillis) {
-		for (Enemy enemy : enemies) {
+		long l=System.nanoTime();
+		boolean pr=false;
+
+		// keep base and hero dimensions calculated
+		Rectangle baseBounds = new Rectangle(base.col * TILE_SIZE, base.row * TILE_SIZE,
+					base.width * TILE_SIZE, base.height * TILE_SIZE);
+		baseBounds.grow(1, 1);
+		Rectangle heroBounds = new Rectangle(hero.x, hero.y, hero.SIZE, hero.SIZE);
+		heroBounds.grow(1, 1);
+		
+		// loop through all enemies
+		Iterator<Enemy> enemyIterator = enemies.iterator();
+		while (enemyIterator.hasNext()) {
+			Enemy enemy = enemyIterator.next();
+
+			// remove dead enemies
+			if (enemy.isDead()) {
+				enemyIterator.remove();
+				PVector loc = enemy.screenLoc();
+				ps.bloodBang(loc.x, loc.y);
+				continue;
+			}
+			
 			// find a target
 			enemy.attacked = false;
-			Rectangle inflated = new Rectangle((int) enemy.bounds.x,
-					(int) enemy.bounds.y, enemy.ENEMY_SIZE, enemy.ENEMY_SIZE);
-			inflated.grow(1, 1);
-			int damage = (int) EnemyStats.getDamage(enemy.type);
+			
+			int damage = EnemyStats.getDamage(enemy.type);
 
 			// target base first
-			if (inflated.intersects(base.col * TILE_SIZE, base.row * TILE_SIZE,
-					base.width * TILE_SIZE, base.height * TILE_SIZE)) {
+			if (enemy.bounds.intersects(baseBounds)) {
 				enemy.attacked = true;
 				base.hp -= damage;
 				if (base.hp <= 0) {
@@ -450,36 +509,37 @@ public class Game {
 			// target buildings next
 			// TODO: for the total thing: boolean removed = false;
 			if (!enemy.attacked) {
-				Iterator<Building> iterator = buildings.iterator();
-				while (iterator.hasNext()) {
-					Building building = iterator.next();
-					if (inflated.intersects(building.col * TILE_SIZE,
-							building.row * TILE_SIZE, building.width
-									* TILE_SIZE, building.height * TILE_SIZE)) {
-						enemy.attacked = true;
-						building.hp -= damage;
-						if (building.hp <= 0) {
-							building.hp = 0;
-
-							// o_o
-							iterator.remove();
-							ps.explosion(building.col * TILE_SIZE - mapX, building.row * TILE_SIZE - mapY);
-							for (int i = 0; i < building.height; i++) {
-								for (int j = 0; j < building.width; j++) {
-									tiles[building.row + i][building.col + j].building = null;
-								}
-							}
-							recalculateField();
-						}
-						break;
+				int top = enemy.bounds.y / TILE_SIZE;
+				int left = enemy.bounds.x / TILE_SIZE;
+				int bottom = (enemy.bounds.y + enemy.ENEMY_SIZE) / TILE_SIZE;
+				int right = (enemy.bounds.x + enemy.ENEMY_SIZE) / TILE_SIZE;
+				Building target = null;
+				
+				if (left * TILE_SIZE == enemy.bounds.x && left != 0) {
+					int temp = left - 1;
+					if (tiles[top][temp].building != null)
+						target = tiles[top][temp].building;
+					if (tiles[bottom][temp].building != null)
+						target = tiles[bottom][temp].building;
+				} else if (right * TILE_SIZE == enemy.bounds.x + enemy.ENEMY_SIZE) {
+					if (tiles[top][right].building != null)
+						target = tiles[top][right].building;
+					if (tiles[bottom][right].building != null)
+						target = tiles[bottom][right].building;
+				}
+				
+				if (target != null) {
+					enemy.attacked = true;
+					target.hp -= damage;
+					if (target.hp <= 0) {
+						ps.explosion(target.col * TILE_SIZE - mapX, target.row * TILE_SIZE - mapY);
 					}
 				}
 			}
 
 			// target hero otherwise
 			if (!enemy.attacked) {
-				if (inflated.intersects(hero.x, hero.y, hero.SIZE,
-						hero.SIZE)) {
+				if (enemy.bounds.intersects(heroBounds)) {
 					enemy.attacked = true;
 					hero.curHp -= damage;
 					if (hero.curHp < 0) {
@@ -489,21 +549,38 @@ public class Game {
 				}
 			}
 
-			if (!enemy.attacked) {
+			if (!enemy.attacked)
 				enemy.move(elapsedMillis);
+		}
+		
+		// remove destroyed buildings
+		boolean recalculate = false;
+		Iterator<Building> buildingIterator = buildings.iterator();
+		while (buildingIterator.hasNext()) {
+			Building building = buildingIterator.next();
+			if (building.hp <= 0) { // explosion?
+				building.hp = 0;
+				buildingIterator.remove();
+				for (int i = 0; i < building.height; i++)
+					for (int j = 0; j < building.width; j++) {
+						tiles[building.row + i][building.col + j].building = null;
+						covered[base.row + i][base.col + j] = false;
+						// TODO: this shit
+					}
+				recalculate = true;
 			}
 		}
-
-		// remove dead enemies
-		Iterator<Enemy> iterator = enemies.iterator();
-		while (iterator.hasNext()) {
-			Enemy enemy = iterator.next();
-			if (enemy.isDead()) {
-				PVector loc = enemy.screenLoc();
-				ps.bloodBang(loc.x, loc.y);
-				iterator.remove();
-			}
-		}
+		
+		if (recalculate)
+			recalculateField();
+		
+		if(enemies.size()==0)return;
+		long t=(System.nanoTime()-l);
+		p.println(" tot=" + t + " count=" + enemies.size() + " avg=" + (t/enemies.size()));
+		// run1: avg=30-60k
+		// run2: avg=4k
+		// run3: avg=3k
+		// run4: avg=2.5k
 	}
 
 	private void recalculateLighting() {
@@ -845,10 +922,6 @@ public class Game {
 				sellBuilding(selectedBuilding);
 				selectedBuilding = null;
 			}
-		} else if (keyCode == KeyEvent.VK_ENTER) {
-			DOUBLE_ASDF*=2;
-			if (DOUBLE_ASDF == 32)
-				DOUBLE_ASDF = 1;
 		}
 	}
 
@@ -860,6 +933,8 @@ public class Game {
 		pauseButton.mousePressed(x, y, mouseButton);
 		quitButton.mousePressed(x, y, mouseButton);
 		playAgainButton.mousePressed(x, y, mouseButton);
+		for (int i = 0; i < speedButtons.length; i++)
+			speedButtons[i].mousePressed(x, y, mouseButton);
 		
 		if (mouseButton != MouseEvent.BUTTON1)
 			return;
@@ -916,23 +991,46 @@ public class Game {
 		pauseButton.mouseReleased(x, y, mouseButton);
 		quitButton.mouseReleased(x, y, mouseButton);
 		playAgainButton.mouseReleased(x, y, mouseButton);
+		for (int i = 0; i < speedButtons.length; i++)
+			speedButtons[i].mouseReleased(x, y, mouseButton);
 	}
 
 	// button event handlers
 	public void buttonClicked(String command) {
 		if (command.equals("Quit")) {
 			listener.quit();
-		} else if (command.equals("Pause")) {
-			pauseButton.text = "Resume";
-			paused = true;
-		} else if (command.equals("Resume")) {
-			pauseButton.text = "Pause";
-			paused = false;
 		} else if (command.equals("Help")) {
 			help = !help;
 		} else if (command.equals("Play Again")) {
 			restartGame();
+		}else if (command.equals("Pause")) {
+			unselectButtons();
+			pauseButton.selected = true;
+			paused = true;
+			gameSpeedMultiplier = 0;
+		} else if (command.equals("1x")) {
+			unselectButtons();
+			gameSpeedMultiplier = 1;
+		} else if (command.equals("2x")) {
+			unselectButtons();
+			gameSpeedMultiplier = 2;
+		} else if (command.equals("4x")) {
+			unselectButtons();
+			gameSpeedMultiplier = 4;
+		} else if (command.equals("8x")) {
+			unselectButtons();
+			gameSpeedMultiplier = 8;
+		} else if (command.equals("16x")) {
+			unselectButtons();
+			gameSpeedMultiplier = 16;
 		}
+	}
+	
+	private void unselectButtons() {
+		paused = false;
+		pauseButton.selected = false;
+		for (int i = 0; i < speedButtons.length; i++)
+			speedButtons[i].selected = false;
 	}
 
 	public float getTotalGen() {

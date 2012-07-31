@@ -54,7 +54,7 @@ public class Projectile {
 		// turn towards target
 		dx = target.center.x - center.x;
 		dy = target.center.y - center.y;
-		rotation = Math.atan2(dx, dy);
+		rotation = Math.PI / 2 + Math.atan2(dx, dy);
 		
 		// explode if target is close enough
 		int damage = (int) BuildingStats.getDamage(6);

@@ -25,8 +25,6 @@ public final class GameRenderer {
 	}
 
 	public static void draw(Game game) {
-		long start = System.nanoTime();
-		
 		p.translate(0, BAR_HEIGHT);
 		GameRenderer.game = game;
 
@@ -58,7 +56,7 @@ public final class GameRenderer {
 		drawBarBackground();
 		
 		drawBarBuildings();
-		
+
 		drawBarUi();
 		
 		if(Globals.DEBUG)
@@ -115,7 +113,8 @@ public final class GameRenderer {
 		p.fill(0xFF202020);
 		p.rect(0, 0, p.width, BAR_HEIGHT + 1);
 		p.fill(0);
-		p.rect(p.width - 3 * 64, 0, 3 * 64, 23);
+		p.rect(p.width - 2 * 64, 0, 2 * 64, 23);
+		//p.rect(p.width - 3 * 64 - 5 * 32, 0, 3 * 64 + 5 * 32, 23);
 	}
 	static void drawBarBuildings() {
 		p.noStroke();
@@ -126,7 +125,7 @@ public final class GameRenderer {
 			int boxX = i * (BAR_HEIGHT - 1) + 1;
 			boolean buyable = (game.curEnergy >= BuildingStats.costs[i + 1]);
 			
-			if (buyable)
+			if (buyable || (game.selectedBuilding != null && game.selectedBuilding.type == 4))
 				p.fill(128);
 			else
 				p.fill(64);
@@ -143,19 +142,34 @@ public final class GameRenderer {
 				if (alpha > 255)
 					alpha = 511 - alpha;
 				p.fill(p.color(32, 128, 0, alpha / 2 + 128));
-			} else if (buyable && p.mouseX >= boxX && p.mouseY >= 1 &&
+			} else if (p.mouseX >= boxX && p.mouseY >= 1 &&
 					p.mouseX <= boxX + BAR_HEIGHT - 2 && p.mouseY <= BAR_HEIGHT) {
-				p.fill(0xFFC0C0C0); // yellow
+				if ((buyable || (game.selectedBuilding != null && game.selectedBuilding.type == 4)))
+					p.fill(0xFFC0C080); // yellow
+				p.pushStyle();
+				
+				// draw upgrade tool-tip or building tool-tip
+				if (game.selectedBuilding != null && game.selectedBuilding.type == 4) {
+					
+				} else {
+					
+				}
+				
+				p.popStyle();
 			}
 			p.rect(boxX, 1, BAR_HEIGHT - 2, BAR_HEIGHT - 1);
 			p.fill(0);
 			
 			String text = "" + (i + 1);
 			if (game.selectedBuilding != null && game.selectedBuilding.type == 4) {
+				String[] vals = { "HP", "GEN", "CAP", "DMG", "EFF", "X" };
+				/*
 				if (i == 5)
 					text = "X";
 				else
 					text = "[" + text + "]";
+				//*/
+				text = vals[i];
 			}
 			p.text(text, boxX, 1 - p.textDescent() / 2, BAR_HEIGHT - 2,
 					BAR_HEIGHT - 1);
@@ -197,10 +211,12 @@ public final class GameRenderer {
 		String time = String.format("Day %d, %d:%02d %s", game.day + 1, hour, game.minute, part);
 		p.text(time, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16, BAR_HEIGHT / 2 - 1);
 		
+		/*
 		p.textAlign(p.RIGHT, p.CENTER);
 		String text = "fps: " + game.lastFrameRate;
 			text = Game.DOUBLE_ASDF + "x! " + text;
 		p.text(text, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16, BAR_HEIGHT / 2 - 1);
+		//*/
 		if (p.millis() - game.lastFrameRateUpdate >= 1000) {
 			game.lastFrameRate = (int) p.frameRate;
 			game.lastFrameRateUpdate = p.millis(); // DOESNT BELONG HERE.
