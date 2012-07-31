@@ -74,7 +74,8 @@ public final class GameRenderer {
 		p.textAlign(p.LEFT, p.TOP);
 		p.textSize(12);
 
-		String[] strings = {"MortarH: " + BuildingStats.getHealth(6),
+		String[] strings = {"FPS: " + p.frameRate,
+				"MortarH: " + BuildingStats.getHealth(6),
 				"Gen: " + game.getTotalGen(),
 				"MHealth: " + EnemyStats.getHP(0),
 				"MDamage: " + EnemyStats.getDamage(0),
@@ -83,7 +84,7 @@ public final class GameRenderer {
 				"Particles: " + game.ps.particles.size()};
 
 		
-		int width = 100, height = (int) ((strings.length + 3) * (p.textAscent() + 4));
+		int width = 140, height = (int) ((strings.length + 3) * (p.textAscent() + 4));
 
 		
 		p.translate(0, p.height-height);
