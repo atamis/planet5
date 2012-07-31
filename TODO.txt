@@ -5,11 +5,11 @@ greyed out.
 
 [done] Buttons for 2x, 4x, etc.
 
-Sprites for enemies.
+[done] Sprites for enemies.
 
-Sprite for the hero
+Draw the sprite for the hero
 
-Sprite for mortar projectiles.
+[done] Sprite for mortar projectiles.
 
 [done] Icons for building buttons
 
@@ -17,7 +17,7 @@ Icons for upgrades?
 
 [done] Tooltips for buildings.
 
-Remake science lab, hero, etc. sprites.
+[done] Remake science lab, hero, etc. sprites.
 
 Add particles effects to guns.
 
@@ -25,4 +25,6 @@ Either add flashlight and/or gun to hero, or remove hero.
 
 Make enemies draw sprites, make them rotate.
 
-[done] Use appropriet font size for title (consolas96).
+Use appropriet font size for title (consolas96).
+
+Make mortar projectiles rotate correctly.

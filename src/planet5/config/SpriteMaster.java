@@ -21,6 +21,7 @@ public class SpriteMaster {
 	public PImage mortar_gun;
 	public PImage hero;
 	public PImage enemy;
+	public PImage mortar_bullet;
 
 	public SpriteMaster(PApplet p) {
 		int width, height;
@@ -93,6 +94,11 @@ public class SpriteMaster {
 		height = (int) (0.5 * TILE_SIZE);
 		enemy = p.createImage(width, height, p.ARGB);
 		enemy.copy(raw_building_sprite, 4 * TILE_SIZE, 3 * TILE_SIZE, width, height, 0, 0, width, height);
+
+		width = (int) (0.5 * TILE_SIZE);
+		height = (int) (0.5 * TILE_SIZE);
+		mortar_bullet = p.createImage(width, height, p.ARGB);
+		mortar_bullet.copy(raw_building_sprite, (int) (4.6 * TILE_SIZE), 3 * TILE_SIZE, width, height, 0, 0, width, height);
 
 
 	}

@@ -98,7 +98,7 @@ public class Projectile {
 		p.rotate((float) rotation);
 		p.pushStyle();
 		p.imageMode(p.CENTER);
-		PImage sprite = SpriteMaster.instance(p).hero;
+		PImage sprite = SpriteMaster.instance(p).mortar_bullet;
 		p.image(sprite, 0, 0);
 		p.popMatrix();
 		p.popStyle();
