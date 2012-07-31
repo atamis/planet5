@@ -486,7 +486,7 @@ public class Game {
 			if (enemy.isDead()) {
 				enemyIterator.remove();
 				PVector loc = enemy.screenLoc();
-				ps.bloodBang(loc.x, loc.y);
+				ps.bloodBang(enemy.bounds.x, enemy.bounds.y);
 				continue;
 			}
 			
@@ -501,7 +501,7 @@ public class Game {
 				base.hp -= damage;
 				if (base.hp <= 0) {
 					base.hp = 0;
-					ps.explosion(base.col * TILE_SIZE - mapX, base.row * TILE_SIZE - mapY);
+					ps.explosion(base.col * TILE_SIZE, base.row * TILE_SIZE);
 				}
 				// TODO: static screen
 			}
@@ -532,7 +532,7 @@ public class Game {
 					enemy.attacked = true;
 					target.hp -= damage;
 					if (target.hp <= 0) {
-						ps.explosion(target.col * TILE_SIZE - mapX, target.row * TILE_SIZE - mapY);
+						ps.explosion(target.col * TILE_SIZE, target.row * TILE_SIZE);
 					}
 				}
 			}

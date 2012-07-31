@@ -88,7 +88,7 @@ public class Projectile {
 		int x = bounds.x - map.mapX;
 		int y = bounds.y - map.mapY;
 		
-		map.ps.projectileTrail(x, y);
+		map.ps.projectileTrail(bounds.x, bounds.y);
 
 		// only draw if it actually shows up
 		if (x + PROJECTILE_SIZE <= 0 || y + PROJECTILE_SIZE <= 0 || x >= p.width

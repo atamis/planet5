@@ -42,7 +42,9 @@ public final class GameRenderer {
 		
 		drawProjectiles();
 		
+		p.translate(-game.mapX, -game.mapY);
 		game.ps.draw(p);
+		p.translate(game.mapX, game.mapY);
 
 		p.translate(-game.mapX, -game.mapY);
 		drawBuildingPlaceover();
