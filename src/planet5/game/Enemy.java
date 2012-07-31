@@ -77,7 +77,7 @@ public class Enemy {
 		int yMove = 0;
 		map.enemyArrayCenter[center.y / TILE_SIZE][center.x / TILE_SIZE].remove(this);
 		map.enemyArrayCorner[bounds.y / TILE_SIZE][bounds.x / TILE_SIZE].remove(this);
-
+		
 		// calculate total pixels to move
 		int left = bounds.x / TILE_SIZE;
 		int up = bounds.y / TILE_SIZE;
@@ -131,10 +131,9 @@ public class Enemy {
 		yMove = Math.abs(yMove);
 
 		// move pixel by pixel
-		boolean moved;
 		int newLeft, newRight, newUp, newDown, oldX, oldY;
 		while (true) {
-			moved = false;
+			boolean moved = false;
 
 			oldX = bounds.x;
 			oldY = bounds.y;

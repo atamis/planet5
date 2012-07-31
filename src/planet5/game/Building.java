@@ -1,5 +1,6 @@
 package planet5.game;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Map;
 
