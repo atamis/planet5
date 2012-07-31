@@ -25,6 +25,12 @@ Either add flashlight and/or gun to hero, or remove hero.
 
 Make enemies draw sprites, make them rotate.
 
-Use appropriet font size for title (consolas96).
+Use appropriate font size for title (consolas96).
 
 Make mortar projectiles rotate correctly.
+
+Make the number of monsters attacking depend on the enemy spawn level.
+
+Balance enemy level.
+
+Add blood splats as particles.

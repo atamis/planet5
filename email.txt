@@ -17,3 +17,8 @@ as long as possible. Spread your network across the alien planet with relays,
 generate and store energy with capacitors and solar farms, research and improve
 your buildings with the science lab, and defend the rest of your buildings with
 powerful laser turrets and mortars.
+
+<applet width="1024" height="768"
+  archive="https://dl.dropbox.com/u/89168/planet5.jar"
+        code="planet5.Main" /> 
+
