@@ -46,11 +46,12 @@ public class ParticleSystem {
 
 			rad += PConstants.TWO_PI / parts;
 		}
-		particles.add(new Particle(new PVector(x, y), new PVector(
-				r.nextFloat() * 0.25f - 0.125f, r.nextFloat() * 0.25f - 0.125f), 200,
-				new Color(0xd0d0d0c8), 30));
+		particles.add(new Particle(new PVector(x, y),
+				new PVector(r.nextFloat() * 0.25f - 0.125f,
+						r.nextFloat() * 0.25f - 0.125f), 200, new Color(
+						0xd0d0d0c8), 30));
 	}
-	
+
 	public void bloodBang(float x, float y) {
 		Random r = new Random();
 		float rad = 0;
@@ -58,9 +59,9 @@ public class ParticleSystem {
 		for (float i = 0; i < parts; i++) {
 			PVector tmp = new PVector((float) Math.cos(rad),
 					(float) Math.sin(rad));
-			tmp.mult(0.2f);
-			particles.add(new Particle(new PVector(x, y), tmp, 500,
-					new Color(0xc80000), 4));
+			tmp.mult((float) (0.2f + r.nextFloat() * 0.3));
+			particles.add(new Particle(new PVector(x, y), tmp, 500, new Color(
+					0xc80000), 4));
 
 			rad = r.nextFloat() * PConstants.TWO_PI;
 		}
@@ -72,5 +73,11 @@ public class ParticleSystem {
 		particles.add(new Particle(new PVector(x, y), new PVector(
 				r.nextFloat() - 0.5f, r.nextFloat() - 0.5f), 1000, new Color(
 				0xff0000), 5));
+	}
+
+	public void projectileTrail(float x, float y) {
+		particles.add(new Particle(new PVector(x, y), new PVector(0, 0), 1000,
+				new Color(0x5f, 0x5f, 0x5f, 0xb5), 15));
+
 	}
 }

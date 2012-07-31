@@ -36,7 +36,7 @@ public class Particle {
 	public void draw(PApplet p) {
 		p.pushStyle();
 		p.noStroke();
-		p.fill(color.getRed(), color.getBlue(), color.getGreen());
+		p.fill(color.getRed(), color.getBlue(), color.getGreen(), color.getAlpha());
 		p.ellipse(loc.x, loc.y, size, size);
 		p.popStyle();
 	}

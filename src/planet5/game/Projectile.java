@@ -38,6 +38,7 @@ public class Projectile {
 		int dx = target.center.x - center.x;
 		int dy = target.center.y - center.y;
 		
+		
 		// move towards target
 		float move = elapsedMillis * SPEED;
 		double mag = dx * dx + dy * dy;
@@ -71,7 +72,7 @@ public class Projectile {
 							enemy.processFutureDamage(damage);
 							enemy.takeDamage(damage);
 							if (enemy.isDead()) {
-								
+								map.ps.bloodBang(enemy.center.x - map.mapX, enemy.center.y - map.mapY);
 							}
 						}
 			
@@ -86,6 +87,8 @@ public class Projectile {
 	public void draw() {
 		int x = bounds.x - map.mapX;
 		int y = bounds.y - map.mapY;
+		
+		map.ps.projectileTrail(x, y);
 
 		// only draw if it actually shows up
 		if (x + PROJECTILE_SIZE <= 0 || y + PROJECTILE_SIZE <= 0 || x >= p.width
