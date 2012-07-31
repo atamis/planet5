@@ -34,8 +34,7 @@ public class MenuFrame extends Frame {
 		
 		// draw background image
 		p.fill(255, 255, 224);
-		p.textFont(Fonts.consolas32);
-		p.textSize(96);
+		p.textFont(Fonts.consolas96);
 		p.textAlign(p.CENTER);
 		p.text("Planet 5", 0, 120, p.width, 400);
 		

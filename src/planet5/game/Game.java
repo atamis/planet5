@@ -83,6 +83,9 @@ public class Game {
 	private ConfirmButton quitButton;
 	public ParticleSystem ps;
 
+	boolean noEnemies = true;
+	int remainderMillis = 0;
+
 	//
 	private GameListener listener;
 
@@ -194,9 +197,50 @@ public class Game {
 		unselectButtons();
 		gameSpeedMultiplier = 1;
 		speedButtons[4].selected = true;
+		
+		// DEBUGGING
+		placingBuilding=0;
+		for(int k=-5;k<=5;k++){
+			Building b=new Building( 1, hero.x/32 + k, hero.y/32 - 5,GAME_START_TIME);
+			buildings.add(b);
+			for (int i = 0; i < b.height; i++) {
+				for (int j = 0; j < b.width; j++) {
+					tiles[b.row + i][b.col + j].building = b;
+				}
+			}
 
+			 b=new Building(1, hero.x/32 + k, hero.y/32 + 5, GAME_START_TIME);
+			buildings.add(b);
+			for (int i = 0; i < b.height; i++) {
+				for (int j = 0; j < b.width; j++) {
+					tiles[b.row + i][b.col + j].building = b;
+				}
+			}
+
+			 b=new Building(1, hero.x/32 + 5, hero.y/32+k, GAME_START_TIME);
+			buildings.add(b);
+			for (int i = 0; i < b.height; i++) {
+				for (int j = 0; j < b.width; j++) {
+					tiles[b.row + i][b.col + j].building = b;
+				}
+			}
+
+			 b=new Building( 1,hero.x /32- 5, hero.y/32+k, GAME_START_TIME);
+			buildings.add(b);
+			for (int i = 0; i < b.height; i++) {
+				for (int j = 0; j < b.width; j++) {
+					tiles[b.row + i][b.col + j].building = b;
+				}
+			}
+		}
+		
+		recalculateField();
+		
 		// game time
+		placingBuilding = -1;
+		noEnemies = true;
 		gameMillis = GAME_START_TIME;
+		remainderMillis = 0;
 		lastUpdateTime = System.currentTimeMillis();
 		ps.particles.clear();
 	}
@@ -298,32 +342,37 @@ public class Game {
 			hour = (gameMillis % MILLIS_PER_DAY) / MILLIS_PER_HOUR;
 			minute = (gameMillis % MILLIS_PER_HOUR) / MILLIS_PER_MINUTE;
 		}
-		
 
 		recalculateLighting();
 		if (!paused()) {
-			ps.update(elapsedMillis);
-			updateHero(elapsedMillis);
-			updateBuildings(elapsedMillis);
-			updateProjectiles(elapsedMillis);
-			spawnEnemies(elapsedMillis);
-
+			final int TICK_MILLIS = 16;
+			remainderMillis += elapsedMillis;
+			while (remainderMillis >= 0) {
+				remainderMillis -= TICK_MILLIS;
+				ps.update(TICK_MILLIS);
+				updateHero(TICK_MILLIS);
+				updateBuildings(TICK_MILLIS);
+				updateProjectiles(TICK_MILLIS);
+				spawnEnemies(TICK_MILLIS);
+				updateEnemies(TICK_MILLIS); // MAKE THIS FASTER.
+				EnemyLevel.add(TICK_MILLIS);
+			}
+			
 			// if there are monsters on the map set game to 1x
-			if (enemies.size() != 0) {
-				for (int i = 0; i < 4; i++)
-					speedButtons[i].enabled = false;
+			if (enemies.size() != 0 && noEnemies) {
+				//for (int i = 0; i < 4; i++)
+				//	speedButtons[i].enabled = false;
 				unselectButtons();
 				gameSpeedMultiplier = 1;
 				speedButtons[4].selected = true;
-			} else {
-				for (int i = 0; i < 4; i++)
-					speedButtons[i].enabled = true;
+				noEnemies = false;
+			} else if (enemies.size() == 0) {
+				noEnemies = true;
+				//for (int i = 0; i < 4; i++)
+				//	speedButtons[i].enabled = true;
 			}
 			
-			updateEnemies(elapsedMillis); // MAKE THIS FASTER.
 			checkGameEvents();
-			
-			EnemyLevel.add(elapsedMillis);
 			recalculateEnergyValues();
 		}
 
@@ -403,8 +452,6 @@ public class Game {
 				
 				// deal damage, remove dead enemies, consume energy
 				if (building.type == 5) {
-					// TODO don't overkill the enemy
-					
 					building.target.takeDamage((int) (elapsedMillis * BuildingStats.getDamage(5)));
 					curEnergy -= elapsedMillis * BuildingStats.getDraw(building.type);
 				} else if (building.type == 6) {
@@ -422,7 +469,7 @@ public class Game {
 		}
 		
 		if (recalc)
-			recalculateField();	// TODO: only recalculate once per draw() ?
+			recalculateField();
 		
 		// limit max energy
 		if (curEnergy > maxEnergy)
@@ -442,11 +489,11 @@ public class Game {
 
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		maxEnemyCount = 10000;
+		maxEnemyCount = 100;
 		//maxEnemyCount = 20;
 		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
-		int trials = 10000-enemies.size();
+		int trials = 100-enemies.size();
 		//int trials = 10;
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
 			int x = (int) (tileWidth * Math.random());
@@ -507,9 +554,8 @@ public class Game {
 			}
 
 			// target buildings next
-			// TODO: for the total thing: boolean removed = false;
 			if (!enemy.attacked) {
-				int top = enemy.bounds.y / TILE_SIZE;
+				int top = (enemy.bounds.y - 1) / TILE_SIZE;
 				int left = enemy.bounds.x / TILE_SIZE;
 				int bottom = (enemy.bounds.y + enemy.ENEMY_SIZE) / TILE_SIZE;
 				int right = (enemy.bounds.x + enemy.ENEMY_SIZE) / TILE_SIZE;
@@ -710,10 +756,12 @@ public class Game {
 		Rectangle building = new Rectangle(x * TILE_SIZE, y * TILE_SIZE, w
 				* TILE_SIZE, h * TILE_SIZE);
 
-		int loopTop = Math.max(0, up - 1);
-		int loopLeft = Math.max(0, left - 1);
-		for (int i = loopLeft; i <= right; i++)
-			for (int j = loopTop; j <= down; j++)
+		int loopTop = Math.max(0, y - 1);
+		int loopLeft = Math.max(0, x - 1);
+		int loopRight = Math.min(x + w, tileWidth - 1);
+		int loopBottom = Math.min(y + h, tileHeight - 1);
+		for (int i = loopLeft; i <= loopRight; i++)
+			for (int j = loopTop; j <= loopBottom; j++)
 				for (Enemy enemy : enemyArrayCorner[j][i])
 					if (building.intersects(enemy.bounds))
 						return false;
@@ -721,7 +769,7 @@ public class Game {
 		return true;
 	}
 
-	public void placeBuilding() {
+	public boolean placeBuilding() {
 		int x = (p.mouseX + mapX) / 32;
 		int y = (p.mouseY + mapY - BAR_HEIGHT) / 32;
 		int w = BuildingStats.cols[placingBuilding];
@@ -733,7 +781,10 @@ public class Game {
 					gameMillis);
 			curEnergy -= BuildingStats.costs[buildingType];
 			addBuilding(placedBuilding);
+			return true;
 		}
+		
+		return false;
 	}
 
 	public void setBase(Building base) {
@@ -939,6 +990,7 @@ public class Game {
 		if (mouseButton != MouseEvent.BUTTON1)
 			return;
 
+		// building bar select
 		for (int i = 0; i < 6; i++) {
 			int boxX = i * (BAR_HEIGHT - 1) + 1;
 			if (mouseButton == MouseEvent.BUTTON1 && x >= boxX && y >= 1
@@ -961,8 +1013,10 @@ public class Game {
 			}
 		}
 
-		// do building related options
-		if (y >= BAR_HEIGHT) {
+		// place THEN do building-related options
+		if (mouseButton == MouseEvent.BUTTON1 && placingBuilding != -1 && !help && placeBuilding()) {
+			
+		} else if (y >= BAR_HEIGHT) {
 			int col = (x + mapX) / TILE_SIZE;
 			int row = (y + mapY - BAR_HEIGHT) / TILE_SIZE;
 			Building building = tiles[row][col].building;
@@ -977,12 +1031,6 @@ public class Game {
 			} else {
 				selectedBuilding = null;
 			}
-		}
-
-		// TODO check if an enemy can be selected (or hover?)
-
-		if (mouseButton == MouseEvent.BUTTON1 && placingBuilding != -1 && !help) {
-			placeBuilding();
 		}
 	}
 

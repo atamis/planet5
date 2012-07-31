@@ -7,11 +7,11 @@ public class BuildingStats {
 			"Capacitor", "Science Lab", "Laser Turret", "Mortar" };
 	public static String[] descriptions = {
 			"The Main Base forms the core of your network and if it falls, you lose.",
-			"The Relay projects an energy field and supplies power to other buildings",
+			"The Relay projects an energy field and supplies power to other buildings.",
 			"The Solar Farm harvests solar energy for your network. Doesn't generate power at night.",
 			"The Capacitor stores energy for use during the night. Increases your maximum power pool.",
 			"The Science Lab upgrades a variety of buildings and weapons you use.",
-			"The Laser Turret provides high damage short range defense. It fires continuously.",
+			"The Laser Turret provides high damage short range defense. Fires continuously.",
 			"The Mortar fires explosive energy that damage enemies in a wide radius. Recharges between shots." };
 	public static int[] costs = { 0, 20, 30, 100, 500, 200, 500 };
 	public static int[] rows = { 3, 1, 1, 1, 2, 1, 2 };
