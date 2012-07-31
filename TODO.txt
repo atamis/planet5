@@ -33,4 +33,6 @@ Make the number of monsters attacking depend on the enemy spawn level.
 
 Balance enemy level.
 
-Add blood splats as particles.
+[done] Add blood splats as particles.
+
+Mute button
