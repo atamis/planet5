@@ -54,16 +54,29 @@ public class ParticleSystem {
 
 	public void bloodBang(float x, float y) {
 		Random r = new Random();
+		
+		float min_rad = 0, max_rad = PConstants.TWO_PI;
+		
+		// 10% chance...
+		if(r.nextFloat() < 0.1) {
+			min_rad = r.nextFloat();
+			do {
+				max_rad = r.nextFloat();
+			} while (min_rad > max_rad);
+		}
+		
 		float rad = 0;
 		float parts = 10f;
 		for (float i = 0; i < parts; i++) {
+			rad = PApplet.map(r.nextFloat(), 0, 1, min_rad, max_rad);
+			
 			PVector tmp = new PVector((float) Math.cos(rad),
 					(float) Math.sin(rad));
 			tmp.mult((float) (0.2f + r.nextFloat() * 0.3));
 			particles.add(new Particle(new PVector(x, y), tmp, 500, new Color(
 					0xc80000), 4));
 
-			rad = r.nextFloat() * PConstants.TWO_PI;
+			
 		}
 
 	}
