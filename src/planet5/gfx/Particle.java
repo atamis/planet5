@@ -14,9 +14,9 @@ public class Particle {
 		this.color = color;
 		this.size = size;
 	}
-	private PVector loc;
+	public PVector loc;
 	private PVector vec;
-	private int time_left;
+	public int time_left;
 	private Color color;
 	private int size;
 	

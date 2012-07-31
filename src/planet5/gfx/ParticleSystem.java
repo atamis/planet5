@@ -57,6 +57,8 @@ public class ParticleSystem {
 		
 		float min_rad = 0, max_rad = PConstants.TWO_PI;
 		
+		particles.add(new BloodSplatParticle(new PVector(x, y)));
+		
 		// 10% chance...
 		if(r.nextFloat() < 0.1) {
 			min_rad = r.nextFloat();

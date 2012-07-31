@@ -22,6 +22,7 @@ public class SpriteMaster {
 	public PImage hero;
 	public PImage enemy;
 	public PImage mortar_bullet;
+	public PImage blood_splat;
 
 	public SpriteMaster(PApplet p) {
 		int width, height;
@@ -99,6 +100,11 @@ public class SpriteMaster {
 		height = (int) (0.5 * TILE_SIZE);
 		mortar_bullet = p.createImage(width, height, p.ARGB);
 		mortar_bullet.copy(raw_building_sprite, (int) (4.6 * TILE_SIZE), 3 * TILE_SIZE, width, height, 0, 0, width, height);
+
+		width = (int) (0.5 * TILE_SIZE);
+		height = (int) (0.5 * TILE_SIZE);
+		blood_splat = p.createImage(width, height, p.ARGB);
+		blood_splat.copy(raw_building_sprite, (int) (5 * TILE_SIZE), 3 * TILE_SIZE, width, height, 0, 0, width, height);
 
 
 	}
