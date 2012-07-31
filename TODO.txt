@@ -22,3 +22,7 @@ Remake science lab, hero, etc. sprites.
 Add particles effects to guns.
 
 Either add flashlight and/or gun to hero, or remove hero.
+
+Make enemies draw sprites, make them rotate.
+
+Use appropriet font size for title (consolas96).
