@@ -443,39 +443,49 @@ public class Game {
 				} else {
 					continue;
 				}
-				
+
 				// find the closest enemy
 				building.target = building.findClosestEnemy(this, range / 32);
-				
-				if (building.target == null || building.target.isDead() || building.target.willBeDead())
+
+				if (building.target == null || building.target.isDead()
+						|| building.target.willBeDead())
 					continue;
-				
+
 				// deal damage, remove dead enemies, consume energy
 				if (building.type == 5) {
-					building.target.takeDamage((int) (elapsedMillis * BuildingStats.getDamage(5)));
-					curEnergy -= elapsedMillis * BuildingStats.getDraw(building.type);
+					building.target
+							.takeDamage((int) (elapsedMillis * BuildingStats
+									.getDamage(5)));
+					curEnergy -= elapsedMillis
+							* BuildingStats.getDraw(building.type);
 				} else if (building.type == 6) {
-					Projectile pr = new Projectile(this, p, building.col * TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE + TILE_SIZE);
+					Projectile pr = new Projectile(this, p, building.col
+							* TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE
+							+ TILE_SIZE);
 					pr.target = building.target;
-					pr.target.takeFutureDamage((int) BuildingStats.getDamage(6));
+					pr.target
+							.takeFutureDamage((int) BuildingStats.getDamage(6));
 					projectiles.add(pr);
+					ps.mortarExhaust(building.col * TILE_SIZE
+							+ (BuildingStats.cols[6] * TILE_SIZE) / 2, building.row
+							* TILE_SIZE + (BuildingStats.rows[6] * TILE_SIZE) / 2);
 					curEnergy -= BuildingStats.getDraw(building.type);
-					//building.target = null;
+					// building.target = null;
 				}
-				
+
 				// set reload time
 				building.lastFireTime = gameMillis;
 			}
 		}
-		
+
 		if (recalc)
 			recalculateField();
-		
+
 		// limit max energy
 		if (curEnergy > maxEnergy)
 			curEnergy = maxEnergy;
 	}
-	
+
 	private void updateProjectiles(int elapsedMillis) {
 		Iterator<Projectile> iterator = projectiles.iterator();
 		while (iterator.hasNext()) {

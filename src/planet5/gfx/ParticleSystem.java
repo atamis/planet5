@@ -95,4 +95,18 @@ public class ParticleSystem {
 				new Color(0x5f, 0x5f, 0x5f, 0xb5), 15));
 
 	}
+
+	public void mortarExhaust(float x, float y) {
+		Random r = new Random();
+		int num_particles = 10;
+		float rad;
+		for(int i = 0; i < num_particles; i++) {
+			rad = r.nextFloat() * PConstants.TWO_PI;
+			PVector tmp = new PVector((float) Math.cos(rad), (float) Math.sin(rad));
+			tmp.normalize();
+			tmp.mult(0.05f + r.nextFloat() * 0.2f);
+			particles.add(new Particle(new PVector(x, y), tmp, 400, new Color(0xc8, 0xc8, 0xc8, 0x40), 25));
+		}
+
+	}
 }
