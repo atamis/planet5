@@ -84,14 +84,34 @@ public class Building {
 			PVector c = new PVector(centerx, centery);
 			PVector e = target.screenLoc();
 			e.add(Enemy.ENEMY_SIZE / 2, Enemy.ENEMY_SIZE / 2, 0);
-			p.line(c.x, c.y, e.x, e.y);
+			//p.line(c.x, c.y, e.x, e.y);
 			rad = p.HALF_PI + (float) p.atan2((e.y - c.y), (e.x - c.x));
 		}
 	}
 
+	public void drawHp(PApplet p, int x, int y, int selectedTime) {
+		if (buildTime != -1)
+			return;
+		
+		final int hpHeight = 8;
+		
+		// background
+		p.noStroke();
+		p.fill(0);
+		p.rect(x, y, width * TILE_SIZE, hpHeight);
+		
+		// bar
+		int fill = (int) ((width * TILE_SIZE - 2) * (hp / maxHp));
+		p.fill(0xFFC00000);
+		if (buildTime != -1) {
+			fill = (int) ((width * TILE_SIZE - 2) * buildHealth * (hp / maxHp) / 5000);
+			p.fill(0xFF204080);
+		}
+		p.rect(x + 1, y + 1, fill, hpHeight - 2);
+	}
+
 	public void draw(PApplet p, int x, int y, int selectedTime) {
 		calcAngle(p, x, y);
-		final int hpHeight = 8;
 
 		if (hp <= 0) {
 			return;
@@ -141,33 +161,29 @@ public class Building {
 			if (alpha > 255)// TODO: fine tuning
 				alpha = 511 - alpha;
 			p.fill(p.color(32, 128, 0, alpha / 2 + 128));
-			p.rect(x, y + hpHeight, width * TILE_SIZE - 1, height * TILE_SIZE
-					- hpHeight - 1);
+			p.rect(x, y, width * TILE_SIZE - 1, height * TILE_SIZE - 1);
 			p.textAlign(p.CENTER, p.CENTER);
 			p.textSize(12);
 			p.fill(0);
 			p.text("sell", x, y, width * TILE_SIZE - 1, height * TILE_SIZE - 1);
 		}
 
-		// hp bar background
-		p.noStroke();
-		p.fill(0);
-		p.rect(x, y, width * TILE_SIZE, hpHeight);
-
-		// hp bar
-		int fill = (int) ((width * TILE_SIZE - 2) * hp / maxHp);
-		p.fill(0xFFC00000);
-		if (buildTime != -1) {
-			fill = (int) ((width * TILE_SIZE - 2) * buildHealth * hp / maxHp / 5000);
-			p.fill(0xFF204080);
-		}
-		p.rect(x + 1, y + 1, fill, hpHeight - 2);
-
 		// text
 		p.textAlign(p.LEFT, p.TOP);
 		p.fill(0);
 		p.textSize(16);
 		// p.text("" + type, x + 8, y + 8);
+		if (buildTime != -1) {
+			p.noStroke();
+			
+			int fill = (int) ((width * TILE_SIZE - 2) * buildHealth * (hp / maxHp) / 5000);
+
+			p.fill(0);
+			p.rect(x, y, fill + 2, 8);
+			
+			p.fill(0xFF204080);
+			p.rect(x + 1, y + 1, fill, 8 - 2);
+		}
 
 		// if building is not powered draw the sign
 		// otherwise draw the connection

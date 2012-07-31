@@ -1,9 +1,9 @@
 TODO
 
-Upgrades whose numbers fall on buildings you don't have the energy to build are
+[fixed] Upgrades whose numbers fall on buildings you don't have the energy to build are
 greyed out.
 
-Buttons for 2x, 4x, etc.
+[done] Buttons for 2x, 4x, etc.
 
 [done] Sprites for enemies.
 
@@ -11,11 +11,11 @@ Draw the sprite for the hero
 
 [done] Sprite for mortar projectiles.
 
-Icons for building buttons
+[done] Icons for building buttons
 
 Icons for upgrades?
 
-Tooltips for buildings.
+[done] Tooltips for buildings.
 
 [done] Remake science lab, hero, etc. sprites.
 

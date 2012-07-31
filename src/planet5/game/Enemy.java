@@ -20,6 +20,7 @@ public class Enemy {
 	public Rectangle bounds;
 	public Game map;
 	private PApplet p;
+	public boolean drawHp = false;
 
 	private int curHp = 0, maxHp = 0, computedHp = 0;
 	private int speed;
@@ -154,15 +155,13 @@ public class Enemy {
 						&& checkTileCollision(newLeft, up, newRight, down)) {
 					kiloX -= xSign;
 					bounds.x = oldX;
-					newLeft = left;
-					newRight = right;
 				} else if (oldX != bounds.x && checkHeroCollision()) {
 					kiloX -= xSign;
 					bounds.x = oldX;
-					newLeft = left;
-					newRight = right;
 				} else {
 					moved = true;
+					left = newLeft;
+					right = newRight;
 				}
 			}
 
@@ -175,7 +174,7 @@ public class Enemy {
 				newDown = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
 
 				if ((up != newUp || down != newDown)
-						&& checkTileCollision(newLeft, newUp, newRight, newDown)) {
+						&& checkTileCollision(left, newUp, right, newDown)) {
 					kiloY -= ySign;
 					bounds.y = oldY;
 				} else if (oldY != bounds.y && checkHeroCollision()) {
@@ -253,17 +252,26 @@ public class Enemy {
 		} else {
 			p.fill(p.color(zero, zero, full));
 		}
-		p.rect(x, y + hpHeight, ENEMY_SIZE, ENEMY_SIZE - hpHeight);
 
-		if (Globals.DRAW_HP) {
-			// hp bar background
+		if (Globals.DRAW_HP || drawHp) {
+			drawHp = false;
+			p.rect(x, y + hpHeight, ENEMY_SIZE, ENEMY_SIZE - hpHeight);
+			
+			// draw health bar outline
+			int hpBarFill = (int) ((ENEMY_SIZE - 2) * curHp / maxHp);
 			p.fill(0);
-			p.rect(x, y, ENEMY_SIZE, hpHeight);
-
-			// hp bar
-			int fill = (int) ((ENEMY_SIZE - 2) * curHp / maxHp);
-			p.fill(p.color(full, zero, zero));
-			p.rect(x + 1, y + 1, fill, hpHeight - 2);
+			p.rect(x, y, 1, hpHeight);
+			p.rect(x + 1, y, hpBarFill, 1);
+			p.rect(x + 1, y + hpHeight - 1, hpBarFill, 1);
+			
+			// draw health bar blackness
+			p.rect(x + 1 + hpBarFill, y, ENEMY_SIZE - hpBarFill - 1, hpHeight);
+			
+			// draw health bar fill
+			p.fill(0xFFC00000);
+			p.rect(x + 1, y + 1, hpBarFill, hpHeight - 2);
+		} else {
+			p.rect(x, y, ENEMY_SIZE, ENEMY_SIZE);
 		}
 	}
 }
