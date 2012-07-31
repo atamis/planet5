@@ -2,7 +2,9 @@ package planet5.game;
 
 import java.awt.event.KeyEvent;
 
+import planet5.config.SpriteMaster;
 import planet5.framework.Applet;
+import processing.core.PApplet;
 
 public class Hero {
 	// copied constants
@@ -28,6 +30,8 @@ public class Hero {
 	// store most recent key pressed
 	public int mostRecentWs = 0;
 	public int mostRecentAd = 0;
+
+	private float rad = 0;
 	
 	// constructor
 	public Hero(Applet p, Game map, int x, int y) {
@@ -101,6 +105,10 @@ public class Hero {
 				}
 			}
 		} while (moved);
+		
+		// Rotate.
+		rad = PApplet.atan2((x - map.mapX) - p.mouseX, (y - map.mapY) - p.mouseY);
+				
 	}
 
 	private int sign(int num) {
@@ -153,7 +161,11 @@ public class Hero {
 		
 		// draw the hero
 		p.fill(0xFF204080);
-		p.rect(x, y + HP_BAR_HEIGHT, SIZE, SIZE - HP_BAR_HEIGHT);
+		p.pushMatrix();
+		p.translate(x + TILE_SIZE/2, y + TILE_SIZE/2);
+		p.rotate(p.TWO_PI - rad);
+		p.image(SpriteMaster.instance(p).hero, -TILE_SIZE/2, -TILE_SIZE/2);
+		p.popMatrix();
 		
 		// draw health bar outline
 		int hpBarFill = (int) ((SIZE - 2) * curHp / maxHp);

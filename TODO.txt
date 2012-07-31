@@ -7,7 +7,7 @@ greyed out.
 
 [done] Sprites for enemies.
 
-Draw the sprite for the hero
+[done] Draw the sprite for the hero
 
 [done] Sprite for mortar projectiles.
 
@@ -25,7 +25,7 @@ Either add flashlight and/or gun to hero, or remove hero.
 
 Make enemies draw sprites, make them rotate.
 
-Use appropriate font size for title (consolas96).
+[done] Use appropriate font size for title (consolas96).
 
 Make mortar projectiles rotate correctly.
 
