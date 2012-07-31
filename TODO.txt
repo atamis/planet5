@@ -1,0 +1,24 @@
+TODO
+
+Upgrades whose numbers fall on buildings you don't have the energy to build are
+greyed out.
+
+Buttons for 2x, 4x, etc.
+
+Sprites for enemies.
+
+Sprite for the hero
+
+Sprite for mortar projectiles.
+
+Icons for building buttons
+
+Icons for upgrades?
+
+Tooltips for buildings.
+
+Remake science lab, hero, etc. sprites.
+
+Add particles effects to guns.
+
+Either add flashlight and/or gun to hero, or remove hero.
