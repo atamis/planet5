@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 
 import planet5.config.EnemyStats;
 import planet5.config.Globals;
+import planet5.config.SpriteMaster;
 import planet5.frames.GameFrame;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -143,9 +144,47 @@ public class Enemy {
 			p.fill(p.color(zero, zero, full));
 		}
 
+		int dx = map.computedX[bounds.y][bounds.x];
+		int dy = map.computedY[bounds.y][bounds.x];
+		float rotation = 0;
+		if (dy == -1) {
+			if (dx == -1) {
+				rotation=-1;
+			} else if (dx == 0) {
+				rotation=0;
+			} else {
+				rotation=1;
+			}
+		} else if (dy == 0) {
+			if (dx == -1) {
+				rotation=-2;
+			} else if (dx == 0) {
+				rotation=0;// THIS IS CENTERED... SHOULD NEVER HAPPEN
+			} else {
+				rotation=2;
+			}
+		} else {
+			if (dx == -1) {
+				rotation=-3;
+			} else if (dx == 0) {
+				rotation=4;
+			} else {
+				rotation=3;
+			}
+		}
+		rotation*=p.QUARTER_PI;
+		
+		p.pushMatrix();
+		p.pushStyle();
+		p.translate(x+8, y+8);
+		p.rotate(rotation);
+		p.imageMode(p.CENTER);
+		p.image(SpriteMaster.instance(p).enemy, 0, 0);
+		p.popStyle();
+		p.popMatrix();
 		if (Globals.DRAW_HP || drawHp) {
 			drawHp = false;
-			p.rect(x, y + hpHeight, ENEMY_SIZE, ENEMY_SIZE - hpHeight);
+			//p.rect(x, y + hpHeight, ENEMY_SIZE, ENEMY_SIZE - hpHeight);
 			
 			// draw health bar outline
 			int hpBarFill = (int) ((ENEMY_SIZE - 2) * curHp / maxHp);
@@ -161,7 +200,6 @@ public class Enemy {
 			p.fill(0xFFC00000);
 			p.rect(x + 1, y + 1, hpBarFill, hpHeight - 2);
 		} else {
-			p.rect(x, y, ENEMY_SIZE, ENEMY_SIZE);
 		}
 	}
 }

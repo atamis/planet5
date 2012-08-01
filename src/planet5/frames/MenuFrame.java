@@ -48,16 +48,15 @@ public class MenuFrame extends Frame {
 	@Override
 	public void buttonClicked(String command) {
 		if (command.equals("Play Campaign")) {
-			Main.campaignFrame.game.restartGame();
-			Main.campaignFrame.update();
-			p.transitionFrame(Main.campaignFrame, Main.fullFadeTransition);
+			p.transitionFrame(Main.levelSelectFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("Play Survival")) {
-			
+			Main.survivalFrame.game.restartGame();
+			Main.survivalFrame.update();
+			p.transitionFrame(Main.survivalFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("Settings")) {
-			//Main.settingsFrame.phase = 0;
-			//p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
+			p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("About")) {
 			p.transitionFrame(Main.aboutFrame, Main.fullFadeTransition);

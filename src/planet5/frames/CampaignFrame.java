@@ -9,8 +9,8 @@ import planet5.game.Game;
 import processing.core.PVector;
 
 public class CampaignFrame extends GameFrame {
-	public CampaignFrame(Applet parent) {
-		super(parent, 200, 200);
+	public CampaignFrame(Applet parent, int w, int h) {
+		super(parent, w, h);
 		//map.enemies.add(new Enemy(new PVector(20, 20)));
 	}
 }

@@ -16,7 +16,7 @@ public class BuildingStats {
 	public static int[] costs = { 0, 20, 30, 100, 500, 200, 500 };
 	public static int[] rows = { 3, 1, 1, 1, 2, 1, 2 };
 	public static int[] cols = { 3, 1, 1, 1, 2, 1, 2 };
-	public static int[] light = { 256, 64, 64, 64, 256, 96, 64 };
+	public static int[] light = { 256, 256, 64, 64, 256, 96, 64 };
 	private static float[] healths = { 1500, 100, 100, 100, 500, 1000, 350 };
 	private static float[] cap = { 4800, 0, 0, 1000, 0, 0, 0 };
 	private static float[] gen = { 0.08f, 0, 0.08f, 0, 0, 0, 0 };

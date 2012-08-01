@@ -16,6 +16,7 @@ import planet5.config.BuildingStats;
 import planet5.config.EnemyLevel;
 import planet5.config.EnemyStats;
 import planet5.config.Fonts;
+import planet5.config.Globals;
 import planet5.config.UpgradeStats;
 import planet5.framework.Applet;
 import planet5.game.gen.CaveGenerator;
@@ -32,8 +33,8 @@ public class Game {
 	private static final int MILLIS_PER_MINUTE = 416;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
 	private static final int MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
-	//private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
-	private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
+	private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
+	//private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
 	public static int gameSpeedMultiplier = 1;
 
 	public boolean paused = false, help = false;
@@ -121,7 +122,7 @@ public class Game {
 		pauseButton = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64, 0, 63,
 				23), "Pause");
 		helpButton = new GameButton(this, p, new Rectangle(w - 63 - 64, 0,
-				63, 23), "Help", Fonts.consolas16);
+				63, 23), "Mute", Fonts.consolas16);
 		quitButton = new ConfirmButton(this, p,
 				new Rectangle(w - 63, 0, 63, 23), "Quit");
 		playAgainButton = new GameButton(this, p, new Rectangle((w - 300) / 2,
@@ -132,7 +133,7 @@ public class Game {
 	}
 
 	public void restartGame() {
-		int width = 200, height = 200;
+		int width = tW, height = tH;
 
 		// map
 		tileWidth = width;
@@ -647,6 +648,7 @@ public class Game {
 		
 		if(enemies.size()==0)return;
 		long t=(System.nanoTime()-l);
+		if (Globals.DEBUG&&p.frameCount%20==0)
 		p.println(" tot=" + t + " count=" + enemies.size() + " avg=" + (t/enemies.size()));
 		// run1: avg=30-60k
 		// final run: avg=
@@ -986,12 +988,11 @@ public class Game {
 
 		// update building placement
 		if (intKey >= 1 && intKey <= BuildingStats.rows.length - 1) {
+			selectedBuilding = null;
 			if (selectedBuilding != null && selectedBuilding.type == 4) {
 				if (intKey == 6) {
-					selectedBuilding = null;
 				} else {
 					selectedBuilding.current_upgrade = intKey - 1;
-					selectedBuilding = null;
 				}
 			} else if (placingBuilding == intKey) {
 				// placingBuilding = -1;
@@ -1002,6 +1003,7 @@ public class Game {
 			placingBuilding = -1;
 			selectedBuilding = null;
 		} else if (keyCode == KeyEvent.VK_SPACE) {
+			placingBuilding = -1;
 			selectedBuilding = null;
 		} else if (keyCode == KeyEvent.VK_Q) {
 			if (selectedBuilding != null) {
@@ -1081,6 +1083,8 @@ public class Game {
 	private void cleanup() {
 		pathX = null;
 		pathY = null;
+		computedX=null;
+		computedY=null;
 	}
 	
 	// button event handlers
@@ -1088,9 +1092,13 @@ public class Game {
 		if (command.equals("Quit")) {
 			cleanup();
 			listener.quit();
-		} else if (command.equals("Help")) {
-			help = !help;
-		} else if (command.equals("Play Again")) {
+		} else if (command.equals("Mute")) {
+			helpButton.text="Unmute";
+			song.mute();
+		} else if (command.equals("Unmute")) {
+			helpButton.text="Mute";
+			song.unmute();
+		}else if (command.equals("Play Again")) {
 			restartGame();
 		}else if (command.equals("Pause")) {
 			unselectButtons();
