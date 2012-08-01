@@ -27,12 +27,14 @@ Make enemies draw sprites, make them rotate.
 
 [done] Use appropriate font size for title (consolas96).
 
-Make mortar projectiles rotate correctly.
+[irrelevant] Make mortar projectiles rotate correctly.
 
-Make the number of monsters attacking depend on the enemy spawn level.
+[done] Make the number of monsters attacking depend on the enemy spawn level.
 
-Balance enemy level.
+[done] Balance enemy level.
 
 [done] Add blood splats as particles.
 
 Mute button
+
+Make main building remove walls.

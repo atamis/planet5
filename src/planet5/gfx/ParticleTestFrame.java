@@ -19,8 +19,8 @@ public class ParticleTestFrame extends Frame {
 	public void update() {
 		int millis = (int) (p.millis() - last_updated);
 
-		//if (p.frameCount % 4 == 0)
-			ps.bloodBang(p.random(p.width), p.random(p.height));
+		if (p.frameCount % 4 == 0)
+			ps.explosion(p.random(p.width), p.random(p.height));
 
 		ps.update(millis);
 		last_updated = p.millis();

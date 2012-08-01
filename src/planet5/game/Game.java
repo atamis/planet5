@@ -457,39 +457,49 @@ public class Game {
 				} else {
 					continue;
 				}
-				
+
 				// find the closest enemy
 				building.target = building.findClosestEnemy(this, range / 32);
-				
-				if (building.target == null || building.target.isDead() || building.target.willBeDead())
+
+				if (building.target == null || building.target.isDead()
+						|| building.target.willBeDead())
 					continue;
-				
+
 				// deal damage, remove dead enemies, consume energy
 				if (building.type == 5) {
-					building.target.takeDamage((int) (elapsedMillis * BuildingStats.getDamage(5)));
-					curEnergy -= elapsedMillis * BuildingStats.getDraw(building.type);
+					building.target
+							.takeDamage((int) (elapsedMillis * BuildingStats
+									.getDamage(5)));
+					curEnergy -= elapsedMillis
+							* BuildingStats.getDraw(building.type);
 				} else if (building.type == 6) {
-					Projectile pr = new Projectile(this, p, building.col * TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE + TILE_SIZE);
+					Projectile pr = new Projectile(this, p, building.col
+							* TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE
+							+ TILE_SIZE);
 					pr.target = building.target;
-					pr.target.takeFutureDamage((int) BuildingStats.getDamage(6));
+					pr.target
+							.takeFutureDamage((int) BuildingStats.getDamage(6));
 					projectiles.add(pr);
+					ps.mortarExhaust(building.col * TILE_SIZE
+							+ (BuildingStats.cols[6] * TILE_SIZE) / 2, building.row
+							* TILE_SIZE + (BuildingStats.rows[6] * TILE_SIZE) / 2);
 					curEnergy -= BuildingStats.getDraw(building.type);
-					//building.target = null;
+					// building.target = null;
 				}
-				
+
 				// set reload time
 				building.lastFireTime = gameMillis;
 			}
 		}
-		
+
 		if (recalc)
 			recalculateField();
-		
+
 		// limit max energy
 		if (curEnergy > maxEnergy)
 			curEnergy = maxEnergy;
 	}
-	
+
 	private void updateProjectiles(int elapsedMillis) {
 		Iterator<Projectile> iterator = projectiles.iterator();
 		while (iterator.hasNext()) {
@@ -503,23 +513,27 @@ public class Game {
 
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		maxEnemyCount = 10000;
-		//maxEnemyCount = 1;
-		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
+		maxEnemyCount = (int) (EnemyStats.getSpawn() * 100);
+		// maxEnemyCount = 20;
+		// double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
-		int trials = 10000-enemies.size();
-		//int trials = 10;
+		int trials = elapsedMillis;
+		// int trials = 10;
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
-			int x = (int) (tileWidth * Math.random());
-			int y = (int) (tileHeight * Math.random());
-			if (path[y][x] != Integer.MAX_VALUE && tiles[y][x].building == null
+			if (p.random(100) < EnemyStats.getSpawn()) {
+				int x = (int) (tileWidth * Math.random());
+				int y = (int) (tileHeight * Math.random());
+				if (!tiles[y][x].wall && tiles[y][x].building == null
 						&& lighting[y][x] <= 128) {
-				int type = (int) (3 * Math.random());
-				Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
-						this, p);
-				enemies.add(enemy);
-				enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].add(enemy);
-				enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x / TILE_SIZE].add(enemy);
+					int type = (int) (3 * Math.random());
+					Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
+							this, p);
+					enemies.add(enemy);
+					enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x
+							/ TILE_SIZE].add(enemy);
+					enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x
+							/ TILE_SIZE].add(enemy);
+				}
 			}
 		}
 		
@@ -562,7 +576,7 @@ public class Game {
 				base.hp -= damage;
 				if (base.hp <= 0) {
 					base.hp = 0;
-					ps.explosion(base.col * TILE_SIZE, base.row * TILE_SIZE);
+					ps.explosion(base.col * TILE_SIZE + (BuildingStats.cols[base.type] * TILE_SIZE)/2, base.row * TILE_SIZE + (BuildingStats.rows[base.type] * TILE_SIZE)/2);
 				}
 				// TODO: static screen
 			}
@@ -590,7 +604,7 @@ public class Game {
 					enemy.attacked = true;
 					target.hp -= damage;
 					if (target.hp <= 0) {
-						ps.explosion(target.col * TILE_SIZE, target.row * TILE_SIZE);
+						ps.explosion(target.col * TILE_SIZE + (BuildingStats.cols[target.type] * TILE_SIZE)/2, target.row * TILE_SIZE + (BuildingStats.rows[target.type] * TILE_SIZE)/2);
 					}
 				}
 			}

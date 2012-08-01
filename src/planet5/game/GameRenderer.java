@@ -108,6 +108,7 @@ public final class GameRenderer {
 				"MHealth: " + EnemyStats.getHP(0),
 				"MDamage: " + EnemyStats.getDamage(0),
 				"MSpeed: " + EnemyStats.getSpeed(0),
+				"MaxM: " + EnemyStats.getSpawn() * 100,
 				"#Monsters: " + game.enemies.size(),
 				"Particles: " + game.ps.particles.size()};
 

@@ -17,9 +17,9 @@ public final class EnemyStats {
 	private static int[] spawn = {3, 2, 1};
 	
 	public static float hp_delta = 0.001f;
-	public static float damage_delta = 0.001f;
-	public static float speed_delta = 0.0001f;
-	public static float spawn_delta = 0.0001f;
+	public static float damage_delta = 0.0001f;
+	public static float speed_delta = 0.00001f;
+	public static float spawn_delta = 0.00001f;
 	
 	public static int getHP(int i) {
 		return (int) (hp[i] + hp_delta * EnemyLevel.level());
@@ -37,4 +37,7 @@ public final class EnemyStats {
 		return (int) (spawn[i] + spawn_delta * EnemyLevel.level());
 	}
 
+	public static float getSpawn() {
+		return 1 + spawn_delta * EnemyLevel.level();
+	}
 }
