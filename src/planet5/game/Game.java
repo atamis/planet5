@@ -499,23 +499,27 @@ public class Game {
 
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		maxEnemyCount = 100;
-		//maxEnemyCount = 20;
-		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
+		maxEnemyCount = (int) (EnemyStats.getSpawn() * 100);
+		// maxEnemyCount = 20;
+		// double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
-		int trials = 100-enemies.size();
-		//int trials = 10;
+		int trials = elapsedMillis;
+		// int trials = 10;
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
-			int x = (int) (tileWidth * Math.random());
-			int y = (int) (tileHeight * Math.random());
-			if (!tiles[y][x].wall && tiles[y][x].building == null
+			if (p.random(100) < EnemyStats.getSpawn()) {
+				int x = (int) (tileWidth * Math.random());
+				int y = (int) (tileHeight * Math.random());
+				if (!tiles[y][x].wall && tiles[y][x].building == null
 						&& lighting[y][x] <= 128) {
-				int type = (int) (3 * Math.random());
-				Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
-						this, p);
-				enemies.add(enemy);
-				enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].add(enemy);
-				enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x / TILE_SIZE].add(enemy);
+					int type = (int) (3 * Math.random());
+					Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
+							this, p);
+					enemies.add(enemy);
+					enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x
+							/ TILE_SIZE].add(enemy);
+					enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x
+							/ TILE_SIZE].add(enemy);
+				}
 			}
 		}
 		
