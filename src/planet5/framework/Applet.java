@@ -116,4 +116,14 @@ public class Applet extends PApplet implements MouseWheelListener {
 			currentFrame.keyTyped();
 		}
 	}
+
+	public void pushS() {
+		pushMatrix();
+		pushStyle();
+	}
+	
+	public void popS() {
+		popStyle();
+		popMatrix();
+	}
 }
