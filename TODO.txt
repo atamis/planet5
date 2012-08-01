@@ -37,4 +37,4 @@ Make enemies draw sprites, make them rotate.
 
 Mute button
 
-Make main building remove walls.
+[done] Make main building remove walls.
