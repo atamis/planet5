@@ -52,7 +52,6 @@ public class Main extends Applet {
 		survivalFrame = new SurvivalFrame(this);
 		test_frame = new ParticleTestFrame(this);
 
-		// TODO: change back to menuFrame
 		setFrame(menuFrame);
 	}
 

@@ -33,8 +33,8 @@ public class Game {
 	private static final int MILLIS_PER_MINUTE = 416;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
 	private static final int MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
-	private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
-	//private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
+	//private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
+	private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
 	public static int gameSpeedMultiplier = 1;
 
 	public boolean paused = false, help = false;
@@ -333,6 +333,9 @@ public class Game {
 	}
 
 	public void update() {
+		if (!p.focused)
+			rightButtonPressed = false;
+		
 		// update buttons
 		helpButton.update(p.focused);
 		pauseButton.update(p.focused);
@@ -473,6 +476,9 @@ public class Game {
 									.getDamage(5)));
 					curEnergy -= elapsedMillis
 							* BuildingStats.getDraw(building.type);
+					if (building.target.isDead()) {
+						//ps.bloodBang(building.target.bounds.x, building.target.bounds.y);
+					}
 				} else if (building.type == 6) {
 					Projectile pr = new Projectile(this, p, building.col
 							* TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE
@@ -520,6 +526,7 @@ public class Game {
 
 		int trials = elapsedMillis;
 		// int trials = 10;
+		//maxEnemyCount=10000;trials=10000-enemies.size();
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
 			if (p.random(100) < EnemyStats.getSpawn()) {
 				int x = (int) (tileWidth * Math.random());
@@ -561,8 +568,11 @@ public class Game {
 			// remove dead enemies
 			if (enemy.isDead()) {
 				enemyIterator.remove();
+				ps.bloodBang(enemy.bounds.x+8, enemy.bounds.y+8);
+				enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].remove(enemy);
+				enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x / TILE_SIZE].remove(enemy);
 				PVector loc = enemy.screenLoc();
-				ps.bloodBang(enemy.bounds.x, enemy.bounds.y);
+				//ps.bloodBang(enemy.bounds.x, enemy.bounds.y);
 				continue;
 			}
 			
@@ -655,8 +665,6 @@ public class Game {
 	}
 
 	private void recalculateLighting() {
-		// TODO: walls block light?
-
 		// global lighting based on time of day
 		for (int i = 0; i < tileHeight; i++) {
 			Arrays.fill(lighting[i], hourToLighting[hour]);
@@ -951,9 +959,6 @@ public class Game {
 		}
 
 		// calculate connections
-		// TODO: power sources must lead to base AND if multiple, connect to
-		// closest
-		// TODO: buildings connect to closest one
 		for (Building building : buildings) {
 
 		}
@@ -988,7 +993,6 @@ public class Game {
 
 		// update building placement
 		if (intKey >= 1 && intKey <= BuildingStats.rows.length - 1) {
-			selectedBuilding = null;
 			if (selectedBuilding != null && selectedBuilding.type == 4) {
 				if (intKey == 6) {
 				} else {
@@ -999,6 +1003,7 @@ public class Game {
 			} else {
 				placingBuilding = intKey;
 			}
+			selectedBuilding = null;
 		} else if (keyCode == KeyEvent.VK_ESCAPE) {
 			placingBuilding = -1;
 			selectedBuilding = null;
@@ -1016,6 +1021,7 @@ public class Game {
 	public void keyReleased(int keyCode) {}
 
 	// mouse event handlers
+	public boolean rightButtonPressed = false;
 	public void mousePressed(int x, int y, int mouseButton) {
 		helpButton.mousePressed(x, y, mouseButton);
 		pauseButton.mousePressed(x, y, mouseButton);
@@ -1023,6 +1029,10 @@ public class Game {
 		playAgainButton.mousePressed(x, y, mouseButton);
 		for (int i = 0; i < speedButtons.length; i++)
 			speedButtons[i].mousePressed(x, y, mouseButton);
+
+		if (mouseButton == MouseEvent.BUTTON3) {
+			rightButtonPressed = true;
+		}
 		
 		if (mouseButton != MouseEvent.BUTTON1)
 			return;
@@ -1072,6 +1082,10 @@ public class Game {
 	}
 
 	public void mouseReleased(int x, int y, int mouseButton) {
+		if (mouseButton == MouseEvent.BUTTON3) {
+			rightButtonPressed = false;
+		}
+		
 		helpButton.mouseReleased(x, y, mouseButton);
 		pauseButton.mouseReleased(x, y, mouseButton);
 		quitButton.mouseReleased(x, y, mouseButton);

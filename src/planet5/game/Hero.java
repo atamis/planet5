@@ -1,10 +1,12 @@
 package planet5.game;
 
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 
 import planet5.config.SpriteMaster;
 import planet5.framework.Applet;
 import processing.core.PApplet;
+import processing.core.PVector;
 
 public class Hero {
 	// copied constants
@@ -107,8 +109,17 @@ public class Hero {
 		} while (moved);
 		
 		// Rotate.
-		rad = PApplet.atan2((x - map.mapX) - p.mouseX + 45, (y - map.mapY) - p.mouseY + 45);
-				
+		rad = PApplet.atan2((x+16 - map.mapX) - p.mouseX, (y+16 - map.mapY) - p.mouseY + Game.BAR_HEIGHT);
+		
+		if (map.rightButtonPressed) {
+			if(map.gameMillis - last > 1000) {
+				last=map.gameMillis;
+				Projectile pr = new Projectile(map, p, x+16, y+16);
+				pr.startpt=new Point(pr.bounds.x, pr.bounds.y);
+				pr.endpt=new Point(p.mouseX+map.mapX,p.mouseY+map.mapY-Game.BAR_HEIGHT);
+				map.projectiles.add(pr);
+			}
+		}
 	}
 
 	private int sign(int num) {
@@ -126,16 +137,17 @@ public class Hero {
 		int right = (x + SIZE - 1) / TILE_SIZE;
 		int down = (y + SIZE - 1) / TILE_SIZE;
 		
-		// TODO: can optimize more b/c max 9 squares have to be checked, not 16
 		int loopTop = Math.max(0, up - 1);
 		int loopLeft = Math.max(0, left - 1);
-		for (int i = loopLeft; i <= right; i++)
-			for (int j = loopTop; j <= down; j++)
+		int loopRight = Math.min(map.tileWidth - 1, right);
+		int loopDown = Math.min(map.tileHeight - 1, down);
+		for (int i = loopLeft; i <= loopRight; i++)
+			for (int j = loopTop; j <= loopDown; j++)
 				for (Enemy enemy : map.enemyArrayCorner[j][i])
 					if (enemy.bounds.intersects(x, y, SIZE, SIZE))
 						return true;
 		
-		if (x < 0 || y < 0 || right >= map.tileWidth || down >= map.tileHeight) {
+		if (x < 0 || y < 0 || x >= 32*map.tileWidth || y >= 32*map.tileHeight) {
 			return true;
 		}
 		
@@ -194,4 +206,6 @@ public class Hero {
 		else if (p.keyCode == KeyEvent.VK_D)
 			mostRecentAd = SPEED;
 	}
+
+	int last=0;
 }

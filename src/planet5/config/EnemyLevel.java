@@ -4,7 +4,6 @@ public class EnemyLevel {
 	private static float level = 0;
 	
 	public static float level() {
-		// TODO: reset
 		// return level;
 		return level;
 	}

@@ -77,7 +77,6 @@ public class VoronoiPerlinNoiseGenerator implements Generator {
 			}
 		}
 
-		// TODO Auto-generated method stub
 		game.tiles = tiles;
 	}
 

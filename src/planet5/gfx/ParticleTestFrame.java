@@ -12,8 +12,6 @@ public class ParticleTestFrame extends Frame {
 		super(p);
 		ps = new ParticleSystem();
 		last_updated = 0;
-		
-		// TODO Auto-generated constructor stub
 	}
 
 	public void update() {

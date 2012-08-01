@@ -161,7 +161,7 @@ public class Building {
 		}
 		if (selectedTime != -1) {
 			int alpha = (selectedTime / 2) % 511;
-			if (alpha > 255)// TODO: fine tuning
+			if (alpha > 255)
 				alpha = 511 - alpha;
 			p.fill(p.color(32, 128, 0, alpha / 2 + 128));
 			p.rect(x, y, width * TILE_SIZE - 1, height * TILE_SIZE - 1);
@@ -174,7 +174,6 @@ public class Building {
 		// text
 		p.textAlign(p.LEFT, p.TOP);
 		p.fill(0);
-		p.textSize(16);
 		// p.text("" + type, x + 8, y + 8);
 		if (buildTime != -1) {
 			p.noStroke();
@@ -191,8 +190,10 @@ public class Building {
 		// if building is not powered draw the sign
 		// otherwise draw the connection
 		if (!powered) {
-			// TODO: optimize
-			p.text("!", x + 8, y + 8);
+			p.fill(255, 255, 0);
+			p.textFont(Fonts.consolas32);
+			p.textAlign(p.LEFT, p.TOP);
+			p.text("!", x, y);
 		} else if (powerSource != null) {
 
 		}
@@ -203,7 +204,6 @@ public class Building {
 		searchResult = null;
 		
 		// this is a close imitation of breadth-first search
-		// TODO: can always optimize more (with a more full breadth search, or larger enemy array)
 		for (int i = 1; i <= range; i++) {
 			// values
 			int top = row - i;
@@ -252,7 +252,6 @@ public class Building {
 	}
 
 	private int distToEnemy(Enemy enemy) {
-		// TODO: use all four squares if needed
 		int x1 = col * TILE_SIZE + width * TILE_SIZE / 2;
 		int y1 = row * TILE_SIZE + height * TILE_SIZE / 2;
 		int x2 = enemy.bounds.x + enemy.ENEMY_SIZE / 2;
