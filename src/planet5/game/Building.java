@@ -27,6 +27,7 @@ public class Building {
 	float maxHp;
 	int lastFireTime = 0;
 	float rad;
+	//public int[] savedX, savedY;
 
 	public int buildTime, buildHealth;
 	Enemy target = null;

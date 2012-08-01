@@ -24,11 +24,11 @@ public class GameFrame extends Frame implements GameListener {
 	Game game;
 	
 	// constructors and initialization
-	public GameFrame(Applet parent) {
+	public GameFrame(Applet parent, int width, int height) {
 		super(parent);
 		
 		GameRenderer.init(p);
-		game = new Game(this, p);
+		game = new Game(this, p, width, height);
 	}
 
 	// updating methods

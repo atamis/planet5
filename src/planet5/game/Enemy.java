@@ -13,7 +13,9 @@ public class Enemy {
 	public static final int TILE_SIZE = Globals.TILE_SIZE;
 	public static final int ENEMY_SIZE = 16;
 
-	private int kiloX, kiloY;
+	private int pXb, pYb, pXc, pYc;
+	private int remainder, left;
+	private int xDirection, yDirection;
 	public Point center;
 	public boolean attacked = false;
 	public int type;
@@ -51,11 +53,14 @@ public class Enemy {
 	}
 
 	public Enemy(int x, int y, int type, Game map, PApplet p) {
-		bounds = new Rectangle(x + (TILE_SIZE - ENEMY_SIZE) / 2, y
-				+ (TILE_SIZE - ENEMY_SIZE) / 2, ENEMY_SIZE, ENEMY_SIZE);
-		this.kiloX = x * 1000;
-		this.kiloY = y * 1000;
-		center = new Point(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
+		bounds = new Rectangle(x + 8, y + 8, ENEMY_SIZE, ENEMY_SIZE);
+		pYb=pYc=y/32;
+		pXb=pXc=x/32;
+		this.remainder = 0;
+		left = 0;
+		this.xDirection = 0;
+		this.yDirection=0;
+		center = new Point(x + 16, y + 16);
 		this.map = map;
 		this.p = p;
 		maxHp = EnemyStats.getHP(type);
@@ -73,156 +78,41 @@ public class Enemy {
 	}
 
 	public void move(int elapsedMillis) {
-		int speed = elapsedMillis * this.speed;
-		int xMove = 0;
-		int yMove = 0;
-		map.enemyArrayCenter[center.y / TILE_SIZE][center.x / TILE_SIZE].remove(this);
-		map.enemyArrayCorner[bounds.y / TILE_SIZE][bounds.x / TILE_SIZE].remove(this);
-		
 		// calculate total pixels to move
-		int left = bounds.x / TILE_SIZE;
-		int up = bounds.y / TILE_SIZE;
-		int right = (bounds.x + ENEMY_SIZE) / TILE_SIZE;
-		int down = (bounds.y + ENEMY_SIZE) / TILE_SIZE;
-		int targetX = left;
-		int targetY = up;
-
-		int currentDistance = map.path[up][left];
-		if (left != 0 && map.path[up][left - 1] < currentDistance) {
-			targetX = left - 1;
-		} else if (left != map.tileWidth - 1
-				&& map.path[up][left + 1] < currentDistance) {
-			targetX = left + 1;
+		remainder += elapsedMillis * this.speed;
+		int pixelsToMove = remainder / 1000;
+		remainder -= pixelsToMove * 1000;
+		
+		// move that amount of pixels
+		while (pixelsToMove > 0) {
+			--pixelsToMove;
+			int dx = map.computedX[bounds.y][bounds.x];
+			int dy = map.computedY[bounds.y][bounds.x];
+			bounds.x += dx;
+			bounds.y += dy;
 		}
 
-		if (up != 0 && map.path[up - 1][left] < currentDistance) {
-			targetY = up - 1;
-		} else if (up != map.tileHeight - 1
-				&& map.path[up + 1][left] < currentDistance) {
-			targetY = up + 1;
+		// update center
+		center.setLocation(bounds.x + 8, bounds.y + 8);
+
+		// update array lists if needed
+		int pXb2 = bounds.x / TILE_SIZE;
+		int pYb2 = bounds.y / TILE_SIZE;
+		if (pXb != pXb2 || pYb != pYb2) {
+			map.enemyArrayCorner[pYb][pXb].remove(this);
+			map.enemyArrayCorner[pYb2][pXb2].add(this);
+			pXb=pXb2;
+			pYb=pYb2;
 		}
-
-		if (left != right)
-			if (targetX == right)
-				xMove = speed;
-			else
-				xMove = -speed;
-		else if (targetX == left + 1)
-			xMove = speed;
-		else if (targetX == left - 1)
-			xMove = -speed;
-
-		if (up != down)
-			if (targetY == down)
-				yMove = speed;
-			else
-				yMove = -speed;
-		else if (targetY == up + 1)
-			yMove = speed;
-		else if (targetY == up - 1)
-			yMove = -speed;
-
-		// find the sign of move
-		int move = this.speed;
-		int xSign = move * sign(xMove);
-		int ySign = move * sign(yMove);
-
-		// take absolute value of move
-		xMove = Math.abs(xMove);
-		yMove = Math.abs(yMove);
-
-		// move pixel by pixel
-		int newLeft, newRight, newUp, newDown, oldX, oldY;
-		while (true) {
-			boolean moved = false;
-
-			oldX = bounds.x;
-			oldY = bounds.y;
-			newLeft = left;
-			newRight = right;
-			newUp = up;
-			newDown = down;
-
-			if (xMove > 0) {
-				xMove -= move;
-				kiloX += xSign;
-				bounds.x = kiloX / 1000;
-
-				newLeft = bounds.x / TILE_SIZE;
-				newRight = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
-
-				if ((left != newLeft || right != newRight)
-						&& checkTileCollision(newLeft, up, newRight, down)) {
-					kiloX -= xSign;
-					bounds.x = oldX;
-				} else if (oldX != bounds.x && checkHeroCollision()) {
-					kiloX -= xSign;
-					bounds.x = oldX;
-				} else {
-					moved = true;
-					left = newLeft;
-					right = newRight;
-				}
-			}
-
-			if (yMove > 0) {
-				kiloY += ySign;
-				yMove -= move;
-				bounds.y = kiloY / 1000;
-
-				newUp = bounds.y / TILE_SIZE;
-				newDown = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
-
-				if ((up != newUp || down != newDown)
-						&& checkTileCollision(left, newUp, right, newDown)) {
-					kiloY -= ySign;
-					bounds.y = oldY;
-				} else if (oldY != bounds.y && checkHeroCollision()) {
-					kiloY -= ySign;
-					bounds.y = oldY;
-				} else {
-					moved = true;
-				}
-			}
-
-			if (!moved)
-				break;
-
-			left = bounds.x / TILE_SIZE;
-			right = (bounds.x + ENEMY_SIZE - 1) / TILE_SIZE;
-			up = bounds.y / TILE_SIZE;
-			down = (bounds.y + ENEMY_SIZE - 1) / TILE_SIZE;
+		
+		int pXc2 = center.x / TILE_SIZE;
+		int pYc2 = center.y / TILE_SIZE;
+		if (pXc != pXc2 || pYc != pYc2) {
+			map.enemyArrayCenter[pYc][pXc].remove(this);
+			map.enemyArrayCenter[pYc2][pXc2].add(this);
+			pXc=pXc2;
+			pYc=pYc2;
 		}
-
-		center.setLocation(this.bounds.x + ENEMY_SIZE / 2, this.bounds.y
-				+ ENEMY_SIZE / 2);
-		map.enemyArrayCenter[center.y / TILE_SIZE][center.x / TILE_SIZE].add(this);
-		map.enemyArrayCorner[bounds.y / TILE_SIZE][bounds.x / TILE_SIZE].add(this);
-	}
-
-	private boolean checkTileCollision(int left, int up, int right, int down) {
-		if (bounds.x < 0 || bounds.y < 0 || right >= map.tileWidth
-				|| down >= map.tileHeight) {
-			return true;
-		}
-
-		if (map.tiles[up][left].wall || map.tiles[up][right].wall
-				|| map.tiles[down][left].wall || map.tiles[down][right].wall) {
-			return true;
-		}
-
-		if (map.tiles[up][left].building != null
-				|| map.tiles[up][right].building != null
-				|| map.tiles[down][left].building != null
-				|| map.tiles[down][right].building != null) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean checkHeroCollision() {
-		return bounds.intersects(map.hero.x, map.hero.y, Hero.SIZE, Hero.SIZE);
 	}
 
 	public PVector screenLoc() {

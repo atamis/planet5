@@ -33,7 +33,7 @@ public class Game {
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
 	private static final int MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 	//private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
-	private static final int GAME_START_TIME = 39 * MILLIS_PER_HOUR/2;
+	private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
 	public static int gameSpeedMultiplier = 1;
 
 	public boolean paused = false, help = false;
@@ -57,7 +57,6 @@ public class Game {
 	public Tile[][] tiles;
 	public int[][] lighting;
 	public boolean[][] field;
-	public boolean[][] covered;
 	public final int[] hourToLighting = { 0, 0, 0, 0, 32, 64, 96, 128, 160,
 			192, 224, 255, 255, 255, 255, 255, 255, 224, 192, 160, 128, 96, 64,
 			32 };
@@ -65,6 +64,8 @@ public class Game {
 			0.0004, 0.0003, 0.0002, 0.0001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0.0001, 0.0002, 0.0003, 0.0004 };
 	public int[][] path;
+	public byte[][] pathX, pathY;
+	public byte[][] computedX, computedY;
 	public int tileWidth, tileHeight;
 	public int mapX = 0, mapY = 0;
 	public int lose = -1, win = -1;
@@ -93,9 +94,13 @@ public class Game {
 	private Applet p;
 	private long lastUpdateTime;
 	AudioPlayer song;
+	int tW, tH;
 
 	// constructors
-	public Game(GameListener listener, Applet p) {
+	public Game(GameListener listener, Applet p, int wi, int he) {
+		tW=wi;
+		tH=he;
+		
 		this.listener = listener;
 		this.p = p;
 		ps = new ParticleSystem();
@@ -123,25 +128,7 @@ public class Game {
 				425, 300, 49), "Play Again", Fonts.consolas32);
 		playAgainButton.visible = false;
 
-		restartGame();
-
-		/*
-		 * // TODO: better placement for (int i = 0; hero == null && i <
-		 * tileHeight; i++) { for (int j = 0; hero == null && j < tileWidth;
-		 * j++) { if (!tiles[i][j].wall) { hero = new Hero(p, this, j *
-		 * TILE_SIZE, i * TILE_SIZE); } } }
-		 * 
-		 * for (int i = 0; buildings.size() == 0 && i < tileHeight; i++) { for
-		 * (int j = 0; buildings.size() == 0 && j < tileWidth; j++) { boolean
-		 * good = true; for (int k = 0; good && k < BuildingStats.cols[0]; k++)
-		 * { for (int m = 0; good && m < BuildingStats.rows[0]; m++) { if
-		 * (tiles[i + m][j + k].wall || (j + k == hero.x / TILE_SIZE && i + m ==
-		 * hero.y / TILE_SIZE)) { good = false; } } } if (good) { base = new
-		 * Building(0, j, i, gameMillis); buildings.add(base); for (int k = 0; k
-		 * < BuildingStats.cols[0]; k++) { for (int m = 0; m <
-		 * BuildingStats.rows[0]; m++) { tiles[i + m][j + k].building = base; }
-		 * } } } }//
-		 */
+		//restartGame();
 	}
 
 	public void restartGame() {
@@ -165,16 +152,7 @@ public class Game {
 		
 		lighting = new int[tileHeight][tileWidth];
 		field = new boolean[tileHeight][tileWidth];
-		covered = new boolean[tileHeight][tileWidth];
 		(new CaveGenerator()).gen(p, this, width, height);
-		
-		// update covered array
-		for (int i = 0; i < tileHeight; i++)
-			for (int j = 0; j < tileWidth; j++)
-				covered[i][j] = tiles[i][j].wall;
-		for (int i = 0; i < base.height; i++)
-			for (int j = 0; j < base.width; j++)
-				covered[base.row + i][base.col + j] = true;
 		
 		calculatePathing();
 		recalculateField();
@@ -197,43 +175,6 @@ public class Game {
 		unselectButtons();
 		gameSpeedMultiplier = 1;
 		speedButtons[4].selected = true;
-		
-		// DEBUGGING
-		placingBuilding=0;
-		for(int k=-5;k<=5;k++){
-			Building b=new Building( 1, hero.x/32 + k, hero.y/32 - 5,GAME_START_TIME);
-			buildings.add(b);
-			for (int i = 0; i < b.height; i++) {
-				for (int j = 0; j < b.width; j++) {
-					tiles[b.row + i][b.col + j].building = b;
-				}
-			}
-
-			 b=new Building(1, hero.x/32 + k, hero.y/32 + 5, GAME_START_TIME);
-			buildings.add(b);
-			for (int i = 0; i < b.height; i++) {
-				for (int j = 0; j < b.width; j++) {
-					tiles[b.row + i][b.col + j].building = b;
-				}
-			}
-
-			 b=new Building(1, hero.x/32 + 5, hero.y/32+k, GAME_START_TIME);
-			buildings.add(b);
-			for (int i = 0; i < b.height; i++) {
-				for (int j = 0; j < b.width; j++) {
-					tiles[b.row + i][b.col + j].building = b;
-				}
-			}
-
-			 b=new Building( 1,hero.x /32- 5, hero.y/32+k, GAME_START_TIME);
-			buildings.add(b);
-			for (int i = 0; i < b.height; i++) {
-				for (int j = 0; j < b.width; j++) {
-					tiles[b.row + i][b.col + j].building = b;
-				}
-			}
-		}
-		
 		recalculateField();
 		
 		// game time
@@ -244,22 +185,91 @@ public class Game {
 		lastUpdateTime = System.currentTimeMillis();
 		ps.particles.clear();
 	}
-
+	
 	public void calculatePathing() {
-		path = new int[tileHeight][tileWidth];
-		for (int i = 0; i < path.length; i++) {
-			Arrays.fill(path[i], Integer.MAX_VALUE);
+		
+		aStar();
+		
+		pathX = new byte[tileHeight][tileWidth];
+		pathY = new byte[tileHeight][tileWidth];
+		computedX = new byte[32*tileHeight][32*tileWidth];
+		computedY = new byte[32*tileHeight][32*tileWidth];
+		
+		// calculate path for every pixel that the enemy can go through
+		// enemies can only start at where they spawn, in the center of a tile
+		for (int col = 0; col < tileWidth; col++) {
+			for (int row = 0; row < tileHeight; row++) {
+				// only simulate spawned enemies at valid tiles
+				if (path[row][col] != Integer.MAX_VALUE && path[row][col] != 0) {
+					// find the next tile to move to
+					byte xOffset = 0;
+					byte yOffset = 0;
+					
+					// try moving up, left, right, and down
+					if (row != 0 && path[row-1][col] < path[row][col])
+						yOffset = -1;
+					if (col != 0 && path[row][col-1] < path[row][col])
+						xOffset = -1;
+					if (col != tileHeight-1 && path[row][col+1] < path[row][col])
+						xOffset = 1;
+					if (row != tileWidth-1 && path[row+1][col] < path[row][col])
+						yOffset = 1;
+
+					// if moving diagonally doesn't help, just move horizontally
+					if (path[row + yOffset][col + xOffset] >= path[row][col])
+						yOffset = 0;
+					
+					// assign the value
+					pathX[row][col] = xOffset;
+					pathY[row][col] = yOffset;
+					
+					// assign values in computed array to go to the next one
+					// note: it's offset by -8
+					// something's wrong with the offset b/c its four 8x8s
+					int r = 32*row + 8;
+					int c = 32*col + 8;
+					for (int i = 0; i < 32; i++) {
+						if (r < 0 || c < 0)
+							break;
+						
+						computedX[r][c] = xOffset;
+						computedY[r][c] = yOffset;
+						r += yOffset;
+						c += xOffset;
+					}
+					
+					// if the next one isn't set yet then set it
+					if (r >= 0 && c >= 0) {
+						if (computedX[r][c] == 0 && computedY[r][c] == 0) {
+							computedX[r][c] = xOffset;
+							computedY[r][c] = yOffset;
+						}
+					}
+				}
+			}
 		}
+	}
+
+	private void aStar() {
+		path = new int[tileHeight][tileWidth];
+		
+		// clear path with max value integers
+		for (int i = 0; i < path.length; i++)
+			Arrays.fill(path[i], Integer.MAX_VALUE);
 
 		ArrayList<Point> stack = new ArrayList<Point>();
 
-		for (int i = 0; i < BuildingStats.cols[0]; i++) {
-			for (int j = 0; j < BuildingStats.rows[0]; j++) {
+		// add points for the outline of the base
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
 				path[base.row + j][base.col + i] = 0;
+				if (i == 1 && j == 1)
+					continue;
 				stack.add(new Point(base.col + i, base.row + j));
 			}
 		}
 
+		// perform astar on the stack
 		int dist = 1;
 		ArrayList<Point> nextStack = new ArrayList<Point>();
 		while (stack.size() != 0) {
@@ -293,7 +303,7 @@ public class Game {
 			}
 		}
 	}
-
+	
 	// game ending methods
 	public void lose() {
 		lose = 0;
@@ -347,13 +357,17 @@ public class Game {
 		if (!paused()) {
 			final int TICK_MILLIS = 16;
 			remainderMillis += elapsedMillis;
+			
+			// spawn enemies only once because it takes a while
+			int times = (remainderMillis + TICK_MILLIS) / TICK_MILLIS;
+			spawnEnemies(times * TICK_MILLIS);
+			
 			while (remainderMillis >= 0) {
 				remainderMillis -= TICK_MILLIS;
 				ps.update(TICK_MILLIS);
 				updateHero(TICK_MILLIS);
 				updateBuildings(TICK_MILLIS);
 				updateProjectiles(TICK_MILLIS);
-				spawnEnemies(TICK_MILLIS);
 				updateEnemies(TICK_MILLIS); // MAKE THIS FASTER.
 				EnemyLevel.add(TICK_MILLIS);
 			}
@@ -489,16 +503,16 @@ public class Game {
 
 	private void spawnEnemies(int elapsedMillis) {
 		int maxEnemyCount = tileWidth * tileHeight / 900;
-		maxEnemyCount = 100;
-		//maxEnemyCount = 20;
+		maxEnemyCount = 10000;
+		//maxEnemyCount = 1;
 		//double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
-		int trials = 100-enemies.size();
+		int trials = 10000-enemies.size();
 		//int trials = 10;
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
 			int x = (int) (tileWidth * Math.random());
 			int y = (int) (tileHeight * Math.random());
-			if (!tiles[y][x].wall && tiles[y][x].building == null
+			if (path[y][x] != Integer.MAX_VALUE && tiles[y][x].building == null
 						&& lighting[y][x] <= 128) {
 				int type = (int) (3 * Math.random());
 				Enemy enemy = new Enemy(x * TILE_SIZE, y * TILE_SIZE, type,
@@ -555,22 +569,20 @@ public class Game {
 
 			// target buildings next
 			if (!enemy.attacked) {
-				int top = (enemy.bounds.y - 1) / TILE_SIZE;
+				int top = enemy.bounds.y / TILE_SIZE;
 				int left = enemy.bounds.x / TILE_SIZE;
 				int bottom = (enemy.bounds.y + enemy.ENEMY_SIZE) / TILE_SIZE;
 				int right = (enemy.bounds.x + enemy.ENEMY_SIZE) / TILE_SIZE;
 				Building target = null;
 				
-				if (left * TILE_SIZE == enemy.bounds.x && left != 0) {
-					int temp = left - 1;
-					if (tiles[top][temp].building != null)
-						target = tiles[top][temp].building;
-					if (tiles[bottom][temp].building != null)
-						target = tiles[bottom][temp].building;
-				} else if (right * TILE_SIZE == enemy.bounds.x + enemy.ENEMY_SIZE) {
+				if (tiles[top][left].building != null)
+					target = tiles[top][left].building;
+				else if (tiles[bottom][left].building != null)
+					target = tiles[bottom][left].building;
+				else if (right != left) {
 					if (tiles[top][right].building != null)
 						target = tiles[top][right].building;
-					if (tiles[bottom][right].building != null)
+					else if (tiles[bottom][right].building != null)
 						target = tiles[bottom][right].building;
 				}
 				
@@ -610,8 +622,7 @@ public class Game {
 				for (int i = 0; i < building.height; i++)
 					for (int j = 0; j < building.width; j++) {
 						tiles[building.row + i][building.col + j].building = null;
-						covered[base.row + i][base.col + j] = false;
-						// TODO: this shit
+						removeBuilding(building, building.col, building.row, building.width, building.height);
 					}
 				recalculate = true;
 			}
@@ -624,9 +635,7 @@ public class Game {
 		long t=(System.nanoTime()-l);
 		p.println(" tot=" + t + " count=" + enemies.size() + " avg=" + (t/enemies.size()));
 		// run1: avg=30-60k
-		// run2: avg=4k
-		// run3: avg=3k
-		// run4: avg=2.5k
+		// final run: avg=
 	}
 
 	private void recalculateLighting() {
@@ -801,6 +810,7 @@ public class Game {
 				tiles[base.row + i][base.col + j].building = base;
 			}
 		}
+		addBuilding(base, base.col, base.row, base.width, base.height);
 		recalculateField();
 	}
 
@@ -811,6 +821,7 @@ public class Game {
 				tiles[building.row + i][building.col + j].building = building;
 			}
 		}
+		addBuilding(building, building.col, building.row, building.width, building.height);
 		recalculateField();
 	}
 
@@ -829,7 +840,17 @@ public class Game {
 				tiles[building.row + i][building.col + j].building = null;
 			}
 		}
+		removeBuilding(building, building.col, building.row, building.width, building.height);
+		// 
 		recalculateField();
+	}
+	
+	private void addBuilding(Building building, int x, int y, int w, int h) {
+		
+	}
+	
+	private void removeBuilding(Building building, int x, int y, int w, int h) {
+		
 	}
 
 	public void recalculateField() {
@@ -1043,9 +1064,15 @@ public class Game {
 			speedButtons[i].mouseReleased(x, y, mouseButton);
 	}
 
+	private void cleanup() {
+		pathX = null;
+		pathY = null;
+	}
+	
 	// button event handlers
 	public void buttonClicked(String command) {
 		if (command.equals("Quit")) {
+			cleanup();
 			listener.quit();
 		} else if (command.equals("Help")) {
 			help = !help;
