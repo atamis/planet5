@@ -6,7 +6,7 @@ public class EnemyLevel {
 	public static float level() {
 		// TODO: reset
 		// return level;
-		return 0;
+		return level;
 	}
 	
 	public static float add(float x) {
