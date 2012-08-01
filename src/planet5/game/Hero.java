@@ -107,7 +107,7 @@ public class Hero {
 		} while (moved);
 		
 		// Rotate.
-		rad = PApplet.atan2((x - map.mapX) - p.mouseX, (y - map.mapY) - p.mouseY);
+		rad = PApplet.atan2((x - map.mapX) - p.mouseX + 45, (y - map.mapY) - p.mouseY + 45);
 				
 	}
 
