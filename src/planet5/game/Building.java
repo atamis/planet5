@@ -19,8 +19,10 @@ public class Building {
 
 	// public static final int
 
-	int type;
-	int row, col;
+	public int type;
+	public int row;
+
+	public int col;
 	int width, height;
 
 	float hp;
