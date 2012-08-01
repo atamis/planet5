@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 
 import planet5.Main;
 import planet5.config.Fonts;
+import planet5.config.SpriteMaster;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
 
@@ -37,12 +38,16 @@ public class MenuFrame extends Frame {
 		p.textFont(Fonts.consolas96);
 		p.textAlign(p.CENTER);
 		p.text("Planet 5", 0, 120, p.width, 400);
-		
-		// big planet
-		p.fill(16, 32, 64);
-		p.stroke(255, 255, 224);
-		p.strokeWeight(2);
-		p.ellipse(1200, 1100, 1800, 1600);
+				
+		p.pushS();
+		p.noSmooth();
+		p.translate(p.width, p.height);
+		p.imageMode(p.CENTER);
+		p.rotate((float) (p.millis() * 0.0001));
+		p.scale(25);
+		p.image(SpriteMaster.instance(p).planet, 0, 0);
+		p.smooth();
+		p.popS();
 	}
 
 	@Override
