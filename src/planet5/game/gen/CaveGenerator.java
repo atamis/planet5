@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import planet5.config.BuildingStats;
 import planet5.config.Globals;
-import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import planet5.game.Building;
 import planet5.game.Game;
@@ -21,22 +20,23 @@ public class CaveGenerator implements Generator {
 		Tile[][] tiles = new Tile[width][height];
 		// Number of "caverns" and the number of connections each cavern has to
 		// other caverns.
-		int num_points = width/5;
-		int num_connections = p.max(2, width/100);
+		int num_points = width / 5;
+		int num_connections = Applet.max(2, width / 100);
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				float hue = (float) 0.1;
-				float sat = p.map(p.noise(x*0.05f, y * 0.05f), 0, 1, (float) 0.52, 1);
-				float val = p.map(p.noise(x*0.053f + 1, y * 0.053f + 1), 0, 1, (float) 0.25, 1);
+				float sat = Applet.map(p.noise(x * 0.05f, y * 0.05f), 0, 1,
+						(float) 0.52, 1);
+				float val = Applet.map(p.noise(x * 0.053f + 1, y * 0.053f + 1), 0,
+						1, (float) 0.25, 1);
 				tiles[x][y] = new Tile(Color.HSBtoRGB(hue, sat, val), true);
 			}
 		}
 
 		// Get all the points generated
 		ArrayList<PVector> points = new ArrayList<PVector>(num_points);
-		points.add(new PVector(width/2, height/2));
-		
+		points.add(new PVector(width / 2, height / 2));
 
 		for (int i = 0; i < num_points; i++) {
 			int point_x = (int) (p.random(width) - 1);
@@ -72,27 +72,51 @@ public class CaveGenerator implements Generator {
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				float hue = (float) 0.1;
-				float sat = p.map(p.noise(x*0.05f, y * 0.05f), 0, 1, (float) 0.52, 1);
-				float val = p.map(p.noise(x*0.053f + 1, y * 0.053f + 1), 0, 1, (float) 0.25, 1);;
-				if(tiles[x][y].wall)
-					val = p.max(0.0f, val - 0.2f);
+				float sat = Applet.map(p.noise(x * 0.05f, y * 0.05f), 0, 1,
+						(float) 0.52, 1);
+				float val = Applet.map(p.noise(x * 0.053f + 1, y * 0.053f + 1), 0,
+						1, (float) 0.25, 1);
+				;
+				if (tiles[x][y].wall)
+					val = Applet.max(0.0f, val - 0.2f);
 				tiles[x][y].color = Color.HSBtoRGB(hue, sat, val);
 			}
 		}
 
 		game.tiles = tiles;
-		
-		int x = (int) (width/2.0);
-		int y = (int) (height/2.0);
-		
+
+		int x = (int) (width / 2.0);
+		int y = (int) (height / 2.0);
+
 		// Put the hero in the center.
 		game.hero = new Hero(p, game, 0, 0);
 		game.hero.x = x * Globals.TILE_SIZE;
 		game.hero.y = y * Globals.TILE_SIZE;
 		game.hero.kiloX = 1000 * game.hero.x;
 		game.hero.kiloY = 1000 * game.hero.y;
-		
+
 		Building base = new Building(0, x + 1, y, game.gameMillis);
+
+		for (int col = base.col; col < base.col + BuildingStats.cols[base.type]; col++) {
+			for (int row = base.row; row < base.row
+					+ BuildingStats.rows[base.type]; row++) {
+				Tile t = game.tiles[row][col];
+				if (t.wall) {
+					// Because the generator automatically makes wall tiles
+					// darker than non-wall tiles, we have to lighten them
+					// again, so that not is the tile not a wall, but it doesn't
+					// look like a wall either.
+					t.wall = false;
+					Color c = new Color(t.color);
+					float[] hsb = Color.RGBtoHSB(c.getRed(), c.getGreen(),
+							c.getBlue(), null);
+					c = Color.getHSBColor(hsb[0], hsb[1], hsb[2] + 0.2f);
+					t.color = c.getRGB();
+				}
+			}
+
+		}
+
 		game.setBase(base);
 	}
 
