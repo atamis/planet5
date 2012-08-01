@@ -1,5 +1,6 @@
 package planet5;
 
+import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
 import planet5.config.BaseBuildingStats;
 import planet5.config.BuildingStats;
@@ -31,14 +32,19 @@ public class Main extends Applet {
 	public static LevelSelectFrame levelSelectFrame;
 	public static SurvivalFrame survivalFrame;
 	public static ParticleTestFrame test_frame;
+	public static AudioPlayer song;
 
 	@Override
 	public void setup() {
 		// set defaults
+		minim = new Minim(this);
+
+		song = Main.minim.loadFile("Eric_Skiff_-_01_-_A_Night_Of_Dizzy_Spells.mp3");
+		song.loop();
+
 		smooth();
 		size(1024, 768);
 		instance = this;
-		minim = new Minim(this);
 
 		// load configuration
 		Fonts.load(this);

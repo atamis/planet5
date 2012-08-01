@@ -94,7 +94,6 @@ public class Game {
 	// special variables
 	private Applet p;
 	private long lastUpdateTime;
-	AudioPlayer song;
 	int tW, tH;
 
 	// constructors
@@ -105,10 +104,6 @@ public class Game {
 		this.listener = listener;
 		this.p = p;
 		ps = new ParticleSystem();
-		
-		song = Main.minim.loadFile("Eric_Skiff_-_01_-_A_Night_Of_Dizzy_Spells.mp3");
-		song.loop();
-
 		// add buttons
 		int w = p.width;
 
@@ -1094,10 +1089,10 @@ public class Game {
 			listener.quit();
 		} else if (command.equals("Mute")) {
 			helpButton.text="Unmute";
-			song.mute();
+			Main.song.mute();
 		} else if (command.equals("Unmute")) {
 			helpButton.text="Mute";
-			song.unmute();
+			Main.song.unmute();
 		}else if (command.equals("Play Again")) {
 			restartGame();
 		}else if (command.equals("Pause")) {
