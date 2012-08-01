@@ -562,7 +562,7 @@ public class Game {
 				base.hp -= damage;
 				if (base.hp <= 0) {
 					base.hp = 0;
-					ps.explosion(base.col * TILE_SIZE, base.row * TILE_SIZE);
+					ps.explosion(base.col * TILE_SIZE + (BuildingStats.cols[base.type] * TILE_SIZE)/2, base.row * TILE_SIZE + (BuildingStats.rows[base.type] * TILE_SIZE)/2);
 				}
 				// TODO: static screen
 			}
@@ -592,7 +592,7 @@ public class Game {
 					enemy.attacked = true;
 					target.hp -= damage;
 					if (target.hp <= 0) {
-						ps.explosion(target.col * TILE_SIZE, target.row * TILE_SIZE);
+						ps.explosion(target.col * TILE_SIZE + (BuildingStats.cols[target.type] * TILE_SIZE)/2, target.row * TILE_SIZE + (BuildingStats.rows[target.type] * TILE_SIZE)/2);
 					}
 				}
 			}

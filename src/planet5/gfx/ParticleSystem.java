@@ -36,20 +36,23 @@ public class ParticleSystem {
 	public void explosion(float x, float y) {
 		Random r = new Random();
 		float rad = 0;
-		float parts = 30f;
+		float parts = 40f;
 		for (float i = 0; i < parts; i++) {
 			PVector tmp = new PVector((float) Math.cos(rad),
 					(float) Math.sin(rad));
-			tmp.mult(0.5f);
+			
+			tmp.mult((float) (r.nextFloat() * 0.5));
+			
 			particles.add(new Particle(new PVector(x, y), tmp, 500,
 					new Color(0), 2));
 
 			rad += PConstants.TWO_PI / parts;
 		}
-		particles.add(new Particle(new PVector(x, y),
+		mortarExhaust(x, y);
+		/*particles.add(new Particle(new PVector(x, y),
 				new PVector(r.nextFloat() * 0.25f - 0.125f,
 						r.nextFloat() * 0.25f - 0.125f), 200, new Color(
-						0xd0d0d0c8), 30));
+						0xd0d0d0c8), 30));*/
 	}
 
 	public void bloodBang(float x, float y) {
