@@ -533,7 +533,7 @@ public class Game {
 		// maxEnemyCount = 20;
 		// double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
-		int trials = elapsedMillis;
+		int trials = (int) (elapsedMillis * EnemyStats.getSpawn() * 2);
 		// int trials = 10;
 		//maxEnemyCount=10000;trials=10000-enemies.size();
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {
