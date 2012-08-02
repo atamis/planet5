@@ -500,7 +500,7 @@ public class Game {
 					if (building.target.isDead()) {
 						//ps.bloodBang(building.target.bounds.x, building.target.bounds.y);
 					}
-				} else if (building.type == 6 && gameMillis - building.lastFireTime >= BuildingStats.mortar_reload_time) {
+				} else if (building.type == 6) {
 					Projectile pr = new Projectile(this, p, building.col
 							* TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE
 							+ TILE_SIZE);

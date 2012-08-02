@@ -26,7 +26,7 @@ public class BuildingStats {
 	public static float health_delta = 0.0001f;
 	public static float cap_delta = 0.0001f;
 	public static float gen_delta = 0.000001f;
-	public static float damage_delta = 0.001f;
+	public static float damage_delta = 0.0001f;
 	public static float draw_delta = 0.01f;
 
 	public static float getHealth(int i) {
@@ -135,6 +135,6 @@ public class BuildingStats {
 	static float mortar_draw = 4;
 	static float mortar_fire_cost = 20;
 	static float mortar_damage = 100;
-	public static int mortar_reload_time = 1000;
+	public static int mortar_reload_time = 500;
 
 }
