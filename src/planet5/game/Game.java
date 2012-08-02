@@ -709,7 +709,7 @@ public class Game {
 
 		// hero produces light
 		produceLight2(hero.x + hero.SIZE / 2, hero.y + hero.SIZE / 2,
-				16 * 32);
+				256);
 	}
 
 	private void produceLight(int col, int row, int width, int height,
