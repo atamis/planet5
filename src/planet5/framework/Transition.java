@@ -7,7 +7,7 @@ public abstract class Transition {
 	protected Applet p;
 
 	// the frame to transition into
-	private Frame nextFrame = null;
+	public Frame nextFrame = null;
 
 	// arrays that store the frame images
 	private int[] currentFrameImagePixels;

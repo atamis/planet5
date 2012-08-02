@@ -1,5 +1,7 @@
 package planet5.framework;
 
+import planet5.Main;
+
 
 public class FullFadeTransition extends Transition {
 	public FullFadeTransition(Applet parent) {
@@ -11,14 +13,18 @@ public class FullFadeTransition extends Transition {
         int time = getElapsedMillis();
 
         if (time > 510) {
-            drawNextFrameImage();
+        	if (super.nextFrame != Main.instance.menuFrame)
+        		drawNextFrameImage();
             finish();
             return;
         }
 
         // draw frame image
         if (time > 255) {
-            drawNextFrameImage();
+        	if (super.nextFrame == Main.instance.menuFrame)
+        		Main.instance.menuFrame.paint();
+        	else
+        		drawNextFrameImage();
             time = 510 - time;
         }
         else {

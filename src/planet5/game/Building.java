@@ -34,6 +34,7 @@ public class Building {
 	public int buildTime, buildHealth;
 	Enemy target = null;
 	boolean powered = false;
+	int reach = 0;
 	Building powerSource = null;
 	int current_upgrade = Upgrades.gen;
 	
@@ -195,8 +196,38 @@ public class Building {
 			p.textAlign(p.LEFT, p.TOP);
 			p.text("!", x, y);
 		} else if (powerSource != null) {
-
+			
 		}
+	}
+	
+	public void drawConnection(PApplet p, int mapX, int mapY) {
+		// don't draw connection if no source
+		if (powerSource == null)
+			return;
+		
+		// don't draw connection if unpowered
+		if (!powered)
+			return;
+		
+		// don't draw connection if still building
+		if (buildTime != -1)
+			return;
+		
+		// calculate building center and source center
+		int x1 = 32*col + 16*width - mapX;
+		int y1 = 32*row + 16*height - mapY;
+		int x2 = 32*powerSource.col + 16*powerSource.width - mapX;
+		int y2 = 32*powerSource.row + 16*powerSource.height - mapY;
+
+		// only draw connection if the line will show on the screen
+		if (!new Rectangle(0, 0, p.width, p.height - Game.BAR_HEIGHT).intersectsLine(x1, y1, x2, y2))
+			return;
+		
+		// draw a connection between (x1, y1) and (x2, y2)
+		p.strokeWeight(3);
+		p.stroke(255, 0, 0);
+		p.line(x1, y1, x2, y2);
+		// TODO better graphics for line
 	}
 
 	public Enemy findClosestEnemy(Game game, int range) {

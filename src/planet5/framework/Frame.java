@@ -12,7 +12,7 @@ public abstract class Frame {
 	}
 
 	// basic methods
-	void paint() {
+	public void paint() {
 		draw();
 
 		for (Button button : buttons) {

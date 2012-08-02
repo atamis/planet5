@@ -27,29 +27,6 @@ public final class GameRenderer {
 	}
 
 	public static void draw(Game game) {
-		/*
-		int r=32*150;
-		int c=32*150;
-		int i=600;
-		int j=1000;
-		p.background(p.color(255));
-		p.fill(p.color(0,0,255));
-		p.stroke(p.color(0,0,255));
-		for (int k=0;k<1000;k++) {
-			int dx=game.computedX[r][c];
-			int dy=game.computedY[r][c];
-			
-			p.point(j, i);
-			
-			r+=dy;
-			c+=dx;
-			i+=2*dy;
-			j+=2*dx;
-		}
-		p.stroke(p.color(0));
-		p.strokeWeight(5);
-		p.point(500,500);
-		/*/
 		p.translate(0, BAR_HEIGHT);
 		GameRenderer.game = game;
 
@@ -64,6 +41,9 @@ public final class GameRenderer {
 		p.translate(game.mapX, game.mapY);
 		
 		drawEnemies();
+
+		for (Building building : game.buildings)
+			building.drawConnection(p, game.mapX, game.mapY);
 		
 		drawProjectiles();
 		
