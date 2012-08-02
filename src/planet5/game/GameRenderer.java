@@ -27,37 +27,46 @@ public final class GameRenderer {
 	}
 
 	public static void draw(Game game) {
-		p.translate(0, BAR_HEIGHT);
 		GameRenderer.game = game;
-
-		p.translate(-game.mapX, -game.mapY);
-		drawTiles();
-		p.translate(game.mapX, game.mapY);
 		
-		drawBuildings();
+		if (game.win != 0 && game.lose != 0) {
+			p.translate(0, BAR_HEIGHT);
+			p.translate(-game.mapX, -game.mapY);
+			drawTiles();
+			p.translate(game.mapX, game.mapY);
+			drawBuildings();
+			p.translate(-game.mapX, -game.mapY);
+			game.hero.draw();
+			p.translate(game.mapX, game.mapY);
+			drawEnemies();
+			for (Building building : game.buildings)
+				building.drawConnection(p, game.mapX, game.mapY);
+			drawProjectiles();
+			p.translate(-game.mapX, -game.mapY);
+			game.ps.draw(p);
+			p.translate(game.mapX, game.mapY);
+			p.translate(-game.mapX, -game.mapY);
+			drawBuildingPlaceover();
+			p.translate(game.mapX, game.mapY);
+			//drawLoseWin();
+			p.translate(0, -BAR_HEIGHT);
+		}
 		
-		p.translate(-game.mapX, -game.mapY);
-		game.hero.draw();
-		p.translate(game.mapX, game.mapY);
-		
-		drawEnemies();
-
-		for (Building building : game.buildings)
-			building.drawConnection(p, game.mapX, game.mapY);
-		
-		drawProjectiles();
-		
-		p.translate(-game.mapX, -game.mapY);
-		game.ps.draw(p);
-		p.translate(game.mapX, game.mapY);
-
-		p.translate(-game.mapX, -game.mapY);
-		drawBuildingPlaceover();
-		p.translate(game.mapX, game.mapY);
-			
-		drawLoseWin();
-
-		p.translate(0, -BAR_HEIGHT);
+		int alpha = 0;
+		if (game.win != -1)
+			alpha = 255 - game.win * 255 / 120;
+		else if (game.lose != -1)
+			alpha = 255 - game.lose * 255 / 120;
+		if (alpha != 0) {
+			p.noStroke();
+			p.fill(p.color(0,0,0,alpha));
+			p.rect(0, BAR_HEIGHT, p.width, p.height -BAR_HEIGHT);
+			if (alpha==255){
+				p.translate(0, BAR_HEIGHT);
+				drawLoseWin();
+				p.translate(0, -BAR_HEIGHT);
+			}
+		}
 		
 		// draw bar
 		drawBarBackground();
@@ -485,7 +494,7 @@ public final class GameRenderer {
 			return;
 		
 		p.fill(0xFF202020);
-		p.rect((p.width - 300) / 2, 290, 300, 89);
+		//p.rect((p.width - 300) / 2, 290, 300, 89);
 		p.textFont(Fonts.consolas32);
 		p.textSize(64);
 		p.textAlign(p.CENTER, p.CENTER);

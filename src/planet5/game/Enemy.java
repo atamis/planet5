@@ -152,8 +152,8 @@ public class Enemy {
 			p.fill(p.color(zero, zero, full));
 		}
 
-		int dx = map.pathX[bounds.y/32][bounds.x/32];
-		int dy = map.pathY[bounds.y/32][bounds.x/32];
+		int dx = xDirection;
+		int dy = yDirection;
 		float rotation = 0;
 		if (dy == -1) {
 			if (dx == -1) {
@@ -187,7 +187,8 @@ public class Enemy {
 		p.translate(x+8, y+8);
 		p.rotate(rotation);
 		p.imageMode(p.CENTER);
-		int b=map.lighting[y/32][x/32];
+		int casdf=p.constrain(map.lighting[y/32][x/32],0,255);
+		int b = casdf;
 		p.tint(p.color(b,b,b));
 		p.image(SpriteMaster.instance(p).enemy, 0, 0);
 		p.popStyle();

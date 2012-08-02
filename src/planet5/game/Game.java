@@ -305,13 +305,11 @@ public class Game {
 	
 	// game ending methods
 	public void lose() {
-		lose = 0;
-		playAgainButton.visible = true;
+		lose = 120;
 	}
 
 	public void win() {
-		win = 0;
-		playAgainButton.visible = true;
+		win = 120;
 	}
 
 	// game stopping methods
@@ -330,6 +328,7 @@ public class Game {
 			speedButtons[i].draw(p.mouseX, p.mouseY, p.focused);
 	}
 
+	int i2=0;
 	public void update() {
 		if (!p.focused)
 			rightButtonPressed = false;
@@ -353,6 +352,19 @@ public class Game {
 			day = gameMillis / MILLIS_PER_DAY;
 			hour = (gameMillis % MILLIS_PER_DAY) / MILLIS_PER_HOUR;
 			minute = (gameMillis % MILLIS_PER_HOUR) / MILLIS_PER_MINUTE;
+		}
+
+		if (win!=-1 || lose!=-1) {
+			i2+=elapsedMillis/gameSpeedMultiplier;
+			while(i2>=0){
+				i2-=16;
+				if (win > 0)
+					--win;
+				if (lose > 0)
+					--lose;
+				if (win == 0 || lose == 0)
+					playAgainButton.visible = true;
+			}
 		}
 
 		recalculateLighting();
@@ -895,8 +907,8 @@ public class Game {
 				int bottom = Math.min(tileHeight - 1, building.row
 						+ building.height + FIELD_RADIUS);
 
-				for (int i = left; i < right; i++) {
-					for (int j = top; j < bottom; j++) {
+				for (int i = left; i <= right; i++) {
+					for (int j = top; j <= bottom; j++) {
 						int dx = i * TILE_SIZE - x;
 						int dy = j * TILE_SIZE - y;
 						if (dx * dx + dy * dy < FIELD_RADIUS_SQ) {
@@ -1042,6 +1054,8 @@ public class Game {
 
 	// key event handlers
 	public void keyPressed(int keyCode) {
+		if (win!=-1||lose!=-1)
+			return;
 		int intKey = keyCode - '0';
 
 		hero.keyPressed();
@@ -1084,11 +1098,14 @@ public class Game {
 		playAgainButton.mousePressed(x, y, mouseButton);
 		for (int i = 0; i < speedButtons.length; i++)
 			speedButtons[i].mousePressed(x, y, mouseButton);
-
+		
 		if (mouseButton == MouseEvent.BUTTON3) {
 			rightButtonPressed = true;
 		}
-		
+
+		if (win!=-1||lose!=-1)
+			return;
+
 		if (mouseButton != MouseEvent.BUTTON1)
 			return;
 
