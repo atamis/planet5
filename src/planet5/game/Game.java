@@ -31,7 +31,7 @@ public class Game {
 	private static final int MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
 	private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
 	//private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
-	public static int gameSpeedMultiplier = 1;
+	public static double gameSpeedMultiplier = 1;
 
 	public boolean paused = false, help = false;
 	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
@@ -104,8 +104,15 @@ public class Game {
 
 		int speed = 16;
 		for (int i = 0; i < speedButtons.length; i++) {
+			String text;
+			if (speed == 8)
+				speed = 4;
+			if (speed == 0)
+				text = ".5x";
+			else
+				text = speed + "x";
 			speedButtons[i] = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64 - 32*speedButtons.length + 32*i, 0, 31,
-					23), speed + "x");
+					23), text);
 			speed /= 2;
 		}
 		
@@ -1192,9 +1199,9 @@ public class Game {
 		} else if (command.equals("4x")) {
 			unselectButtons();
 			gameSpeedMultiplier = 4;
-		} else if (command.equals("8x")) {
+		} else if (command.equals(".5x")) {
 			unselectButtons();
-			gameSpeedMultiplier = 8;
+			gameSpeedMultiplier = 0.5;
 		} else if (command.equals("16x")) {
 			unselectButtons();
 			gameSpeedMultiplier = 16;
