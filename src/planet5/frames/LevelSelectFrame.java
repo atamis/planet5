@@ -9,7 +9,7 @@ import planet5.loaders.Fonts;
 
 public class LevelSelectFrame extends Frame {
 	MenuButton[] buttons = new MenuButton[5];
-	String[] texts = { "Level 1 40x40 (Easy)    ",
+	String[] texts = { "Level 1: 40x40 (Easy)    ",
 			"Level 2: 80x80 (Easy)    ",
 			"Level 3: 120x120 (Medium)",
 			"Level 4: 160x160 (Hard)  ",
@@ -24,9 +24,9 @@ public class LevelSelectFrame extends Frame {
 		
 		for (int i = 0; i < 5; i++) {
 			int x = 48+32;
-			int y = 96+32+16 + i * 120;
+			int y = 96+32+16+100 + i * 70;
 			int w = 864;
-			int h = 70;
+			int h = 69;
 			buttons[i] = new MenuButton(new Rectangle(x,y,w,h), texts[i], Fonts.consolas32, true);
 			addButton(buttons[i]);
 		}
