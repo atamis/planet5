@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import megamu.mesh.MPolygon;
 import megamu.mesh.Voronoi;
 
-import planet5.frames.GameFrame;
 import planet5.framework.Applet;
 import planet5.game.Game;
 import planet5.game.Tile;

@@ -3,7 +3,6 @@ package planet5.frames;
 import java.awt.Rectangle;
 
 import planet5.framework.Button;
-import planet5.loaders.Fonts;
 import processing.core.PFont;
 
 public class MenuButton extends Button {

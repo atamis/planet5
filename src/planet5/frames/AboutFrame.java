@@ -4,10 +4,8 @@ import java.awt.Rectangle;
 
 import planet5.Main;
 import planet5.framework.Applet;
-import planet5.framework.Button;
 import planet5.framework.Frame;
 import planet5.loaders.Fonts;
-import planet5.loaders.SpriteMaster;
 
 public class AboutFrame extends Frame {
 	public AboutFrame(Applet parent) {

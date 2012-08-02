@@ -11,7 +11,6 @@ import planet5.config.UpgradeStats;
 import planet5.framework.Applet;
 import planet5.loaders.Fonts;
 import planet5.loaders.SpriteMaster;
-import processing.core.PApplet;
 
 public final class GameRenderer {
 	private static Applet p;
@@ -390,10 +389,10 @@ public final class GameRenderer {
 				p.textAlign(p.CENTER, p.CENTER);
 				p.textSize(16);
 				p.fill(0);
-				int percent = (int)(100*hoveredBuilding.hp/hoveredBuilding.maxHp);
+				//int percent = (int)(100*hoveredBuilding.hp/hoveredBuilding.maxHp);
 				//p.text(percent+"%", hoveredBuilding.col*TILE_SIZE-game.mapX + 1, hoveredBuilding.row*TILE_SIZE-game.mapY - p.textDescent() / 2, hoveredBuilding.width * TILE_SIZE - 2, 17);
 
-				hoveredBuilding.drawHp(p, hoveredBuilding.col * TILE_SIZE - game.mapX, hoveredBuilding.row * TILE_SIZE - game.mapY, -1);
+				hoveredBuilding.drawHp(p, hoveredBuilding.col * TILE_SIZE - game.mapX, hoveredBuilding.row * TILE_SIZE - game.mapY);
 
 				if(hoveredBuilding.type==5||hoveredBuilding.type==6){
 					drew=true;
@@ -405,8 +404,8 @@ public final class GameRenderer {
 
 			int x = (p.mouseX + game.mapX) / 32;
 			int y = (p.mouseY + game.mapY - BAR_HEIGHT) / 32;
-			int drawX = (p.mouseX) / 32;
-			int drawY = (p.mouseY - BAR_HEIGHT) / 32;
+			//int drawX = (p.mouseX) / 32;
+			//int drawY = (p.mouseY - BAR_HEIGHT) / 32;
 			
 			drawTurretRange(x, y, game.placingBuilding);
 		} else if (game.selectedBuilding != null && (game.selectedBuilding.type==6 ||game.selectedBuilding.type==5) ) {

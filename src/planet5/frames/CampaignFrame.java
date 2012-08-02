@@ -1,12 +1,6 @@
 package planet5.frames;
 
-import java.awt.Rectangle;
-
 import planet5.framework.Applet;
-import planet5.framework.Frame;
-import planet5.game.Enemy;
-import planet5.game.Game;
-import processing.core.PVector;
 
 public class CampaignFrame extends GameFrame {
 	public CampaignFrame(Applet parent, int w, int h) {

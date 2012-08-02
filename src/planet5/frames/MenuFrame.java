@@ -11,7 +11,6 @@ import planet5.loaders.SpriteMaster;
 public class MenuFrame extends Frame {
 	// menu buttons
 	private final String[] buttonTexts = { "Play Campaign", "Play Survival", "Settings", "About" };
-	private final int menuBorder = 1;
 	private final int menuX = 64, menuY = 350;
 	private final int buttonHeightOffset = 50;
 	private final int buttonWidth = 300, buttonHeight = buttonHeightOffset - 1;

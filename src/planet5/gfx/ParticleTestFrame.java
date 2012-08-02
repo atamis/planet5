@@ -1,6 +1,5 @@
 package planet5.gfx;
 
-import planet5.Main;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
 
@@ -14,6 +13,7 @@ public class ParticleTestFrame extends Frame {
 		last_updated = 0;
 	}
 
+	@Override
 	public void update() {
 		int millis = (int) (p.millis() - last_updated);
 
@@ -30,6 +30,7 @@ public class ParticleTestFrame extends Frame {
 		ps.draw(p);
 	}
 
+	@Override
 	public void keyPressed() {
 		ps.explosion(p.mouseX, p.mouseY);
 	}

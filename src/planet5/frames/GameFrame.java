@@ -1,24 +1,12 @@
 package planet5.frames;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.concurrent.TimeUnit;
-
 import planet5.Main;
-import planet5.config.BuildingStats;
-import planet5.config.Globals;
 import planet5.framework.Applet;
-import planet5.framework.Button;
 import planet5.framework.Frame;
-import planet5.game.Building;
 import planet5.game.Game;
 import planet5.game.GameListener;
 import planet5.game.GameRenderer;
-import planet5.game.gen.CaveGenerator;
-import planet5.game.gen.VoronoiPerlinNoiseGenerator;
-import planet5.loaders.Fonts;
 
 public class GameFrame extends Frame implements GameListener {
 	Game game;

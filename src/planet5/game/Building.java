@@ -2,9 +2,6 @@ package planet5.game;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Map;
-
-import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.Globals;
 import planet5.config.UpgradeStats;
@@ -96,7 +93,7 @@ public class Building {
 		}
 	}
 
-	public void drawHp(PApplet p, int x, int y, int selectedTime) {
+	public void drawHp(PApplet p, int x, int y) {
 		if (buildTime != -1)
 			return;
 		

@@ -20,6 +20,7 @@ public class BloodSplatParticle extends Particle {
 		c = new Color(r.nextInt(150) + 100, 0, 0, 0);
 	}
 	
+	@Override
 	public void draw(PApplet p) {
 		p.pushStyle();
 		p.pushMatrix();

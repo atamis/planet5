@@ -3,10 +3,8 @@ package planet5.game;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
-import planet5.framework.Button;
 import planet5.loaders.Fonts;
 import processing.core.PApplet;
-import processing.core.PFont;
 
 public class ConfirmButton {
 	// listening variables

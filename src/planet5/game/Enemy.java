@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 
 import planet5.config.EnemyStats;
 import planet5.config.Globals;
-import planet5.frames.GameFrame;
 import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -67,15 +66,6 @@ public class Enemy {
 		maxHp = EnemyStats.getHP(type);
 		speed = EnemyStats.getSpeed(type);
 		computedHp = curHp = maxHp;
-	}
-
-	private int sign(int num) {
-		if (num > 0)
-			return 1;
-		else if (num == 0)
-			return 0;
-		else
-			return -1;
 	}
 
 	public void move(int elapsedMillis) {

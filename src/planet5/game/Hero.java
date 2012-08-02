@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import planet5.framework.Applet;
 import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
-import processing.core.PVector;
 
 public class Hero {
 	// copied constants

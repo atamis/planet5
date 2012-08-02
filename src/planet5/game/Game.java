@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.EnemyLevel;
 import planet5.config.EnemyStats;
@@ -19,7 +18,6 @@ import planet5.game.gen.CaveGenerator;
 import planet5.gfx.ParticleSystem;
 import planet5.loaders.Fonts;
 import planet5.loaders.SoundMaster;
-import processing.core.PVector;
 
 public class Game {
 	// graphical constants
@@ -560,7 +558,6 @@ public class Game {
 
 	private void updateEnemies(int elapsedMillis) {
 		long l=System.nanoTime();
-		boolean pr=false;
 
 		// keep base and hero dimensions calculated
 		Rectangle baseBounds = new Rectangle(base.col * TILE_SIZE, base.row * TILE_SIZE,
@@ -580,7 +577,7 @@ public class Game {
 				ps.bloodBang(enemy.bounds.x+8, enemy.bounds.y+8);
 				enemyArrayCenter[enemy.center.y / TILE_SIZE][enemy.center.x / TILE_SIZE].remove(enemy);
 				enemyArrayCorner[enemy.bounds.y / TILE_SIZE][enemy.bounds.x / TILE_SIZE].remove(enemy);
-				PVector loc = enemy.screenLoc();
+				//PVector loc = enemy.screenLoc();
 				//ps.bloodBang(enemy.bounds.x, enemy.bounds.y);
 				continue;
 			}
@@ -664,7 +661,6 @@ public class Game {
 				for (int i = 0; i < building.height; i++)
 					for (int j = 0; j < building.width; j++) {
 						tiles[building.row + i][building.col + j].building = null;
-						removeBuilding(building, building.col, building.row, building.width, building.height);
 					}
 				recalculate = true;
 			}
@@ -851,7 +847,6 @@ public class Game {
 				tiles[base.row + i][base.col + j].building = base;
 			}
 		}
-		addBuilding(base, base.col, base.row, base.width, base.height);
 		recalculateField();
 	}
 
@@ -862,7 +857,6 @@ public class Game {
 				tiles[building.row + i][building.col + j].building = building;
 			}
 		}
-		addBuilding(building, building.col, building.row, building.width, building.height);
 		recalculateField();
 	}
 
@@ -881,17 +875,8 @@ public class Game {
 				tiles[building.row + i][building.col + j].building = null;
 			}
 		}
-		removeBuilding(building, building.col, building.row, building.width, building.height);
 		// 
 		recalculateField();
-	}
-	
-	private void addBuilding(Building building, int x, int y, int w, int h) {
-		
-	}
-	
-	private void removeBuilding(Building building, int x, int y, int w, int h) {
-		
 	}
 
 	public void recalculateField() {

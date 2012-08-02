@@ -21,9 +21,9 @@ Icons for upgrades?
 
 Add particles effects to guns.
 
-Either add flashlight and/or gun to hero, or remove hero.
+[done] Either add flashlight and/or gun to hero, or remove hero.
 
-Make enemies draw sprites, make them rotate.
+[done] Make enemies draw sprites, make them rotate.
 
 [done] Use appropriate font size for title (consolas96).
 
@@ -35,8 +35,8 @@ Make enemies draw sprites, make them rotate.
 
 [done] Add blood splats as particles.
 
-Mute button
+[done] Mute button
 
 [done] Make main building remove walls.
 
-Make blood bangs appear in the correct place.
+[done] Make blood bangs appear in the correct place.

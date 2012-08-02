@@ -1,6 +1,5 @@
 package planet5.framework;
 
-import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
 public abstract class Frame {
