@@ -33,7 +33,7 @@ public class GameButton {
 
 	// painting methods
 	protected void draw(int mouseX, int mouseY, boolean windowFocused) {
-		if (!visible) {
+		if (!visible || !enabled) {
 			return;
 		}
 		

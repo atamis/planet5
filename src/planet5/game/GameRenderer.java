@@ -29,38 +29,36 @@ public final class GameRenderer {
 	public static void draw(Game game) {
 		GameRenderer.game = game;
 		
+		if (game.help) {
+			drawHelp();
+			
+			drawBarBackground();
+			drawBarBuildings();
+			drawBarUi();
+			return;
+		}
+		
 		if (game.win != 0 && game.lose != 0) {
 			p.translate(0, BAR_HEIGHT);
 			
 			p.translate(-game.mapX, -game.mapY);
 			drawTiles();
 			p.translate(game.mapX, game.mapY);
-			
 			for (Building building : game.buildings) {
 				building.drawConnection(p, game.mapX, game.mapY, game.ps);
 			}
-
-			
 			drawBuildings();
-
-			
 			p.translate(-game.mapX, -game.mapY);
 			game.hero.draw();
 			p.translate(game.mapX, game.mapY);
-			
 			drawEnemies();
-			
-			
 			drawProjectiles();
-			
 			p.translate(-game.mapX, -game.mapY);
 			game.ps.draw(p);
 			p.translate(game.mapX, game.mapY);
-			
 			p.translate(-game.mapX, -game.mapY);
 			drawBuildingPlaceover();
 			p.translate(game.mapX, game.mapY);
-			
 			//drawLoseWin();
 			
 			p.translate(0, -BAR_HEIGHT);
@@ -92,6 +90,44 @@ public final class GameRenderer {
 		if(Globals.DEBUG)
 			drawDebug();
 		//*/
+	}
+
+	private static void drawHelp() {
+		p.background(32);
+		p.fill(224);
+		p.textFont(Fonts.consolas16);
+		p.textAlign(p.LEFT, p.TOP);
+		String text = "[WASD] to move the hero\n" +
+"[ESC] or [SPACE] to cancel a selection\n" +
+"[123456] to build a building\n" +
+"RIGHT CLICK to shoot\n" +
+"\n" +
+"1 - relay: relays energy field. buildings need energy to work\n" +
+"2 - solar farm: produces solar energy during the day\n" +
+"3 - capacitor: stores energy\n" +
+"4 - science lab: gives upgrades\n" +
+"5 - laser: single target constant damage\n" +
+"6 - mortar: rocket AOE damage\n" +
+"\n" +
+"Use the buildings at your disposal to survive the ever growing hordes of " +
+"aliens. If you or your main base dies, you lose. Enemies will grow in health, " +
+"damage, speed, and number. They will destroy everything in their path to reach " +
+"your main base.\n" +
+"\n" +
+"At the science lab, you can improve your buildings in a variety of ways.\n" +
+"\n" +
+"1 - HP - health of buildings\n" +
+"2 - GEN - energy generation\n" +
+"3 - CAP - energy capacitance\n" +
+"4 - DMG - turret damage\n" +
+"5 - ??? - mystery upgrade\n" +
+"\n" +
+"Monsters too will continually improve. Monsters spawn in darkness only, 8pm to\n" +
+"7:59 am. During the day, monsters that spawned during the night may still\n" +
+"attack, but no new monsters will spawn.\n" +
+"\n" +
+"To win, there must be no monsters on the map at midnight.";
+		p.text(text, 32, BAR_HEIGHT + 32, p.width - 64, p.height - BAR_HEIGHT - 64);
 	}
 
 	private static void drawDebug() {
