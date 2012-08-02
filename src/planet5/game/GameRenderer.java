@@ -154,11 +154,8 @@ public final class GameRenderer {
 		p.pushMatrix();
 		p.pushStyle();
 		
-		
-		p.textFont(Fonts.consolas16);
-		p.textAlign(p.LEFT, p.TOP);
-		p.textSize(12);
 
+		/*
 		String[] strings = {"FPS: " + p.frameRate,
 				"LaserDMG: " + BuildingStats.getDamage(5),
 				"MortarDMG: " + BuildingStats.getDamage(6),
@@ -169,20 +166,33 @@ public final class GameRenderer {
 				"MaxM: " + EnemyStats.getSpawn() * 100,
 				"#Monsters: " + game.enemies.size(),
 				"Particles: " + game.ps.particles.size()};
+		//*/
+		String text = "FPS: " + p.frameRate + "\n" +
+				"LaserDMG: " + BuildingStats.getDamage(5) + "\n" +
+				"MortarDMG: " + BuildingStats.getDamage(6) + "\n" +
+				"Gen: " + game.getTotalGen() + "\n" +
+				"MHealth: " + EnemyStats.getHP(0) + "\n" +
+				"MDamage: " + EnemyStats.getDamage(0) + "\n" +
+				"MSpeed: " + EnemyStats.getSpeed(0) + "\n" +
+				"MaxM: " + EnemyStats.getSpawn() * 100 + "\n" +
+				"#Monsters: " + game.enemies.size() + "\n" +
+				"Particles: " + game.ps.particles.size();
 
 		
-		int width = 140, height = (int) ((strings.length + 3) * (p.textAscent() + 4));
-
+		int width = 140, height = 180;
 		
 		p.translate(0, p.height-height);
 		p.fill(200, 200, 200, 100);
-		
 		p.rect(0, 0, width, height);
-		
+
+		p.textFont(Fonts.consolas16);
+		p.textAlign(p.LEFT, p.CENTER);
+		p.textSize(12);
+		p.noStroke();
 		p.fill(0);
-		p.stroke(0, 255, 0);
+		p.text(text, 4, 0, width - 8, height);
 		
-		
+		/*
 		for(int i = 0; i < height/p.textAscent() + 5; i++) {
 			p.pushMatrix();
 			p.translate(0, i * (p.textAscent() + 5));
@@ -190,6 +200,7 @@ public final class GameRenderer {
 			//p.rect(0, 0, 10, 10);
 			p.popMatrix();
 		}
+		//*/
 		
 		p.popStyle();
 		p.popMatrix();
