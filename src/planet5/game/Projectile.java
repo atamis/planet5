@@ -72,6 +72,9 @@ public class Projectile {
 			int damage = (int) BuildingStats.getDamage(6);
 			
 			if (endpt.equals(startpt)) {
+				SoundMaster.mortar_explosion.trigger();
+				map.ps.explosion(endpt.x, endpt.y);
+
 				int loopTop = Math.max(0, (endpt.y - EXPLOSION_RADIUS) / TILE_SIZE);
 				int loopLeft = Math.max(0, (endpt.x - EXPLOSION_RADIUS) / TILE_SIZE);
 				int loopBottom = Math.min((endpt.y + EXPLOSION_RADIUS + TILE_SIZE - 1) / TILE_SIZE, map.tileHeight - 1);
