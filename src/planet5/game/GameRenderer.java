@@ -106,7 +106,8 @@ public final class GameRenderer {
 		p.textSize(12);
 
 		String[] strings = {"FPS: " + p.frameRate,
-				"MortarH: " + BuildingStats.getHealth(6),
+				"LaserDMG: " + BuildingStats.getDamage(5),
+				"MortarDMG: " + BuildingStats.getDamage(6),
 				"Gen: " + game.getTotalGen(),
 				"MHealth: " + EnemyStats.getHP(0),
 				"MDamage: " + EnemyStats.getDamage(0),
