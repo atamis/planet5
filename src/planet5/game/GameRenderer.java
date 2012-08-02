@@ -122,8 +122,8 @@ public final class GameRenderer {
 "4 - DMG - turret damage\n" +
 "5 - ??? - mystery upgrade\n" +
 "\n" +
-"Monsters too will continually improve. Monsters spawn in darkness only, 8pm to\n" +
-"7:59 am. During the day, monsters that spawned during the night may still\n" +
+"Monsters too will continually improve. Monsters spawn in darkness only, 8pm to " +
+"7:59 am. During the day, monsters that spawned during the night may still " +
 "attack, but no new monsters will spawn.\n" +
 "\n" +
 "To win, there must be no monsters on the map at midnight.";
