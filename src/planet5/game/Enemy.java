@@ -84,13 +84,21 @@ public class Enemy {
 		int pixelsToMove = remainder / 1000;
 		remainder -= pixelsToMove * 1000;
 		
+		if (left == 0) {
+			left = 32;
+			xDirection = map.pathX[bounds.y / 32][bounds.x / 32];
+			yDirection = map.pathY[bounds.y / 32][bounds.x / 32];
+		}
+		
+		if (pixelsToMove > left)
+			pixelsToMove = left;
+		
 		// move that amount of pixels
 		while (pixelsToMove > 0) {
 			--pixelsToMove;
-			int dx = map.computedX[bounds.y][bounds.x];
-			int dy = map.computedY[bounds.y][bounds.x];
-			bounds.x += dx;
-			bounds.y += dy;
+			--left;
+			bounds.x += xDirection;
+			bounds.y += yDirection;
 		}
 
 		// update center
@@ -144,8 +152,8 @@ public class Enemy {
 			p.fill(p.color(zero, zero, full));
 		}
 
-		int dx = map.computedX[bounds.y][bounds.x];
-		int dy = map.computedY[bounds.y][bounds.x];
+		int dx = xDirection;
+		int dy = yDirection;
 		float rotation = 0;
 		if (dy == -1) {
 			if (dx == -1) {
@@ -179,6 +187,9 @@ public class Enemy {
 		p.translate(x+8, y+8);
 		p.rotate(rotation);
 		p.imageMode(p.CENTER);
+		int casdf=p.constrain(map.lighting[y/32][x/32],0,255);
+		int b = casdf;
+		p.tint(p.color(b,b,b));
 		p.image(SpriteMaster.instance(p).enemy, 0, 0);
 		p.popStyle();
 		p.popMatrix();

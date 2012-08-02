@@ -1,9 +1,10 @@
-[WASD] to move the hero.
+[WASD] to move the hero
 [ESC] or [SPACE] to cancel a selection
 [123456] to build a building
+RIGHT CLICK to shoot
 
 1 - relay: relays energy field. buildings need energy to work
-2 - solar farm: produces solar energy during the day.
+2 - solar farm: produces solar energy during the day
 3 - capacitor: stores energy
 4 - science lab: gives upgrades
 5 - laser: single target constant damage
@@ -20,10 +21,10 @@ At the science lab, you can improve your buildings in a variety of ways.
 2 - GEN - energy generation
 3 - CAP - energy capacitance
 4 - DMG - turret damage
-5 - ??? - mystery upgrade.
+5 - ??? - mystery upgrade
 
 Monsters too will continually improve. Monsters spawn in darkness only, 8pm to
 7:59 am. During the day, monsters that spawned during the night may still
-attack, but no new monsters will spawn
+attack, but no new monsters will spawn.
 
 To win, there must be no monsters on the map at midnight.

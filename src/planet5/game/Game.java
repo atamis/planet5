@@ -31,8 +31,8 @@ public class Game {
 	private static final int MILLIS_PER_MINUTE = 416;
 	private static final int MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60;
 	private static final int MILLIS_PER_DAY = MILLIS_PER_HOUR * 24;
-	//private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
-	private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
+	private static final int GAME_START_TIME = 8 * MILLIS_PER_HOUR;
+	//private static final int GAME_START_TIME = (39*2) * MILLIS_PER_HOUR/4;
 	public static int gameSpeedMultiplier = 1;
 
 	public boolean paused = false, help = false;
@@ -64,7 +64,6 @@ public class Game {
 			0.0001, 0.0002, 0.0003, 0.0004 };
 	public int[][] path;
 	public byte[][] pathX, pathY;
-	public byte[][] computedX, computedY;
 	public int tileWidth, tileHeight;
 	public int mapX = 0, mapY = 0;
 	public int lose = -1, win = -1;
@@ -186,8 +185,8 @@ public class Game {
 		
 		pathX = new byte[tileHeight][tileWidth];
 		pathY = new byte[tileHeight][tileWidth];
-		computedX = new byte[32*tileHeight][32*tileWidth];
-		computedY = new byte[32*tileHeight][32*tileWidth];
+		//computedX = new byte[32*tileHeight][32*tileWidth];
+		//computedY = new byte[32*tileHeight][32*tileWidth];
 		
 		// calculate path for every pixel that the enemy can go through
 		// enemies can only start at where they spawn, in the center of a tile
@@ -217,6 +216,8 @@ public class Game {
 					pathX[row][col] = xOffset;
 					pathY[row][col] = yOffset;
 					
+					/*
+					
 					// assign values in computed array to go to the next one
 					// note: it's offset by -8
 					// something's wrong with the offset b/c its four 8x8s
@@ -239,6 +240,8 @@ public class Game {
 							computedY[r][c] = yOffset;
 						}
 					}
+					
+					//*/
 				}
 			}
 		}
@@ -300,13 +303,11 @@ public class Game {
 	
 	// game ending methods
 	public void lose() {
-		lose = 0;
-		playAgainButton.visible = true;
+		lose = 120;
 	}
 
 	public void win() {
-		win = 0;
-		playAgainButton.visible = true;
+		win = 120;
 	}
 
 	// game stopping methods
@@ -325,6 +326,7 @@ public class Game {
 			speedButtons[i].draw(p.mouseX, p.mouseY, p.focused);
 	}
 
+	int i2=0;
 	public void update() {
 		if (!p.focused)
 			rightButtonPressed = false;
@@ -348,6 +350,19 @@ public class Game {
 			day = gameMillis / MILLIS_PER_DAY;
 			hour = (gameMillis % MILLIS_PER_DAY) / MILLIS_PER_HOUR;
 			minute = (gameMillis % MILLIS_PER_HOUR) / MILLIS_PER_MINUTE;
+		}
+
+		if (win!=-1 || lose!=-1) {
+			i2+=elapsedMillis/gameSpeedMultiplier;
+			while(i2>=0){
+				i2-=16;
+				if (win > 0)
+					--win;
+				if (lose > 0)
+					--lose;
+				if (win == 0 || lose == 0)
+					playAgainButton.visible = true;
+			}
 		}
 
 		recalculateLighting();
@@ -899,8 +914,8 @@ public class Game {
 				int bottom = Math.min(tileHeight - 1, building.row
 						+ building.height + FIELD_RADIUS);
 
-				for (int i = left; i < right; i++) {
-					for (int j = top; j < bottom; j++) {
+				for (int i = left; i <= right; i++) {
+					for (int j = top; j <= bottom; j++) {
 						int dx = i * TILE_SIZE - x;
 						int dy = j * TILE_SIZE - y;
 						if (dx * dx + dy * dy < FIELD_RADIUS_SQ) {
@@ -932,6 +947,7 @@ public class Game {
 		for (Building building : buildings) {
 			building.powered = false;
 			building.powerSource = null;
+			building.reach = 32;
 		}
 
 		// power all the buildings
@@ -944,6 +960,7 @@ public class Game {
 			Building source = stack.remove(0);
 
 			for (Building building : buildings) {
+				// calculate whether a building will be powered
 				if (!building.powered) {
 					if (willPower(source, building)) {
 						building.powered = true;
@@ -959,11 +976,66 @@ public class Game {
 				nextStack = new ArrayList<Building>();
 			}
 		}
-
-		// calculate connections
-		for (Building building : buildings) {
-
+		
+		// calculate distances between the buildings
+		int size = buildings.size();
+		int[][] distances = new int[size][size];
+		for (int i = 0; i < size; i++) {
+			Building source = buildings.get(i);
+			if (source.type == 0 || source.type == 1) {
+				for (int j = 0; j < size; j++) {
+					Building b = buildings.get(j);
+					if (willPower(source, b)) {
+						distances[i][j] = (int) buildingDistSq(source, b);
+					}
+				}
+			}
 		}
+		
+		// calculate connections
+		while (true) {
+			int min = Integer.MAX_VALUE;
+			Building client = null, source = null;
+			
+			// find the closest connection possible
+			// source must have a powerSource OR be the base
+			// client must not have a powerSource AND must be within range AND must not be building AND must be powered
+			for (int i = 0; i < size; i++) {
+				Building s = buildings.get(i);
+				if (s.powerSource == null && s.type != 0)
+					continue;
+				
+				for (int j = 0; j < size; j++) {
+					Building c = buildings.get(j);
+					if (c.powerSource != null || distances[i][j] == 0 || c.buildTime != -1 || !c.powered)
+						continue;
+					
+					if (distances[i][j] < min) {
+						min = distances[i][j];
+						source = s;
+						client = c;
+					}
+				}
+			}
+			
+			// apply the connection
+			if (min == Integer.MAX_VALUE)
+				break;
+			
+			client.powerSource = source;
+		}
+	}
+	
+	private double buildingDistSq(Building b1, Building b2) {
+		int x1 = 32*b1.col + 16*b1.width - mapX;
+		int y1 = 32*b1.row + 16*b1.height - mapY;
+		int x2 = 32*b2.col + 16*b2.width - mapX;
+		int y2 = 32*b2.row + 16*b2.height - mapY;
+		
+		int dx = x1 - x2;
+		int dy = y1 - y2;
+		
+		return dx*dx + dy*dy;
 	}
 
 	private boolean willPower(Building source, Building building) {
@@ -989,6 +1061,8 @@ public class Game {
 
 	// key event handlers
 	public void keyPressed(int keyCode) {
+		if (win!=-1||lose!=-1)
+			return;
 		int intKey = keyCode - '0';
 
 		hero.keyPressed();
@@ -1031,11 +1105,14 @@ public class Game {
 		playAgainButton.mousePressed(x, y, mouseButton);
 		for (int i = 0; i < speedButtons.length; i++)
 			speedButtons[i].mousePressed(x, y, mouseButton);
-
+		
 		if (mouseButton == MouseEvent.BUTTON3) {
 			rightButtonPressed = true;
 		}
-		
+
+		if (win!=-1||lose!=-1)
+			return;
+
 		if (mouseButton != MouseEvent.BUTTON1)
 			return;
 
@@ -1097,10 +1174,10 @@ public class Game {
 	}
 
 	private void cleanup() {
-		pathX = null;
-		pathY = null;
-		computedX=null;
-		computedY=null;
+		//pathX = null;
+		//pathY = null;
+		//computedX=null;
+		//computedY=null;
 	}
 	
 	// button event handlers

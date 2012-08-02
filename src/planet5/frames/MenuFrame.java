@@ -27,10 +27,15 @@ public class MenuFrame extends Frame {
 			int h = buttonHeight;
 			addButton(new MenuButton(new Rectangle(x, y, w, h), buttonTexts[i], Fonts.consolas32, false));
 		}
+		p.millis();
 	}
 
+	long l = 0, prev = 0;
 	@Override
-	protected void draw() {
+	public void draw() {
+		l += (p.millis() - prev);
+		prev=p.millis();
+		
 		p.background(0);
 		
 		// draw background image
@@ -43,7 +48,7 @@ public class MenuFrame extends Frame {
 		p.noSmooth();
 		p.translate(p.width, p.height);
 		p.imageMode(p.CENTER);
-		p.rotate((float) (p.millis() * 0.0001));
+		p.rotate((float) (l * 0.0001));
 		p.scale(25);
 		p.image(SpriteMaster.instance(p).planet, 0, 0);
 		p.smooth();

@@ -137,6 +137,10 @@ public class Hero {
 		int right = (x + SIZE - 1) / TILE_SIZE;
 		int down = (y + SIZE - 1) / TILE_SIZE;
 		
+		if (x < 0 || y < 0 || x > 32*map.tileWidth-32 || y > 32*map.tileHeight-32) {
+			return true;
+		}
+		
 		int loopTop = Math.max(0, up - 1);
 		int loopLeft = Math.max(0, left - 1);
 		int loopRight = Math.min(map.tileWidth - 1, right);
@@ -146,10 +150,6 @@ public class Hero {
 				for (Enemy enemy : map.enemyArrayCorner[j][i])
 					if (enemy.bounds.intersects(x, y, SIZE, SIZE))
 						return true;
-		
-		if (x < 0 || y < 0 || x >= 32*map.tileWidth || y >= 32*map.tileHeight) {
-			return true;
-		}
 		
 		if (map.tiles[up][left].wall || map.tiles[up][right].wall || 
 				map.tiles[down][left].wall || map.tiles[down][right].wall) {
