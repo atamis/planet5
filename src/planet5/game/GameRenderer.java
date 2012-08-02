@@ -8,12 +8,13 @@ import planet5.config.BuildingStats;
 import planet5.config.EnemyStats;
 import planet5.config.Globals;
 import planet5.config.UpgradeStats;
+import planet5.framework.Applet;
 import planet5.loaders.Fonts;
 import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 
 public final class GameRenderer {
-	private static PApplet p;
+	private static Applet p;
 	private static Game game;
 	
 	private static final int BAR_HEIGHT = Game.BAR_HEIGHT;
@@ -22,7 +23,7 @@ public final class GameRenderer {
 	private GameRenderer() {
 	}
 	
-	public static void init(PApplet parent) {
+	public static void init(Applet parent) {
 		p = parent;
 	}
 
@@ -31,24 +32,38 @@ public final class GameRenderer {
 		
 		if (game.win != 0 && game.lose != 0) {
 			p.translate(0, BAR_HEIGHT);
+			
 			p.translate(-game.mapX, -game.mapY);
 			drawTiles();
 			p.translate(game.mapX, game.mapY);
+			
+			for (Building building : game.buildings) {
+				building.drawConnection(p, game.mapX, game.mapY, game.ps);
+			}
+
+			
 			drawBuildings();
+
+			
 			p.translate(-game.mapX, -game.mapY);
 			game.hero.draw();
 			p.translate(game.mapX, game.mapY);
+			
 			drawEnemies();
-			for (Building building : game.buildings)
-				building.drawConnection(p, game.mapX, game.mapY);
+			
+			
 			drawProjectiles();
+			
 			p.translate(-game.mapX, -game.mapY);
 			game.ps.draw(p);
 			p.translate(game.mapX, game.mapY);
+			
 			p.translate(-game.mapX, -game.mapY);
 			drawBuildingPlaceover();
 			p.translate(game.mapX, game.mapY);
+			
 			//drawLoseWin();
+			
 			p.translate(0, -BAR_HEIGHT);
 		}
 		

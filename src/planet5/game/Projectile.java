@@ -137,6 +137,7 @@ public class Projectile {
 							e.processFutureDamage(damage);
 							e.takeDamage(damage);
 							SoundMaster.mortar_explosion.trigger();
+							map.ps.explosion(e.center.x, e.center.y);
 							if (e.isDead()) {
 								//map.ps.bloodBang(e.center.x - map.mapX, e.center.y - map.mapY);
 								//iterator.remove();

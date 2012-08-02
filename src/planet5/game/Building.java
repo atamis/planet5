@@ -4,10 +4,13 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Map;
 
+import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.Globals;
 import planet5.config.UpgradeStats;
 import planet5.config.Upgrades;
+import planet5.framework.Applet;
+import planet5.gfx.ParticleSystem;
 import planet5.loaders.Fonts;
 import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
@@ -200,7 +203,7 @@ public class Building {
 		}
 	}
 	
-	public void drawConnection(PApplet p, int mapX, int mapY) {
+	public void drawConnection(Applet p, int mapX, int mapY, ParticleSystem ps) {
 		// don't draw connection if no source
 		if (powerSource == null)
 			return;
@@ -223,10 +226,14 @@ public class Building {
 		if (!new Rectangle(0, 0, p.width, p.height - Game.BAR_HEIGHT).intersectsLine(x1, y1, x2, y2))
 			return;
 		
+		ps.connectionParticles(x1 + mapX, y1 + mapY, x2 + mapX, y2 + mapY);
 		// draw a connection between (x1, y1) and (x2, y2)
+		p.pushS();
 		p.strokeWeight(3);
-		p.stroke(255, 0, 0);
+		p.stroke(p.map((float) Math.sin(p.millis() * 0.005), -1, 1, 30, 150), 0, 0);
 		p.line(x1, y1, x2, y2);
+		p.popS();
+		
 		// TODO better graphics for line
 	}
 
