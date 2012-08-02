@@ -119,7 +119,7 @@ public class Game {
 		pauseButton = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64-64, 0, 63,
 				23), "Pause");
 		helpButton = new GameButton(this, p, new Rectangle(w - 63 - 64-64, 0,
-				63, 23), "Mute", Fonts.consolas16);
+				63, 23), "Help", Fonts.consolas16);
 		muteButton = new GameButton(this, p, new Rectangle(w - 63 - 64, 0,
 				63, 23), "Mute", Fonts.consolas16);
 		quitButton = new ConfirmButton(this, p,
@@ -1193,7 +1193,13 @@ public class Game {
 			muteButton.text="Mute";
 			SoundMaster.theme_song.unmute();
 		} else if (command.equals("Help")) {
-			help = !help;
+			if (win <= 0 && lose <= 0) {
+				help = !help;
+				if (help)
+					playAgainButton.enabled = false;
+				else if (win == 0 || lose == 0)
+					playAgainButton.enabled = true;
+			}
 			
 		} else if (command.equals("Play Again")) {
 			restartGame();
