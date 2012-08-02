@@ -20,8 +20,8 @@ public class BuildingStats {
 	private static float[] healths = { 1500, 100, 100, 100, 500, 1000, 350 };
 	private static float[] cap = { 4800, 0, 0, 1000, 0, 0, 0 };
 	private static float[] gen = { 0.08f, 0, 0.08f, 0, 0, 0, 0 };
-	private static float[] draw = { 0, 0, 0, 0, 10, 0.5f, 0 };
-	private static float[] damage = { 0, 0, 0, 0, 0, 30, 200 };
+	private static float[] draw = { 0, 0, 0, 0, 10, 0.1f, 0 };
+	private static float[] damage = { 0, 0, 0, 0, 0, 0.5f, 200 };
 
 	public static float health_delta = 0.0001f;
 	public static float cap_delta = 0.0001f;
