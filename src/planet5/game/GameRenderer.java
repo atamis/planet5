@@ -147,7 +147,7 @@ public final class GameRenderer {
 		p.rect(0, 0, p.width, BAR_HEIGHT + 1);
 		p.fill(0);
 		//p.rect(p.width - 2 * 64, 0, 2 * 64, 23);
-		p.rect(p.width - 3 * 64 - 5 * 32, 0, 3 * 64 + 5 * 32, 23);
+		p.rect(p.width - 3 * 64 - 5 * 32-64, 0, 3 * 64 + 5 * 32+64, 23);
 	}
 	static void drawBarBuildings() {
 		p.noStroke();
@@ -290,7 +290,7 @@ public final class GameRenderer {
 		// Draw the energy text.
 		p.textAlign(p.CENTER, p.CENTER);
 		p.fill(255);
-		p.text(String.format("%d/%d", game.curEnergy, game.maxEnergy), energy_bar_start
+		p.text(String.format("%d/%d", (int) game.curEnergy, (int) game.maxEnergy), energy_bar_start
 				, BAR_HEIGHT / 2 + 2 - p.textDescent() / 2, energy_bar_width, BAR_HEIGHT / 2 - 2);
 
 		// Draw the timer
@@ -313,7 +313,7 @@ public final class GameRenderer {
 		p.textAlign(p.RIGHT, p.CENTER);
 		String text = "fps: " + game.lastFrameRate;
 		//	text = Game.DOUBLE_ASDF + "x! " + text;
-		p.text(text, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64 - 16-5*32, BAR_HEIGHT / 2 - 1);
+		p.text(text, energy_bar_start + 8, 1 - p.textDescent() / 2, energy_bar_width - 3 * 64-64 - 16-5*32, BAR_HEIGHT / 2 - 1);
 		//*/
 		if (p.millis() - game.lastFrameRateUpdate >= 1000) {
 			game.lastFrameRate = (int) p.frameRate;

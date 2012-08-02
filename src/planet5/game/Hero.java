@@ -110,7 +110,7 @@ public class Hero {
 		// Rotate.
 		rad = PApplet.atan2((x+16 - map.mapX) - p.mouseX, (y+16 - map.mapY) - p.mouseY + Game.BAR_HEIGHT);
 		
-		if (map.rightButtonPressed) {
+		if (map.rightButtonPressed && p.mouseY > Game.BAR_HEIGHT) {
 			if(map.gameMillis - last > 1000) {
 				last=map.gameMillis;
 				Projectile pr = new Projectile(map, p, x+16, y+16);

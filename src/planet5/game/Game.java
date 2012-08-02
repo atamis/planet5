@@ -35,7 +35,7 @@ public class Game {
 
 	public boolean paused = false, help = false;
 	public int lastFrameRate = 10, lastFrameRateUpdate = 0;
-	public int curEnergy = 0, maxEnergy = 1000;
+	public float curEnergy = 0, maxEnergy = 1000;
 
 	// game time
 	public int gameMillis;
@@ -74,7 +74,7 @@ public class Game {
 	public Hero hero;
 	public Building base;
 
-	private GameButton helpButton, playAgainButton;
+	private GameButton muteButton, playAgainButton, helpButton;
 	private RadioButton[] speedButtons = new RadioButton[5];
 	private RadioButton pauseButton;
 	private ConfirmButton quitButton;
@@ -111,14 +111,16 @@ public class Game {
 				text = ".5x";
 			else
 				text = speed + "x";
-			speedButtons[i] = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64 - 32*speedButtons.length + 32*i, 0, 31,
+			speedButtons[i] = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64-64 - 32*speedButtons.length + 32*i, 0, 31,
 					23), text);
 			speed /= 2;
 		}
-		
-		pauseButton = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64, 0, 63,
+
+		pauseButton = new RadioButton(this, p, new Rectangle(w - 63 - 64 - 64-64, 0, 63,
 				23), "Pause");
-		helpButton = new GameButton(this, p, new Rectangle(w - 63 - 64, 0,
+		helpButton = new GameButton(this, p, new Rectangle(w - 63 - 64-64, 0,
+				63, 23), "Mute", Fonts.consolas16);
+		muteButton = new GameButton(this, p, new Rectangle(w - 63 - 64, 0,
 				63, 23), "Mute", Fonts.consolas16);
 		quitButton = new ConfirmButton(this, p,
 				new Rectangle(w - 63, 0, 63, 23), "Quit");
@@ -172,7 +174,7 @@ public class Game {
 		
 		unselectButtons();
 		gameSpeedMultiplier = 1;
-		speedButtons[4].selected = true;
+		speedButtons[3].selected = true;
 		recalculateField();
 		
 		// game time
@@ -324,6 +326,7 @@ public class Game {
 	public void draw() {
 		GameRenderer.draw(this);
 		helpButton.draw(p.mouseX, p.mouseY, p.focused);
+		muteButton.draw(p.mouseX, p.mouseY, p.focused);
 		pauseButton.draw(p.mouseX, p.mouseY, p.focused);
 		quitButton.draw(p.mouseX, p.mouseY, p.focused);
 		playAgainButton.draw(p.mouseX, p.mouseY, p.focused);
@@ -338,6 +341,7 @@ public class Game {
 		
 		// update buttons
 		helpButton.update(p.focused);
+		muteButton.update(p.focused);
 		pauseButton.update(p.focused);
 		quitButton.update(p.focused);
 		playAgainButton.update(p.focused);
@@ -372,7 +376,10 @@ public class Game {
 
 		recalculateLighting();
 		if (!paused()) {
-			final int TICK_MILLIS = 16;
+			int TICK_MILLIS = 16;
+			if (gameSpeedMultiplier == 0.5)
+				TICK_MILLIS = 5;
+			
 			remainderMillis += elapsedMillis;
 			
 			// spawn enemies only once because it takes a while
@@ -921,8 +928,8 @@ public class Game {
 
 	public void recalculateEnergyValues() {
 		// calculate energy values
-		int energy = this.curEnergy;
-		int maxEnergy = 0;
+		float energy = this.curEnergy;
+		float maxEnergy = 0;
 		for (Building building : buildings) {
 			if (building.powered && building.buildTime == -1) {
 				maxEnergy += BuildingStats.getCap(building.type);
@@ -1092,6 +1099,7 @@ public class Game {
 	public boolean rightButtonPressed = false;
 	public void mousePressed(int x, int y, int mouseButton) {
 		helpButton.mousePressed(x, y, mouseButton);
+		muteButton.mousePressed(x, y, mouseButton);
 		pauseButton.mousePressed(x, y, mouseButton);
 		quitButton.mousePressed(x, y, mouseButton);
 		playAgainButton.mousePressed(x, y, mouseButton);
@@ -1158,6 +1166,7 @@ public class Game {
 		}
 		
 		helpButton.mouseReleased(x, y, mouseButton);
+		muteButton.mouseReleased(x, y, mouseButton);
 		pauseButton.mouseReleased(x, y, mouseButton);
 		quitButton.mouseReleased(x, y, mouseButton);
 		playAgainButton.mouseReleased(x, y, mouseButton);
@@ -1178,14 +1187,17 @@ public class Game {
 			cleanup();
 			listener.quit();
 		} else if (command.equals("Mute")) {
-			helpButton.text="Unmute";
+			muteButton.text="Unmute";
 			SoundMaster.theme_song.mute();
 		} else if (command.equals("Unmute")) {
-			helpButton.text="Mute";
+			muteButton.text="Mute";
 			SoundMaster.theme_song.unmute();
-		}else if (command.equals("Play Again")) {
+		} else if (command.equals("Help")) {
+			help = !help;
+			
+		} else if (command.equals("Play Again")) {
 			restartGame();
-		}else if (command.equals("Pause")) {
+		} else if (command.equals("Pause")) {
 			unselectButtons();
 			pauseButton.selected = true;
 			paused = true;

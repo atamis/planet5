@@ -46,7 +46,10 @@ public class Projectile {
 		Point center = new Point(bounds.x + PROJECTILE_SIZE / 2, bounds.y + PROJECTILE_SIZE / 2);
 		
 		if (target == null) {
-			speed+=1;
+			if (elapsedMillis==5)
+				speed+=5f/16f/2f;
+			else
+			speed+=elapsedMillis/16f;
 			double dsq=startpt.distanceSq(endpt);
 			if (dsq < speed*speed){
 				startpt.x = endpt.x;
@@ -118,7 +121,7 @@ public class Projectile {
 		// turn towards target
 		dx = target.center.x - center.x;
 		dy = target.center.y - center.y;
-		rotation = Math.PI / 2 + Math.atan2(dx, dy);
+		rotation = Math.PI - Math.atan2(dx, dy);
 		
 		// explode if target is close enough
 		int damage = (int) BuildingStats.getDamage(6);

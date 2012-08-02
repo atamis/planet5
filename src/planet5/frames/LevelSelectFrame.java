@@ -60,6 +60,7 @@ public class LevelSelectFrame extends Frame {
 			for (int i = 0; i < 5; i++) {
 				if (command.equals(texts[i])) {
 					int size = (i+1)*40;
+					Main.campaignFrame = null;
 					Main.campaignFrame = new CampaignFrame(super.p, size, size);
 					Main.campaignFrame.game.restartGame();
 					Main.campaignFrame.update();
