@@ -57,6 +57,7 @@ public class Projectile {
 			} else {
 				int dx=endpt.x-startpt.x;
 				int dy=endpt.y-startpt.y;
+				rotation = Math.PI - Math.atan2(dx, dy);
 				
 				PVector v=new PVector(dx, dy);
 				v.normalize();

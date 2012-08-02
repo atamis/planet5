@@ -101,7 +101,7 @@ public class SpriteMaster {
 
 		width = (int) (0.5 * TILE_SIZE);
 		height = (int) (0.5 * TILE_SIZE);
-		mortar_bullet = p.createImage(width, height, p.ARGB);
+		mortar_bullet = p.createImage(width-4, height, p.ARGB);
 		mortar_bullet.copy(raw_building_sprite, (int) (4.6 * TILE_SIZE), 3 * TILE_SIZE, width, height, 0, 0, width, height);
 
 		width = (int) (0.5 * TILE_SIZE);

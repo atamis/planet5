@@ -9,13 +9,17 @@ import planet5.framework.Frame;
 import planet5.loaders.Fonts;
 
 public class SettingsFrame extends Frame {
-	MenuButton debug=new MenuButton(new Rectangle(362, 352, 300, 63), "Show Debug", Fonts.consolas32, true);
+	MenuButton debug=new MenuButton(new Rectangle(262, 289, 500, 63), "Show Debug", Fonts.consolas32, true);
+	MenuButton part=new MenuButton(new Rectangle(262, 353, 500, 63), "Hide Particles", Fonts.consolas32, true);
+	MenuButton conn=new MenuButton(new Rectangle(262, 414, 500, 63), "Hide Building Connections", Fonts.consolas32, true);
 	public SettingsFrame(Applet parent) {
 		super(parent);
 		
 		// add back button
 		addButton(new MenuButton(new Rectangle(32, 32, 110, 63), "Back", Fonts.consolas32, true));
 		addButton(debug);
+		addButton(part);
+		addButton(conn);
 	}
 
 	@Override
@@ -51,6 +55,22 @@ public class SettingsFrame extends Frame {
 			debug.text="Show Debug";
 			debug.command="Show Debug";
 			Globals.DEBUG = false;
+		} else if (command.equals("Show Particles")) {
+			part.text="Hide Particles";
+			part.command="Hide Particles";
+			Globals.PARTICLES = true;
+		} else if (command.equals("Hide Particles")) {
+			part.text="Show Particles";
+			part.command="Show Particles";
+			Globals.PARTICLES = false;
+		} else if (command.equals("Show Building Connections")) {
+			conn.text="Hide Building Connections";
+			conn.command="Hide Building Connections";
+			Globals.CONNECTIONS = true;
+		} else if (command.equals("Hide Building Connections")) {
+			conn.text="Show Building Connections";
+			conn.command="Show Building Connections";
+			Globals.CONNECTIONS = false;
 		}
 	}
 }

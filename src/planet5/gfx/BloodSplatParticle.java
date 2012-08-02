@@ -3,6 +3,8 @@ package planet5.gfx;
 import java.awt.Color;
 import java.util.Random;
 
+import planet5.game.Game;
+import planet5.game.GameRenderer;
 import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -22,6 +24,13 @@ public class BloodSplatParticle extends Particle {
 	
 	@Override
 	public void draw(PApplet p) {
+		int top = (int) loc.y - GameRenderer.mapY;
+		int left = (int) loc.x - GameRenderer.mapX;
+		int bottom = top + SpriteMaster.instance(p).blood_splat.height;
+		int right = left + SpriteMaster.instance(p).blood_splat.width;
+		if (top > p.height || left > p.width || bottom < Game.BAR_HEIGHT || right < 0)
+			return;
+		
 		p.pushStyle();
 		p.pushMatrix();
 		

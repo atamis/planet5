@@ -3,6 +3,8 @@ package planet5.gfx;
 import java.awt.Color;
 
 import planet5.config.Globals;
+import planet5.game.Game;
+import planet5.game.GameRenderer;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -34,6 +36,14 @@ public class Particle {
 	}
 	
 	public void draw(PApplet p) {
+		int top = (int) loc.y - GameRenderer.mapY;
+		int left = (int) loc.x - GameRenderer.mapX;
+		int bottom = top + size;
+		int right = left + size;
+		if (top > p.height || left > p.width || bottom < Game.BAR_HEIGHT || right < 0) {
+			return;
+		}
+		
 		p.pushStyle();
 		p.noStroke();
 		p.fill(color.getRed(), color.getBlue(), color.getGreen(), color.getAlpha());

@@ -15,6 +15,7 @@ import planet5.loaders.SpriteMaster;
 public final class GameRenderer {
 	private static Applet p;
 	private static Game game;
+	public static int mapX, mapY;
 	
 	private static final int BAR_HEIGHT = Game.BAR_HEIGHT;
 	private static final int TILE_SIZE = Game.TILE_SIZE;
@@ -28,6 +29,8 @@ public final class GameRenderer {
 
 	public static void draw(Game game) {
 		GameRenderer.game = game;
+		mapX = game.mapX;
+		mapY = game.mapY;
 		
 		if (game.help) {
 			drawHelp();
@@ -39,14 +42,16 @@ public final class GameRenderer {
 		}
 		
 		if (game.win != 0 && game.lose != 0) {
+			//*
 			p.translate(0, BAR_HEIGHT);
 			
 			p.translate(-game.mapX, -game.mapY);
 			drawTiles();
 			p.translate(game.mapX, game.mapY);
-			for (Building building : game.buildings) {
-				building.drawConnection(p, game.mapX, game.mapY, game.ps);
-			}
+			if (Globals.CONNECTIONS)
+				for (Building building : game.buildings) {
+					building.drawConnection(p, game.mapX, game.mapY, game.ps);
+				}
 			drawBuildings();
 			p.translate(-game.mapX, -game.mapY);
 			game.hero.draw();
@@ -54,7 +59,8 @@ public final class GameRenderer {
 			drawEnemies();
 			drawProjectiles();
 			p.translate(-game.mapX, -game.mapY);
-			game.ps.draw(p);
+			if(Globals.PARTICLES)
+				game.ps.draw(p);
 			p.translate(game.mapX, game.mapY);
 			p.translate(-game.mapX, -game.mapY);
 			drawBuildingPlaceover();
@@ -62,6 +68,7 @@ public final class GameRenderer {
 			//drawLoseWin();
 			
 			p.translate(0, -BAR_HEIGHT);
+			//*/
 		}
 		
 		int alpha = 0;

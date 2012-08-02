@@ -22,7 +22,7 @@ import planet5.loaders.SoundMaster;
 public class Game {
 	// graphical constants
 	static final int TILE_SIZE = 32;
-	static final int BAR_HEIGHT = 45;
+	public static final int BAR_HEIGHT = 45;
 
 	// time constants
 	// 10 mintues for 25 hours
