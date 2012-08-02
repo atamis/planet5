@@ -7,16 +7,19 @@ import planet5.config.Globals;
 import planet5.framework.Applet;
 import planet5.framework.Frame;
 import planet5.loaders.Fonts;
+import planet5.loaders.SoundMaster;
 
 public class SettingsFrame extends Frame {
-	MenuButton debug=new MenuButton(new Rectangle(262, 289, 500, 63), "Show Debug", Fonts.consolas32, true);
-	MenuButton part=new MenuButton(new Rectangle(262, 353, 500, 63), "Hide Particles", Fonts.consolas32, true);
-	MenuButton conn=new MenuButton(new Rectangle(262, 414, 500, 63), "Hide Building Connections", Fonts.consolas32, true);
+	MenuButton mute=new MenuButton(new Rectangle(262, 250, 500, 63), "Mute Sounds", Fonts.consolas32, true);
+	MenuButton debug=new MenuButton(new Rectangle(262, 250+64, 500, 63), "Show Debug", Fonts.consolas32, true);
+	MenuButton part=new MenuButton(new Rectangle(262, 250+128, 500, 63), "Hide Particles", Fonts.consolas32, true);
+	MenuButton conn=new MenuButton(new Rectangle(262, 250+192, 500, 63), "Hide Building Connections", Fonts.consolas32, true);
 	public SettingsFrame(Applet parent) {
 		super(parent);
 		
 		// add back button
 		addButton(new MenuButton(new Rectangle(32, 32, 110, 63), "Back", Fonts.consolas32, true));
+		addButton(mute);
 		addButton(debug);
 		addButton(part);
 		addButton(conn);
@@ -46,6 +49,17 @@ public class SettingsFrame extends Frame {
 	}
 	
 	@Override
+	public void update() {
+		if (Globals.MUTE) {
+			mute.text="Unmute Sounds";
+			mute.command="Unmute Sounds";
+		} else {
+			mute.text="Mute Sounds";
+			mute.command="Mute Sounds";
+		}
+	}
+	
+	@Override
 	public void buttonPressed(String command) {
 		if (command.equals("Show Debug")) {
 			debug.text="Hide Debug";
@@ -71,6 +85,16 @@ public class SettingsFrame extends Frame {
 			conn.text="Show Building Connections";
 			conn.command="Show Building Connections";
 			Globals.CONNECTIONS = false;
+		} else if (command.equals("Mute Sounds")) {
+			mute.text="Unmute Sounds";
+			mute.command="Unmute Sounds";
+			Globals.MUTE = true;
+			SoundMaster.mute();
+		} else if (command.equals("Unmute Sounds")) {
+			mute.text="Mute Sounds";
+			mute.command="Mute Sounds";
+			Globals.MUTE = false;
+			SoundMaster.unmute();
 		}
 	}
 }

@@ -16,4 +16,18 @@ public class SoundMaster {
 		mortar_explosion = m.loadSample("mortar_fire.wav");
 		laser_fire = m.loadSample("laser_fire.wav");
 	}
+	
+	public static void mute() {
+		theme_song.mute();
+		mortar_fire.mute();
+		mortar_explosion.mute();
+		laser_fire.mute();
+	}
+	
+	public static void unmute() {
+		theme_song.unmute();
+		mortar_fire.unmute();
+		mortar_explosion.unmute();
+		laser_fire.unmute();
+	}
 }

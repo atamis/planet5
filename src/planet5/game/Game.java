@@ -177,6 +177,12 @@ public class Game {
 		speedButtons[3].selected = true;
 		recalculateField();
 		
+		if (Globals.MUTE) {
+			muteButton.text="Unmute";
+		} else {
+			muteButton.text="Mute";
+		}
+		
 		// game time
 		placingBuilding = -1;
 		noEnemies = true;
@@ -1189,10 +1195,12 @@ public class Game {
 			listener.quit();
 		} else if (command.equals("Mute")) {
 			muteButton.text="Unmute";
-			SoundMaster.theme_song.mute();
+			SoundMaster.mute();
+			Globals.MUTE = true;
 		} else if (command.equals("Unmute")) {
 			muteButton.text="Mute";
-			SoundMaster.theme_song.unmute();
+			Globals.MUTE = false;
+			SoundMaster.unmute();
 		} else if (command.equals("Help")) {
 			if (win <= 0 && lose <= 0) {
 				help = !help;

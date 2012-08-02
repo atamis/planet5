@@ -65,6 +65,7 @@ public class MenuFrame extends Frame {
 			p.transitionFrame(Main.survivalFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("Settings")) {
+			Main.settingsFrame.update();
 			p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("About")) {

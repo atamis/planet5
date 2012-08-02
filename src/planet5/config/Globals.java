@@ -6,6 +6,7 @@ public final class Globals {
 	public static boolean DEBUG = false;
 	public static boolean PARTICLES = true;
 	public static boolean CONNECTIONS = true;
+	public static boolean MUTE = false;
 	public static final boolean DRAW_HP = false;
 	public static final float FRICTION = 0.99f;
 }
