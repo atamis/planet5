@@ -10,11 +10,11 @@ import planet5.loaders.Fonts;
 
 public class LevelSelectFrame extends Frame {
 	MenuButton[] buttons = new MenuButton[5];
-	String[] texts = { "Level 1     40x40   Difficulty: Easy  ",
-			"Level 2     80x80   Difficulty: Easy  ",
-			"Level 3    120x120  Difficulty: Medium",
-			"Level 4    160x160  Difficulty: Hard  ",
-			"Level 5    200x200  Difficulty: Hard  " };
+	String[] texts = { "Level 1 40x40 (Easy)    ",
+			"Level 2: 80x80 (Easy)    ",
+			"Level 3: 120x120 (Medium)",
+			"Level 4: 160x160 (Hard)  ",
+			"Level 5: 200x200 (Hard)  " };
 	public LevelSelectFrame(Applet parent) {
 		super(parent);
 

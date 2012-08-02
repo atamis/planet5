@@ -1197,7 +1197,7 @@ public class Game {
 			unselectButtons();
 			pauseButton.selected = true;
 			paused = true;
-			gameSpeedMultiplier = 0;
+			//gameSpeedMultiplier = 0;
 		} else if (command.equals("1x")) {
 			unselectButtons();
 			gameSpeedMultiplier = 1;
