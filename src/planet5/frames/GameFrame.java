@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import planet5.Main;
 import planet5.config.BuildingStats;
-import planet5.config.Fonts;
 import planet5.config.Globals;
 import planet5.framework.Applet;
 import planet5.framework.Button;
@@ -19,6 +18,7 @@ import planet5.game.GameListener;
 import planet5.game.GameRenderer;
 import planet5.game.gen.CaveGenerator;
 import planet5.game.gen.VoronoiPerlinNoiseGenerator;
+import planet5.loaders.Fonts;
 
 public class GameFrame extends Frame implements GameListener {
 	Game game;

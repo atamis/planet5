@@ -3,8 +3,8 @@ package planet5.game;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 
-import planet5.config.SpriteMaster;
 import planet5.framework.Applet;
+import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PVector;
 

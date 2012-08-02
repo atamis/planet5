@@ -5,7 +5,8 @@ import java.awt.Rectangle;
 import java.util.Iterator;
 
 import planet5.config.BuildingStats;
-import planet5.config.SpriteMaster;
+import planet5.loaders.SoundMaster;
+import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -31,6 +32,7 @@ public class Projectile {
 	private double rotation;
 	
 	public Projectile(Game map, PApplet p, int x, int y) {
+		SoundMaster.mortar_fire.trigger();
 		this.bounds = new Rectangle(x - PROJECTILE_SIZE / 2, y - PROJECTILE_SIZE / 2, PROJECTILE_SIZE, PROJECTILE_SIZE);
 		this.map = map;
 		this.p = p;
@@ -79,6 +81,8 @@ public class Projectile {
 								if (e.center.distanceSq(endpt) < EXPLOSION_RADIUS_SQ) {
 									e.processFutureDamage(damage);
 									e.takeDamage(damage);
+									SoundMaster.mortar_explosion.trigger();
+
 									if (e.isDead()) {
 										//map.ps.bloodBang(e.center.x - map.mapX, e.center.y - map.mapY);
 										//iterator.remove();
@@ -132,6 +136,7 @@ public class Projectile {
 						if (e.center.distanceSq(center) < EXPLOSION_RADIUS_SQ) {
 							e.processFutureDamage(damage);
 							e.takeDamage(damage);
+							SoundMaster.mortar_explosion.trigger();
 							if (e.isDead()) {
 								//map.ps.bloodBang(e.center.x - map.mapX, e.center.y - map.mapY);
 								//iterator.remove();

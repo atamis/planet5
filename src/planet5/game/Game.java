@@ -8,19 +8,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import ddf.minim.AudioPlayer;
-import ddf.minim.Minim;
-
 import planet5.Main;
 import planet5.config.BuildingStats;
 import planet5.config.EnemyLevel;
 import planet5.config.EnemyStats;
-import planet5.config.Fonts;
 import planet5.config.Globals;
 import planet5.config.UpgradeStats;
 import planet5.framework.Applet;
 import planet5.game.gen.CaveGenerator;
 import planet5.gfx.ParticleSystem;
+import planet5.loaders.Fonts;
+import planet5.loaders.SoundMaster;
 import processing.core.PVector;
 
 public class Game {
@@ -469,6 +467,7 @@ public class Game {
 					building.target
 							.takeDamage((int) (elapsedMillis * BuildingStats
 									.getDamage(5)));
+					SoundMaster.laser_fire.trigger();
 					curEnergy -= elapsedMillis
 							* BuildingStats.getDraw(building.type);
 					if (building.target.isDead()) {
@@ -582,7 +581,15 @@ public class Game {
 				base.hp -= damage;
 				if (base.hp <= 0) {
 					base.hp = 0;
-					ps.explosion(base.col * TILE_SIZE + (BuildingStats.cols[base.type] * TILE_SIZE)/2, base.row * TILE_SIZE + (BuildingStats.rows[base.type] * TILE_SIZE)/2);
+					ps.explosion(
+							base.col
+									* TILE_SIZE
+									+ (BuildingStats.cols[base.type] * TILE_SIZE)
+									/ 2,
+							base.row
+									* TILE_SIZE
+									+ (BuildingStats.rows[base.type] * TILE_SIZE)
+									/ 2);
 				}
 				// TODO: static screen
 			}
@@ -1103,10 +1110,10 @@ public class Game {
 			listener.quit();
 		} else if (command.equals("Mute")) {
 			helpButton.text="Unmute";
-			Main.song.mute();
+			SoundMaster.theme_song.mute();
 		} else if (command.equals("Unmute")) {
 			helpButton.text="Mute";
-			Main.song.unmute();
+			SoundMaster.theme_song.unmute();
 		}else if (command.equals("Play Again")) {
 			restartGame();
 		}else if (command.equals("Pause")) {

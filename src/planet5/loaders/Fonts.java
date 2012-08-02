@@ -1,4 +1,4 @@
-package planet5.config;
+package planet5.loaders;
 
 import processing.core.PApplet;
 import processing.core.PFont;

@@ -3,10 +3,10 @@ package planet5.frames;
 import java.awt.Rectangle;
 
 import planet5.Main;
-import planet5.config.Fonts;
 import planet5.framework.Applet;
 import planet5.framework.Button;
 import planet5.framework.Frame;
+import planet5.loaders.Fonts;
 
 public class LevelSelectFrame extends Frame {
 	MenuButton[] buttons = new MenuButton[5];

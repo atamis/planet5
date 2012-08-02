@@ -3,7 +3,7 @@ package planet5.gfx;
 import java.awt.Color;
 import java.util.Random;
 
-import planet5.config.SpriteMaster;
+import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
@@ -29,6 +29,7 @@ public class BloodSplatParticle extends Particle {
 		
 		p.translate(loc.x, loc.y);
 		p.rotate(rad);
+		p.imageMode(p.CENTER);
 		p.image(SpriteMaster.instance(p).blood_splat, 0, 0);
 		
 		p.popMatrix();

@@ -5,8 +5,8 @@ import java.awt.Rectangle;
 
 import planet5.config.EnemyStats;
 import planet5.config.Globals;
-import planet5.config.SpriteMaster;
 import planet5.frames.GameFrame;
+import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PVector;
 

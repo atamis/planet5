@@ -3,7 +3,7 @@ package planet5.game;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
-import planet5.config.Fonts;
+import planet5.loaders.Fonts;
 import processing.core.PApplet;
 
 public class RadioButton {

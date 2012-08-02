@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import planet5.config.BuildingStats;
-import planet5.config.Fonts;
 import planet5.config.Globals;
-import planet5.config.SpriteMaster;
 import planet5.config.UpgradeStats;
 import planet5.config.Upgrades;
+import planet5.loaders.Fonts;
+import planet5.loaders.SpriteMaster;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;

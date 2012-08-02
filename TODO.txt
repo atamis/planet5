@@ -38,3 +38,5 @@ Make enemies draw sprites, make them rotate.
 Mute button
 
 [done] Make main building remove walls.
+
+Make blood bangs appear in the correct place.

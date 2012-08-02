@@ -1,5 +1,7 @@
-package planet5.config;
+package planet5.loaders;
 
+import planet5.config.BuildingStats;
+import planet5.config.Globals;
 import processing.core.PApplet;
 import processing.core.PImage;
 
