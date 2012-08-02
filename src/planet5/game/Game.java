@@ -474,7 +474,7 @@ public class Game {
 				if (building.type == 5) {
 					range = 32 * 4;
 				} else if (building.type == 6) {
-					if (gameMillis - building.lastFireTime < 25) {
+					if (gameMillis - building.lastFireTime < BuildingStats.mortar_reload_time) {
 						continue;
 					}
 					range = 32 * 8;
@@ -500,7 +500,7 @@ public class Game {
 					if (building.target.isDead()) {
 						//ps.bloodBang(building.target.bounds.x, building.target.bounds.y);
 					}
-				} else if (building.type == 6) {
+				} else if (building.type == 6 && gameMillis - building.lastFireTime >= BuildingStats.mortar_reload_time) {
 					Projectile pr = new Projectile(this, p, building.col
 							* TILE_SIZE + TILE_SIZE, building.row * TILE_SIZE
 							+ TILE_SIZE);
@@ -512,6 +512,7 @@ public class Game {
 							+ (BuildingStats.cols[6] * TILE_SIZE) / 2, building.row
 							* TILE_SIZE + (BuildingStats.rows[6] * TILE_SIZE) / 2);
 					curEnergy -= BuildingStats.getDraw(building.type);
+					building.lastFireTime = gameMillis;
 					// building.target = null;
 				}
 

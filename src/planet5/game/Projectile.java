@@ -84,7 +84,6 @@ public class Projectile {
 								if (e.center.distanceSq(endpt) < EXPLOSION_RADIUS_SQ) {
 									e.processFutureDamage(damage);
 									e.takeDamage(damage);
-									SoundMaster.mortar_explosion.trigger();
 
 									if (e.isDead()) {
 										//map.ps.bloodBang(e.center.x - map.mapX, e.center.y - map.mapY);

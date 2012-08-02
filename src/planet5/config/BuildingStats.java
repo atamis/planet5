@@ -135,5 +135,6 @@ public class BuildingStats {
 	static float mortar_draw = 4;
 	static float mortar_fire_cost = 20;
 	static float mortar_damage = 100;
+	public static int mortar_reload_time = 1000;
 
 }
