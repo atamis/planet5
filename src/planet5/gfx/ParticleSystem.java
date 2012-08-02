@@ -96,7 +96,7 @@ public class ParticleSystem {
 
 	public void projectileTrail(float x, float y) {
 		particles.add(new Particle(new PVector(x, y), new PVector(0, 0), 1000,
-				new Color(0x5f, 0x5f, 0x5f, 0xb5), 15));
+				new Color(0x5f, 0x5f, 0x5f, 0x90), 15));
 
 	}
 

@@ -126,6 +126,11 @@ public class Projectile {
 		// explode if target is close enough
 		int damage = (int) BuildingStats.getDamage(6);
 		if (target.center.distanceSq(center) < DETONATE_RADIUS_SQ) {
+			
+			SoundMaster.mortar_explosion.trigger();
+			map.ps.explosion(target.bounds.x, target.bounds.y);
+
+			
 			int loopTop = Math.max(0, (target.center.y - EXPLOSION_RADIUS) / TILE_SIZE);
 			int loopLeft = Math.max(0, (target.center.x - EXPLOSION_RADIUS) / TILE_SIZE);
 			int loopBottom = Math.min((target.center.y + EXPLOSION_RADIUS + TILE_SIZE - 1) / TILE_SIZE, map.tileHeight - 1);
@@ -139,8 +144,6 @@ public class Projectile {
 						if (e.center.distanceSq(center) < EXPLOSION_RADIUS_SQ) {
 							e.processFutureDamage(damage);
 							e.takeDamage(damage);
-							SoundMaster.mortar_explosion.trigger();
-							map.ps.explosion(e.center.x, e.center.y);
 							if (e.isDead()) {
 								//map.ps.bloodBang(e.center.x - map.mapX, e.center.y - map.mapY);
 								//iterator.remove();
