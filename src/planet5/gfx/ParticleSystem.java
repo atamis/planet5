@@ -27,10 +27,10 @@ public class ParticleSystem {
 		}
 	}
 
-	public void draw(PApplet p) {
+	public void draw(PApplet p, boolean above) {
 		for (Iterator<Particle> i = particles.iterator(); i.hasNext();) {
 			Particle particle = i.next();
-			particle.draw(p);
+			particle.draw(p, above);
 		}
 	}
 
@@ -45,7 +45,7 @@ public class ParticleSystem {
 			tmp.mult((float) (r.nextFloat() * 0.5));
 
 			particles.add(new Particle(new PVector(x, y), tmp, 500,
-					new Color(0), 2));
+					new Color(0), 2, true));
 
 			rad += PConstants.TWO_PI / parts;
 		}
@@ -81,7 +81,7 @@ public class ParticleSystem {
 					(float) Math.sin(rad));
 			tmp.mult((float) (0.2f + r.nextFloat() * 0.3));
 			particles.add(new Particle(new PVector(x, y), tmp, 500, new Color(
-					0xc80000), 4));
+					0xc80000), 4, true));
 
 		}
 
@@ -91,12 +91,12 @@ public class ParticleSystem {
 		Random r = new Random();
 		particles.add(new Particle(new PVector(x, y), new PVector(
 				r.nextFloat() - 0.5f, r.nextFloat() - 0.5f), 1000, new Color(
-				0xff0000), 5));
+				0xff0000), 5, true));
 	}
 
 	public void projectileTrail(float x, float y) {
 		particles.add(new Particle(new PVector(x, y), new PVector(0, 0), 1000,
-				new Color(0x5f, 0x5f, 0x5f, 0x90), 15));
+				new Color(0x5f, 0x5f, 0x5f, 0x90), 15, true));
 
 	}
 
@@ -111,7 +111,7 @@ public class ParticleSystem {
 			tmp.normalize();
 			tmp.mult(0.05f + r.nextFloat() * 0.2f);
 			particles.add(new Particle(new PVector(x, y), tmp, 400, new Color(
-					0xc8, 0xc8, 0xc8, 0x40), 25));
+					0xc8, 0xc8, 0xc8, 0x40), 25, true));
 		}
 
 	}
@@ -141,7 +141,7 @@ public class ParticleSystem {
 
 				particles.add(new Particle(new PVector(Applet.lerp(x1, x2,
 						lerp_x), Applet.lerp(y1, y2, lerp_x)), tmp, 300,
-						new Color(0xff, 0, 0, 0x90), 3));
+						new Color(0xff, 0, 0, 0x90), 3, false));
 			}
 		}
 	}

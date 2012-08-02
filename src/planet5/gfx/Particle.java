@@ -9,7 +9,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 public class Particle {
-	public Particle(PVector loc, PVector vec, int time_left, Color color, int size) {
+	public Particle(PVector loc, PVector vec, int time_left, Color color, int size, boolean above) {
 		this.loc = loc;
 		this.vec = vec;
 		this.time_left = time_left;
@@ -21,6 +21,7 @@ public class Particle {
 	public int time_left;
 	private Color color;
 	private int size;
+	private boolean above;
 	
 	public boolean dead() {
 		return time_left < 0;
@@ -35,7 +36,10 @@ public class Particle {
 		time_left -= millis;
 	}
 	
-	public void draw(PApplet p) {
+	public void draw(PApplet p, boolean a) {
+		if (above != a)
+			return;
+		
 		int top = (int) loc.y - GameRenderer.mapY;
 		int left = (int) loc.x - GameRenderer.mapX;
 		int bottom = top + size;

@@ -27,7 +27,7 @@ public class ParticleTestFrame extends Frame {
 	@Override
 	protected void draw() {
 		p.background(100);
-		ps.draw(p);
+		ps.draw(p, true);
 	}
 
 	@Override

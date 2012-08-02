@@ -16,14 +16,17 @@ public class BloodSplatParticle extends Particle {
 	private Color c;
 
 	public BloodSplatParticle(PVector loc) {
-		super(loc, new PVector(0, 0), max_age, new Color(0xffffff), 0);
+		super(loc, new PVector(0, 0), max_age, new Color(0xffffff), 0, false);
 		Random r = new Random();
 		rad = r.nextFloat() * PConstants.TWO_PI;
 		c = new Color(r.nextInt(150) + 100, 0, 0, 0);
 	}
 	
 	@Override
-	public void draw(PApplet p) {
+	public void draw(PApplet p, boolean above) {
+		if (above == true)
+			return;
+		
 		int top = (int) loc.y - GameRenderer.mapY;
 		int left = (int) loc.x - GameRenderer.mapX;
 		int bottom = top + SpriteMaster.instance(p).blood_splat.height;

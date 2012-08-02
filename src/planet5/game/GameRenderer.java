@@ -48,20 +48,31 @@ public final class GameRenderer {
 			p.translate(-game.mapX, -game.mapY);
 			drawTiles();
 			p.translate(game.mapX, game.mapY);
+
+			p.translate(-game.mapX, -game.mapY);
+			if(Globals.PARTICLES)
+				game.ps.draw(p, false);
+			p.translate(game.mapX, game.mapY);
+			
 			if (Globals.CONNECTIONS)
 				for (Building building : game.buildings) {
 					building.drawConnection(p, game.mapX, game.mapY, game.ps);
 				}
 			drawBuildings();
+			
 			p.translate(-game.mapX, -game.mapY);
 			game.hero.draw();
 			p.translate(game.mapX, game.mapY);
+			
 			drawEnemies();
-			drawProjectiles();
+			
 			p.translate(-game.mapX, -game.mapY);
 			if(Globals.PARTICLES)
-				game.ps.draw(p);
+				game.ps.draw(p, true);
 			p.translate(game.mapX, game.mapY);
+
+			drawProjectiles();
+			
 			p.translate(-game.mapX, -game.mapY);
 			drawBuildingPlaceover();
 			p.translate(game.mapX, game.mapY);
