@@ -3,6 +3,7 @@ package planet5;
 import ddf.minim.Minim;
 import planet5.frames.AboutFrame;
 import planet5.frames.CampaignFrame;
+import planet5.frames.InstructionsFrame;
 import planet5.frames.LevelSelectFrame;
 import planet5.frames.MenuFrame;
 import planet5.frames.SettingsFrame;
@@ -22,6 +23,7 @@ public class Main extends Applet {
 	public static MenuFrame menuFrame;
 	public static CampaignFrame campaignFrame;
 	public static SettingsFrame settingsFrame;
+	public static InstructionsFrame instructionsFrame;
 	public static AboutFrame aboutFrame;
 	public static FullFadeTransition fullFadeTransition;
 	public static LevelSelectFrame levelSelectFrame;
@@ -46,6 +48,7 @@ public class Main extends Applet {
 		// load frames and transitions
 		menuFrame = new MenuFrame(this);
 		settingsFrame = new SettingsFrame(this);
+		instructionsFrame = new InstructionsFrame(this);
 		aboutFrame = new AboutFrame(this);
 		fullFadeTransition = new FullFadeTransition(this);
 		levelSelectFrame = new LevelSelectFrame(this);

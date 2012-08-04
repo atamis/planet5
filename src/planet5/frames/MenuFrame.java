@@ -10,7 +10,7 @@ import planet5.loaders.SpriteMaster;
 
 public class MenuFrame extends Frame {
 	// menu buttons
-	private final String[] buttonTexts = { "Play Campaign", "Play Survival", "Settings", "About" };
+	private final String[] buttonTexts = { "Play Campaign", "Play Survival", "Settings", "Instructions", "About" };
 	private final int menuX = 64, menuY = 350;
 	private final int buttonHeightOffset = 50;
 	private final int buttonWidth = 300, buttonHeight = buttonHeightOffset - 1;
@@ -67,6 +67,10 @@ public class MenuFrame extends Frame {
 		else if (command.equals("Settings")) {
 			Main.settingsFrame.update();
 			p.transitionFrame(Main.settingsFrame, Main.fullFadeTransition);
+		}
+		else if (command.equals("Instructions")) {
+			Main.instructionsFrame.update();
+			p.transitionFrame(Main.instructionsFrame, Main.fullFadeTransition);
 		}
 		else if (command.equals("About")) {
 			p.transitionFrame(Main.aboutFrame, Main.fullFadeTransition);
