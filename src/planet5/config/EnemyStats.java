@@ -10,6 +10,7 @@ public final class EnemyStats {
 	 */
 	// HP. Damage until it dies.
 	private static int[] hp = {30, 60, 20};
+	//private static int[] hp = {30*16, 60*16, 20*16};
 	// Damage per second
 	private static int[] damage = {3, 6, 4};
 	// Speed per second.

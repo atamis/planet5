@@ -369,6 +369,8 @@ public class Game {
 
 		if (win!=-1 || lose!=-1) {
 			i2+=elapsedMillis/gameSpeedMultiplier;
+			if(i2<0)
+				i2=0;
 			while(i2>=0){
 				i2-=16;
 				if (win > 0)
@@ -408,7 +410,7 @@ public class Game {
 				//	speedButtons[i].enabled = false;
 				unselectButtons();
 				gameSpeedMultiplier = 1;
-				speedButtons[4].selected = true;
+				speedButtons[3].selected = true;
 				noEnemies = false;
 			} else if (enemies.size() == 0) {
 				noEnemies = true;
@@ -553,6 +555,7 @@ public class Game {
 		// double chance = elapsedMillis * enemySpawnChances[hour] * 0.01;
 
 		int trials = (int) (elapsedMillis * EnemyStats.getSpawn() * 2);
+		//int trials = (int) (elapsedMillis * EnemyStats.getSpawn() / 4);
 		// int trials = 10;
 		//maxEnemyCount=10000;trials=10000-enemies.size();
 		for (int i = 0; i < trials && enemies.size() < maxEnemyCount; i++) {

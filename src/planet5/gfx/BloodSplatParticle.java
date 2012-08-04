@@ -31,7 +31,7 @@ public class BloodSplatParticle extends Particle {
 		int left = (int) loc.x - GameRenderer.mapX;
 		int bottom = top + SpriteMaster.instance(p).blood_splat.height;
 		int right = left + SpriteMaster.instance(p).blood_splat.width;
-		if (top > p.height || left > p.width || bottom < Game.BAR_HEIGHT || right < 0)
+		if (top > p.height - Game.BAR_HEIGHT || left > p.width || bottom < 0 || right < 0)
 			return;
 		
 		p.pushStyle();
